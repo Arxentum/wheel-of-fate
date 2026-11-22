@@ -38,7 +38,7 @@ export const MINOR_HANDLERS: Partial<Record<FaceKey, Handler>> = {
   },
   'swords.reversed': (ctx, a, c) => {
     for (const t of targets(ctx, a, c, 'swords.reversed')) {
-      if (hit(ctx, t, 'swords.reversed')) moveBy(ctx, t, -params(ctx, 'swords.reversed').back!, 'card');
+      if (hit(ctx, t, 'swords.reversed')) moveBy(ctx, t, -params(ctx, 'swords.reversed').back!, 'push');
     }
   },
 

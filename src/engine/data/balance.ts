@@ -7,7 +7,7 @@ function defaultCardParams(): Record<FaceKey, Record<string, number>> {
   return out;
 }
 
-/** The rules and numbers of rulebook v4 (v3 + the M1 balance changes, decision D-58). */
+/** The rules and numbers of rules v5 (v3 + the M1 balance changes D-58, shield refund D-59, character reversed redesign D-60). */
 export function defaultBalance(): BalanceConfig {
   return {
     startFp: 3,
@@ -32,6 +32,11 @@ export function defaultBalance(): BalanceConfig {
     chainFpLoss: 2,
     illusionBack: 3,
     shieldRefund: 1,
+    majorReversedV5: true,
+    leaderBonus: 1,
+    trapOnPass: true,
+    trapBounty: 1,
+    trapReach: 3,
     startProgressBySeat: [],
     startFpBySeat: [],
     finishSafe: false,

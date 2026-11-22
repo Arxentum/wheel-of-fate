@@ -10,7 +10,7 @@ import { signOf } from '../data/board';
 import { FACES, ONCE_PER_GAME, ORIENTATIONS, cardDef, faceKey, isCourt, isSuit } from '../data/cards';
 import { canSpend } from '../rules/fp';
 import { hasShield } from '../rules/status';
-import { trapAt } from '../rules/trap';
+import { trapAt, trapSignAllowed } from '../rules/trap';
 import type { Action, CardUid, FaceKey, GameState, Orientation, PlayerId, PlayerState, Suit } from '../types';
 import { W, perspective, score, type AiWeights, type Perspective } from './evaluate';
 
@@ -162,10 +162,13 @@ function best(s: GameState, me: PlayerId, actions: readonly Action[], w: AiWeigh
 function trapSign(s: GameState, me: PlayerId): number {
   const leader = leadingOther(s, me);
   const at = player(s, leader).progress;
-  for (const d of [2, 3, 1, 4, 5, 6, 7, 8, 9, 10, 11, 0]) {
+  // v5 traps spring on pass-through: right in front of the leader is best.
+  const order = s.config.balance.trapOnPass ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0] : [2, 3, 1, 4, 5, 6, 7, 8, 9, 10, 11, 0];
+  for (const d of order) {
     const sign = signOf(at + d);
-    if (!trapAt(s, sign)) return sign;
+    if (!trapAt(s, sign) && trapSignAllowed(s, me, sign)) return sign;
   }
+  for (let sign = 0; sign < 12; sign++) if (!trapAt(s, sign) && trapSignAllowed(s, me, sign)) return sign;
   return signOf(at + 2);
 }
 
@@ -221,6 +224,7 @@ function decideFlip(s: GameState, me: PlayerId, w: AiWeights): Action {
 }
 
 function threatAt(s: GameState, p: PlayerState, progress: number): boolean {
+  if (s.config.balance.trapOnPass) return false; // passing springs it anyway
   const trap = trapAt(s, signOf(progress));
   return !!trap && trap.owner !== p.id && p.trapImmuneTurn !== p.turnNo;
 }

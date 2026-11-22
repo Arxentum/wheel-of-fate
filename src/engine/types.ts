@@ -33,7 +33,8 @@ export type Targeting =
   | 'discardAny'  // any cards from your hand
   | 'discardUpTo' // up to params.max cards from your hand
   | 'others'      // all other players, nothing to choose
-  | 'ahead';      // every player ahead of you (balance.reversedAhead), nothing to choose
+  | 'ahead'       // every player ahead of you (balance.reversedAhead), nothing to choose
+  | 'aheadOne';   // one player ahead of you (rules v5 character reversed faces)
 
 export interface FaceDef {
   targeting: Targeting;
@@ -50,6 +51,8 @@ export interface Status {
   /** Last own turn it applies to. Wrong Turn uses Infinity until consumed. */
   until: number;
   source: FaceKey | 'trap';
+  /** Wrong Turn: how many spaces back the next Move step goes (rules v5, leader bonus). */
+  amount?: number;
 }
 
 export interface Trap {
@@ -178,6 +181,16 @@ export interface BalanceConfig {
   illusionBack: number;
   /** FP returned when a shield runs out without having blocked anything (decision D-59). */
   shieldRefund: number;
+  /** Rules v5 character reversed faces: one player ahead of you, positional effects (D-60). */
+  majorReversedV5: boolean;
+  /** Added to the main number of a v5 reversed face (and a trap) when it hits the leading player. */
+  leaderBonus: number;
+  /** Traps spring when another player passes over them during their own movement (D-60). */
+  trapOnPass: boolean;
+  /** FP the owner gains when their trap springs. */
+  trapBounty: number;
+  /** A trap must go 1..N signs in front of a player ahead of you (0 = any free sign). */
+  trapReach: number;
   /** Extra starting progress by position in the turn order (seat 1 first). Empty = none. */
   startProgressBySeat: number[];
   /** Extra starting FP by position in the turn order. Empty = none. */
@@ -240,10 +253,11 @@ export interface GameState {
   result: GameResult | null;
 }
 
-export type MoveCause = 'move' | 'card' | 'wrongTurn' | 'trap' | 'swap';
+/** 'move', 'wrongTurn', 'card': the player's own movement (springs traps on the way in v5); 'push', 'trap', 'swap': moved by someone else. */
+export type MoveCause = 'move' | 'card' | 'wrongTurn' | 'push' | 'trap' | 'swap';
 export type FpReason =
   | 'resonance' | 'element' | 'lap' | 'meditate' | 'card' | 'steal' | 'trap'
-  | 'reroll' | 'boost' | 'flip' | 'skill' | 'reckoning' | 'shieldRefund';
+  | 'reroll' | 'boost' | 'flip' | 'skill' | 'reckoning' | 'shieldRefund' | 'trapBounty';
 export type CardsReason = 'random' | 'chosen' | 'limit' | 'whole' | 'combo' | 'played';
 
 export type GameEvent =

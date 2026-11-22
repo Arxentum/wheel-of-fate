@@ -1,6 +1,6 @@
 // Builds docs/balance-report.md (in Chinese, as the project's documents are).
 import { COURTS, MAJORS, SUITS, RULEBOOK_AI_WEIGHTS, AI_WEIGHTS, type BalancePatch, type FateCardId, type MajorId } from '../engine';
-import { RULEBOOK_V3 } from './rulebookV3';
+import { RULEBOOK_V3 } from './rulebooks';
 import { runMany } from './runGame';
 import { Stats } from './stats';
 import { tournament } from './tournament';

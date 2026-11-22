@@ -31,6 +31,7 @@ function put(ctx: Ctx, id: PlayerId, st: Status): void {
     old.from = Math.min(old.from, st.from);
     old.until = Math.max(old.until, st.until);
     old.source = st.source;
+    if (st.amount !== undefined) old.amount = Math.max(old.amount ?? 0, st.amount);
   } else {
     p.statuses.push(st);
   }
@@ -43,13 +44,13 @@ function put(ctx: Ctx, id: PlayerId, st: Status): void {
  * own turns, also when given during the target's own turn.
  */
 export function addStatus(
-  ctx: Ctx, id: PlayerId, kind: StatusKind, turns: number, source: FaceKey | 'trap',
+  ctx: Ctx, id: PlayerId, kind: StatusKind, turns: number, source: FaceKey | 'trap', amount?: number,
 ): void {
   if (turns <= 0 || kind === 'shielded') return;
   const p = player(ctx.s, id);
   const from = p.turnNo + 1;
   const until = kind === 'wrongTurn' ? FOREVER : from + turns - 1;
-  put(ctx, id, { kind, from, until, source });
+  put(ctx, id, { kind, from, until, source, ...(amount !== undefined ? { amount } : {}) });
 }
 
 /** Decision D-18: a shield holds from now to the end of your next turn; gaining again refreshes it. */

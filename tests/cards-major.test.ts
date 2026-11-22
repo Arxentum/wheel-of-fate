@@ -1,8 +1,9 @@
-// Rulebook v4 §9.3: both faces of the 22 characters (v4 = v3 + the M1 balance changes, D-58).
-// Single-target reversed faces hit every player ahead of you, so targets are placed ahead.
+// Upright faces of the 22 characters (identical in rules v4 and v5) and the v4 reversed faces.
+// These run under rules v4; tests/v5.test.ts covers the v5 reversed faces (D-60).
 import { describe, expect, it } from 'vitest';
 import { canReroll, checkAction, hasShield, statusOf, trapAt, type MajorId, type Orientation, type PlayerId } from '../src/engine';
 import { act, autoUntil, handDefs, ofType, scenario, skill, status, uid, type PSpec, type Spec } from './helpers';
+import { RULEBOOK_V4 } from '../src/sim/rulebooks';
 
 const P0 = 0, P1 = 1, P2 = 2;
 
@@ -11,6 +12,7 @@ function withMajor(major: MajorId, o: Orientation, p0: PSpec = {}, others: PSpec
   const fallback: MajorId[] = major === 'chariot' ? ['sun', 'empress'] : major === 'sun' ? ['chariot', 'empress'] : major === 'empress' ? ['chariot', 'sun'] : ['chariot', 'sun'];
   return scenario({
     ...extra,
+    balance: { ...RULEBOOK_V4, ...extra.balance, cards: { ...RULEBOOK_V4.cards, ...extra.balance?.cards } },
     players: [{ major, orientation: o, ...p0 }, ...others.map((p, i) => ({ major: fallback[i], ...p }))],
   });
 }
@@ -198,7 +200,7 @@ describe('6 The Lovers', () => {
     expect(ofType(ev, 'swapFailed')).toHaveLength(1);
   });
   it('reversed in a 2-player game: target back 2', () => {
-    const s = scenario({ players: [{ major: 'lovers', orientation: 'reversed' }, { major: 'sun', progress: 6 }] });
+    const s = scenario({ balance: RULEBOOK_V4, players: [{ major: 'lovers', orientation: 'reversed' }, { major: 'sun', progress: 6 }] });
     skill(s, { target: P1 });
     expect(s.players[P1]!.progress).toBe(4);
   });

@@ -82,6 +82,11 @@ export function leadersAmong(s: GameState, ids: readonly PlayerId[]): PlayerId[]
   return ids.filter((id) => player(s, id).progress === m);
 }
 
+/** v5 leader bonus for an effect on `id`: only when they lead, and never in a 2-player game (D-60). */
+export function leaderBonusOn(s: GameState, id: PlayerId): number {
+  return s.players.length >= 3 && isLeading(s, id) ? s.config.balance.leaderBonus : 0;
+}
+
 /** Decision D-27: players ahead of you by progress. */
 export function playersAhead(s: GameState, id: PlayerId): PlayerId[] {
   const me = player(s, id).progress;

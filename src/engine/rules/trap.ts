@@ -1,12 +1,22 @@
-import { bal, emit, player, type Ctx } from '../core/context';
+import { bal, emit, leaderBonusOn, player, playersAhead, type Ctx } from '../core/context';
 import { signOf } from '../data/board';
 import type { GameState, PlayerId, Trap, TrapKind } from '../types';
-import { loseFp } from './fp';
+import { gainFp, loseFp } from './fp';
 import { moveBy } from './move';
 import { addStatus, hasShield, isFinishSafe, removeStatus } from './status';
 
 export function trapAt(s: GameState, sign: number): Trap | undefined {
   return s.traps.find((t) => t.sign === sign);
+}
+
+/** v5 (D-60): a trap goes 1..trapReach signs in front of a player ahead of you (0 = anywhere). */
+export function trapSignAllowed(s: GameState, owner: PlayerId, sign: number): boolean {
+  const reach = s.config.balance.trapReach;
+  if (reach <= 0) return true;
+  return playersAhead(s, owner).some((o) => {
+    const d = (sign - signOf(player(s, o).progress) + 12) % 12;
+    return d >= 1 && d <= reach;
+  });
 }
 
 /** Rule §7 / decision D-23: one trap per sign; a 4th trap removes the oldest. */
@@ -24,31 +34,43 @@ export function placeTrap(ctx: Ctx, owner: PlayerId, kind: TrapKind, sign: numbe
 }
 
 /**
- * Called once at the end of a Move step (rule §7). Card pushes never call it.
- * Decision D-24: The Moon's immunity leaves the trap (and the shield) in place.
+ * Rules v3/v4 (balance.trapOnPass off): called once at the end of a Move step (rule §7).
+ * With trapOnPass on, moveTo springs traps on the way instead.
  */
 export function landOn(ctx: Ctx, id: PlayerId): void {
+  const trap = trapAt(ctx.s, signOf(player(ctx.s, id).progress));
+  if (trap && trap.owner !== id) springTrap(ctx, id, trap);
+}
+
+/**
+ * A trap springs on `id`. Returns true when it ends the current movement (an Illusion Trap).
+ * Decision D-24: The Moon's immunity leaves the trap (and the shield) in place.
+ * Decision D-60: the owner gains balance.trapBounty FP (also when a shield blocks it) and the
+ * effect is +balance.leaderBonus against the leading player.
+ */
+export function springTrap(ctx: Ctx, id: PlayerId, trap: Trap): boolean {
   const s = ctx.s;
   const p = player(s, id);
-  const trap = trapAt(s, signOf(p.progress));
-  if (!trap || trap.owner === id) return;
+  const b = bal(ctx);
   if (p.trapImmuneTurn === p.turnNo || isFinishSafe(s, p)) {
     emit(ctx, { t: 'trapIgnored', p: id, trap });
-    return;
+    return false;
   }
   s.traps = s.traps.filter((t) => t !== trap);
-  if (hasShield(p)) {
+  const blocked = hasShield(p);
+  if (blocked) {
     removeStatus(p, 'shielded');
     emit(ctx, { t: 'shieldBlock', p: id, source: 'trap' });
-    emit(ctx, { t: 'trapTrigger', p: id, trap, blocked: true });
-    return;
   }
-  emit(ctx, { t: 'trapTrigger', p: id, trap, blocked: false });
-  const b = bal(ctx);
+  emit(ctx, { t: 'trapTrigger', p: id, trap, blocked });
+  gainFp(ctx, trap.owner, b.trapBounty, 'trapBounty');
+  if (blocked) return false;
+  const lead = leaderBonusOn(s, id);
   if (trap.kind === 'chain') {
     addStatus(ctx, id, 'rooted', b.chainRootedTurns, 'trap');
-    loseFp(ctx, id, b.chainFpLoss, 'trap');
-  } else {
-    moveBy(ctx, id, -b.illusionBack, 'trap');
+    loseFp(ctx, id, b.chainFpLoss + lead, 'trap');
+    return false;
   }
+  moveBy(ctx, id, -(b.illusionBack + lead), 'trap');
+  return true;
 }

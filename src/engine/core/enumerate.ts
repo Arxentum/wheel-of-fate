@@ -4,7 +4,7 @@ import { ORIENTATIONS, cardDef, faceKey, isCourt, isSuit } from '../data/cards';
 import type { Action, CardUid, GameState, PlayerId, SkillChoice } from '../types';
 import { checkAction, checkSkillBase } from './check';
 import { faceTargeting } from './targeting';
-import { leadersAmong, othersOf, player } from './context';
+import { leadersAmong, othersOf, player, playersAhead } from './context';
 
 /** One card uid per distinct definition. */
 export function representatives(cards: readonly CardUid[], keep: (u: CardUid) => boolean = () => true): CardUid[] {
@@ -66,6 +66,8 @@ export function skillChoices(s: GameState, id: PlayerId): SkillChoice[] {
       return [{}];
     case 'other':
       return others.map((target) => ({ target }));
+    case 'aheadOne':
+      return playersAhead(s, id).map((target) => ({ target }));
     case 'twoOthers': {
       if (s.players.length === 2) return others.map((target) => ({ target }));
       const out: SkillChoice[] = [];

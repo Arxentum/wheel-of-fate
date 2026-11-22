@@ -1,0 +1,12 @@
+import { runMany } from 'D:/Tarot Game/web/src/sim/runGame.ts';
+import { Stats } from 'D:/Tarot Game/web/src/sim/stats.ts';
+import { MAJORS, type BalancePatch } from 'D:/Tarot Game/web/src/engine/index.ts';
+import { readFileSync } from 'node:fs';
+const G = Number(process.argv[2] ?? 10000);
+const N = Number(process.argv[3] ?? 3);
+const patch: BalancePatch = JSON.parse(readFileSync(process.argv[4]!, 'utf8'));
+const st = runMany({ players: N, laps: 3, balance: patch }, G, `pm-${N}`, new Stats());
+const pct = (x: number) => (x * 100).toFixed(1);
+console.log(`${N}p rounds ${st.meanRounds().toFixed(2)} | skill reversed ${pct(1 - st.share(st.orient.skill))}% | minor up ${pct(st.share(st.orient.minor))} court up ${pct(st.share(st.orient.court))} | traps/game ${(st.traps.triggered / st.games).toFixed(2)} | seats ${st.bySeat.slice(0, N).map((c) => pct(c.wins / c.games)).join('/')}`);
+const rows = MAJORS.map((m) => { const c = st.byMajor.get(m)!; const u = st.skillByMajor.get(m)!; return { m, d: c.wins / c.games - 1 / N, rev: 1 - st.share(u), uses: (u.upright + u.reversed) / st.majorGames.get(m)! }; }).sort((a, b) => b.d - a.d);
+console.log(rows.map((r) => `${r.m.padEnd(15)} ${(r.d >= 0 ? '+' : '') + pct(r.d)}  rev ${pct(r.rev)}%  uses ${r.uses.toFixed(1)}${Math.abs(r.d) > (N === 3 ? 0.05 : 0.08) ? '  <<' : ''}`).join('\n'));

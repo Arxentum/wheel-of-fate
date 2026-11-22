@@ -17,7 +17,7 @@ export const COURT_HANDLERS: Partial<Record<FaceKey, Handler>> = {
     for (const t of targetsFor(ctx.s, a, c, 'page.reversed')) {
       const P = params(ctx, 'page.reversed');
       if (!hit(ctx, t, 'page.reversed')) continue;
-      moveBy(ctx, t, -P.back!, 'card');
+      moveBy(ctx, t, -P.back!, 'push');
       discardRandom(ctx, t, P.discard!);
       addStatus(ctx, t, 'silenced', P.silencedTurns!, 'page.reversed');
     }
@@ -27,7 +27,7 @@ export const COURT_HANDLERS: Partial<Record<FaceKey, Handler>> = {
   'knight.reversed': (ctx, a, c) => {
     for (const t of targetsFor(ctx.s, a, c, 'knight.reversed')) {
       if (!hit(ctx, t, 'knight.reversed')) continue;
-      moveBackTo(ctx, t, 'earth');
+      moveBackTo(ctx, t, 'earth', 'push');
       addStatus(ctx, t, 'stunned', params(ctx, 'knight.reversed').stunnedTurns!, 'knight.reversed');
     }
   },
@@ -41,7 +41,7 @@ export const COURT_HANDLERS: Partial<Record<FaceKey, Handler>> = {
   'queen.reversed': (ctx, a, c) => {
     for (const t of targetsFor(ctx.s, a, c, 'queen.reversed')) {
       if (!hit(ctx, t, 'queen.reversed')) continue;
-      moveBackTo(ctx, t, 'fire');
+      moveBackTo(ctx, t, 'fire', 'push');
       loseFp(ctx, t, params(ctx, 'queen.reversed').fpLoss!, 'card');
     }
   },
@@ -57,7 +57,7 @@ export const COURT_HANDLERS: Partial<Record<FaceKey, Handler>> = {
     const P = params(ctx, 'king.reversed');
     for (const t of ts) {
       if (!hit(ctx, t, 'king.reversed')) continue;
-      moveBy(ctx, t, -P.back!, 'card');
+      moveBy(ctx, t, -P.back!, 'push');
       addStatus(ctx, t, 'silenced', P.silencedTurns!, 'king.reversed');
       addStatus(ctx, t, 'drained', P.drainedTurns!, 'king.reversed');
     }

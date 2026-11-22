@@ -3,7 +3,7 @@ import { PISCES, SUIT_ELEMENT, signOf } from '../data/board';
 import { COURT_REQUIRES, FACES, ONCE_PER_GAME, cardDef, faceKey, isCourt, isSuit } from '../data/cards';
 import { canSpend } from '../rules/fp';
 import { isActive } from '../rules/status';
-import { trapAt } from '../rules/trap';
+import { trapAt, trapSignAllowed } from '../rules/trap';
 import type {
   Action, CardUid, Check, CourtRank, FaceKey, GameState, Orientation, PlayerId, PlayerState,
   Reason, SkillChoice, Suit,
@@ -74,6 +74,9 @@ export function checkSkillBase(s: GameState, p: PlayerState): Check {
   const key = faceKey(p.major, p.orientation);
   if (key === 'world.upright' && signOf(p.progress) === PISCES) return fail('onPisces');
   if (key === 'tower.reversed' && playersAhead(s, p.id).length === 0) return fail('noTarget');
+  const tg = faceTargeting(s, key);
+  if ((tg === 'aheadOne' || tg === 'ahead') && playersAhead(s, p.id).length === 0) return fail('noTarget');
+  if (tg === 'sign' && s.config.balance.trapReach > 0 && playersAhead(s, p.id).length === 0) return fail('noTarget');
   return OK;
 }
 
@@ -90,6 +93,11 @@ export function checkFaceChoice(s: GameState, actor: PlayerId, key: FaceKey, cho
       return checkOther(s, actor, choice.target);
     case 'ahead':
       return playersAhead(s, actor).length > 0 ? OK : fail('noTarget');
+    case 'aheadOne': {
+      const ahead = playersAhead(s, actor);
+      if (ahead.length === 0 || choice.target === undefined) return fail('noTarget');
+      return ahead.includes(choice.target) ? OK : fail('invalidTarget');
+    }
     case 'twoOthers': {
       if (s.players.length === 2) return checkOther(s, actor, choice.target);
       const t = choice.targets;
@@ -109,7 +117,8 @@ export function checkFaceChoice(s: GameState, actor: PlayerId, key: FaceKey, cho
     case 'sign': {
       const sign = choice.sign;
       if (sign === undefined || !Number.isInteger(sign) || sign < 0 || sign > 11) return fail('invalidSign');
-      return trapAt(s, sign) ? fail('trapThere') : OK;
+      if (trapAt(s, sign)) return fail('trapThere');
+      return trapSignAllowed(s, actor, sign) ? OK : fail('invalidSign');
     }
     case 'discardAny':
     case 'discardUpTo': {

@@ -5,6 +5,7 @@ import {
   enumerateActions, hasShield, statusOf, trapAt, applyActionMut, type GameState,
 } from '../src/engine';
 import { act, autoUntil, cardLocations, ofType, playMinor, resume, scenario, skill, status, uid } from './helpers';
+import { RULEBOOK_V4 } from '../src/sim/rulebooks';
 
 const P0 = 0, P1 = 1, P2 = 2;
 const three = [{ controller: 'ai' as const, element: 'fire' as const }, { controller: 'ai' as const, element: 'earth' as const }, { controller: 'ai' as const, element: 'air' as const }];
@@ -218,8 +219,8 @@ describe('statuses (rule §6, D-17)', () => {
     expect(statusOf(s.players[P0]!, 'drained')).toMatchObject({ from: 2, until: 2 });
   });
   it('the same status does not stack; the longer one stays', () => {
-    const s = scenario({ players: [{ hand: ['wands'], major: 'temperance', orientation: 'reversed' }, { progress: 3 }, {}] });
-    skill(s);
+    const s = scenario({ players: [{ hand: ['wands'], major: 'temperance', orientation: 'reversed' }, { progress: 3 }, { progress: 5 }] });
+    skill(s, { target: P1 });
     s.pending = { kind: 'chooseAction', player: P0 };
     s.players[P0]!.lastSkillTurn = null;
     playMinor(s, 'wands', 'reversed');
@@ -264,8 +265,8 @@ describe('shield (rule §6, D-18)', () => {
 
 describe('traps (rule §7, D-23 – D-25)', () => {
   const chainAt3 = [{ sign: 3, kind: 'chain' as const, owner: P1, seq: 0 }];
-  it('triggers at the end of a Move step: Chain = Rooted next turn and −2 FP', () => {
-    const s = scenario({ players: [{ progress: 1 }, {}, {}], traps: chainAt3, balance: { die: [2] } });
+  it('v4: triggers at the end of a Move step: Chain = Rooted next turn and −2 FP', () => {
+    const s = scenario({ players: [{ progress: 1 }, {}, {}], traps: chainAt3, balance: { ...RULEBOOK_V4, die: [2] } });
     act(s, { type: 'meditate' }, false);
     const ev = autoUntil(s);
     expect(ofType(ev, 'trapTrigger')[0]).toMatchObject({ p: P0, blocked: false });
@@ -279,12 +280,12 @@ describe('traps (rule §7, D-23 – D-25)', () => {
     autoUntil(s);
     expect(s.players[P0]!.progress).toBe(0);
   });
-  it('the owner, passing by and card pushes do not trigger it', () => {
-    const own = scenario({ players: [{ progress: 1 }, {}, {}], traps: [{ sign: 3, kind: 'chain', owner: P0, seq: 0 }], balance: { die: [2] } });
+  it('v4: the owner, passing by and card pushes do not trigger it', () => {
+    const own = scenario({ players: [{ progress: 1 }, {}, {}], traps: [{ sign: 3, kind: 'chain', owner: P0, seq: 0 }], balance: { ...RULEBOOK_V4, die: [2] } });
     act(own, { type: 'meditate' }, false);
     autoUntil(own);
     expect(own.traps).toHaveLength(1);
-    const pass = scenario({ players: [{ progress: 1 }, {}, {}], traps: chainAt3, balance: { die: [3] } });
+    const pass = scenario({ players: [{ progress: 1 }, {}, {}], traps: chainAt3, balance: { ...RULEBOOK_V4, die: [3] } });
     act(pass, { type: 'meditate' }, false);
     autoUntil(pass);
     expect(pass.traps).toHaveLength(1);
@@ -311,7 +312,7 @@ describe('traps (rule §7, D-23 – D-25)', () => {
   });
   it('at most 3 on the board; a 4th removes the oldest', () => {
     const traps = [0, 1, 2].map((i) => ({ sign: i + 4, kind: 'chain' as const, owner: P1, seq: i }));
-    const s = scenario({ players: [{ major: 'moon', orientation: 'reversed' }, {}, {}], traps });
+    const s = scenario({ balance: RULEBOOK_V4, players: [{ major: 'moon', orientation: 'reversed' }, {}, {}], traps });
     const ev = skill(s, { sign: 9 });
     expect(ofType(ev, 'trapExpire')[0]!.trap.sign).toBe(4);
     expect(s.traps.map((t) => t.sign).sort()).toEqual([5, 6, 9]);

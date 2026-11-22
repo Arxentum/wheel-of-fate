@@ -105,8 +105,8 @@ export function enterMove(ctx: Ctx): void {
   if (wrong && wrong.from <= p.turnNo) {
     removeStatus(p, 'wrongTurn');
     t.moved = true;
-    moveBy(ctx, p.id, -params(ctx, 'fool.reversed').back!, 'wrongTurn');
-    landOn(ctx, p.id);
+    moveBy(ctx, p.id, -(wrong.amount ?? params(ctx, 'fool.reversed').back!), 'wrongTurn');
+    if (!bal(ctx).trapOnPass) landOn(ctx, p.id);
     enterResolve(ctx);
     return;
   }
@@ -116,7 +116,7 @@ export function enterMove(ctx: Ctx): void {
     t.roll = { dice: [], value: 1, mode: 'slowed' };
     emit(ctx, { t: 'roll', p: p.id, dice: [], value: 1, mode: 'slowed', reroll: false });
     moveBy(ctx, p.id, 1, 'move');
-    landOn(ctx, p.id);
+    if (!bal(ctx).trapOnPass) landOn(ctx, p.id);
     enterResolve(ctx);
     return;
   }
@@ -187,7 +187,7 @@ export function confirmMove(ctx: Ctx): void {
   t.moved = true;
   const steps = (t.roll?.value ?? 0) + (t.boosted ? 1 : 0);
   moveBy(ctx, t.player, steps, 'move');
-  landOn(ctx, t.player);
+  if (!bal(ctx).trapOnPass) landOn(ctx, t.player);
   enterResolve(ctx);
 }
 

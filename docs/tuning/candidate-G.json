@@ -1,0 +1,57 @@
+{
+ "leaderBonus": 2,
+ "illusionBack": 3,
+ "chainRootedTurns": 1,
+ "chainFpLoss": 3,
+ "cards": {
+  "moon.upright": {
+   "fp": 1,
+   "shield": 0
+  },
+  "emperor.upright": {
+   "fp": 1
+  },
+  "emperor.reversed": {
+   "extra": 1
+  },
+  "lovers.reversed": {
+   "extra": 2
+  },
+  "temperance.reversed": {
+   "extra": 1
+  },
+  "justice.reversed": {
+   "extra": 1
+  },
+  "sun.reversed": {
+   "extra": 1
+  },
+  "hierophant.upright": {
+   "fp": 1
+  },
+  "death.upright": {
+   "fp": 1
+  },
+  "world.upright": {
+   "max": 9
+  },
+  "fool.reversed": {
+   "back": 2
+  },
+  "empress.reversed": {
+   "extra": 1
+  },
+  "tower.upright": {
+   "moveIfLeading": 3
+  },
+  "magician.reversed": {
+   "extra": 1
+  },
+  "hangedMan.upright": {
+   "fp": 2
+  },
+  "justice.upright": {
+   "fpIfLeading": 3
+  }
+ }
+}

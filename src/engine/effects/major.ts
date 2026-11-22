@@ -173,7 +173,7 @@ export const MAJOR_HANDLERS: Partial<Record<FaceKey, Handler>> = {
   },
   'hierophant.reversed': (ctx, a, c) => {
     for (const t of targetsFor(ctx.s, a, c, 'hierophant.reversed')) {
-      if (hit(ctx, t, 'hierophant.reversed')) moveBackTo(ctx, t, 'earth');
+      if (hit(ctx, t, 'hierophant.reversed')) moveBackTo(ctx, t, 'earth', 'push');
     }
   },
 
@@ -194,7 +194,7 @@ export const MAJOR_HANDLERS: Partial<Record<FaceKey, Handler>> = {
     const s = ctx.s;
     if (s.players.length === 2) {
       const t = target(c);
-      if (hit(ctx, t, 'lovers.reversed')) moveBy(ctx, t, -params(ctx, 'lovers.reversed').back2p!, 'card');
+      if (hit(ctx, t, 'lovers.reversed')) moveBy(ctx, t, -params(ctx, 'lovers.reversed').back2p!, 'push');
       return;
     }
     const pair = c.targets;
@@ -218,7 +218,7 @@ export const MAJOR_HANDLERS: Partial<Record<FaceKey, Handler>> = {
     for (const t of targetsFor(ctx.s, a, c, 'chariot.reversed')) {
       const P = params(ctx, 'chariot.reversed');
       if (!hit(ctx, t, 'chariot.reversed')) continue;
-      moveBy(ctx, t, -P.back!, 'card');
+      moveBy(ctx, t, -P.back!, 'push');
       addStatus(ctx, t, 'slowed', P.slowedTurns!, 'chariot.reversed');
     }
   },
@@ -278,7 +278,7 @@ export const MAJOR_HANDLERS: Partial<Record<FaceKey, Handler>> = {
     const P = params(ctx, 'justice.reversed');
     const t = chosenLeader(ctx, a, c);
     if (!hit(ctx, t, 'justice.reversed')) return;
-    moveBy(ctx, t, -P.back!, 'card');
+    moveBy(ctx, t, -P.back!, 'push');
     loseFp(ctx, t, P.fpLoss!, 'card');
   },
 
@@ -347,14 +347,15 @@ export const MAJOR_HANDLERS: Partial<Record<FaceKey, Handler>> = {
   // 16 The Tower
   'tower.upright': (ctx, a) => {
     const P = params(ctx, 'tower.upright');
-    moveBy(ctx, a, P.move!, 'card');
+    // Rules v5 option: a smaller dash for the leader (tower.upright.moveIfLeading).
+    moveBy(ctx, a, isLeading(ctx.s, a) ? (P.moveIfLeading ?? P.move!) : P.move!, 'card');
     discardCards(ctx, a, [...player(ctx.s, a).hand], 'whole');
     if (P.fpLoss) loseFp(ctx, a, P.fpLoss, 'card');
   },
   'tower.reversed': (ctx, a) => {
     const back = params(ctx, 'tower.reversed').back!;
     for (const o of playersAhead(ctx.s, a)) {
-      if (hit(ctx, o, 'tower.reversed')) moveBy(ctx, o, -back, 'card');
+      if (hit(ctx, o, 'tower.reversed')) moveBy(ctx, o, -back, 'push');
     }
   },
 

@@ -1,16 +1,13 @@
 import { bal, emit, player, type Ctx } from '../core/context';
-import { distanceToNext, distanceToPrev, lapOf } from '../data/board';
+import { distanceToNext, distanceToPrev, lapOf, signOf } from '../data/board';
 import type { Element, MoveCause, PlayerId } from '../types';
 import { gainFp } from './fp';
+import { springTrap, trapAt } from './trap';
 
-/**
- * Every change of position goes through here: floor at 0 (rule §9), lap bonus only for a
- * new highest lap (decision D-14), and the final-round trigger (decision D-37).
- */
-export function moveTo(ctx: Ctx, id: PlayerId, target: number, cause: MoveCause): void {
+/** Sets the position: floor at 0 (rule §9), lap bonus for a new highest lap (D-14), final round (D-37). */
+function place(ctx: Ctx, id: PlayerId, to: number, cause: MoveCause): void {
   const s = ctx.s;
   const p = player(s, id);
-  const to = Math.max(0, Math.floor(target));
   const from = p.progress;
   if (to === from) return;
   p.progress = to;
@@ -29,6 +26,29 @@ export function moveTo(ctx: Ctx, id: PlayerId, target: number, cause: MoveCause)
   }
 }
 
+/** Own movement springs traps on the way when balance.trapOnPass is on (decision D-60). */
+function springsTraps(ctx: Ctx, cause: MoveCause): boolean {
+  return bal(ctx).trapOnPass && (cause === 'move' || cause === 'wrongTurn' || cause === 'card');
+}
+
+/** Every change of position goes through here. */
+export function moveTo(ctx: Ctx, id: PlayerId, target: number, cause: MoveCause): void {
+  const s = ctx.s;
+  const p = player(s, id);
+  const to = Math.max(0, Math.floor(target));
+  if (to === p.progress) return;
+  if (springsTraps(ctx, cause) && s.traps.length > 0) {
+    const dir = to > p.progress ? 1 : -1;
+    for (let q = p.progress + dir; dir > 0 ? q <= to : q >= to; q += dir) {
+      const trap = trapAt(s, signOf(q));
+      if (!trap || trap.owner === id) continue;
+      place(ctx, id, q, cause);
+      if (springTrap(ctx, id, trap)) return; // an Illusion Trap ends the movement
+    }
+  }
+  place(ctx, id, to, cause);
+}
+
 export function moveBy(ctx: Ctx, id: PlayerId, delta: number, cause: MoveCause): void {
   moveTo(ctx, id, player(ctx.s, id).progress + delta, cause);
 }
@@ -40,7 +60,7 @@ export function moveToNext(ctx: Ctx, id: PlayerId, element: Element, extra = 0):
 }
 
 /** Rule §9: back to the previous sign of an element (1..4 spaces), not below 0. */
-export function moveBackTo(ctx: Ctx, id: PlayerId, element: Element): void {
+export function moveBackTo(ctx: Ctx, id: PlayerId, element: Element, cause: MoveCause = 'push'): void {
   const p = player(ctx.s, id);
-  moveBy(ctx, id, -distanceToPrev(p.progress, element), 'card');
+  moveBy(ctx, id, -distanceToPrev(p.progress, element), cause);
 }

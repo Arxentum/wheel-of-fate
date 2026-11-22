@@ -1,6 +1,6 @@
 import { SUIT_ELEMENT, elementOfSign, signOf } from '../data/board';
 import { ONCE_PER_GAME, cardDef, faceKey, isCourt, isSuit } from '../data/cards';
-import { HANDLERS } from '../effects';
+import { HANDLERS, handlerFor } from '../effects';
 import { continueWheel, resolveWheelCard, useMinorUpright } from '../effects/major';
 import { discardCards, drawCards, putOnBottom, removeFromHand } from '../rules/deck';
 import { gainFp, spendFp } from '../rules/fp';
@@ -77,7 +77,7 @@ function perform(ctx: Ctx, a: Action, d: Decision): void {
         ...(choice.targets ? { targets: [...choice.targets] } : {}),
         ...(choice.sign !== undefined ? { sign: choice.sign } : {}),
       });
-      HANDLERS[key](ctx, p.id, choice);
+      handlerFor(s, key)(ctx, p.id, choice);
       afterPlay(ctx);
       return;
     }

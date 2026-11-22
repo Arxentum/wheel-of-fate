@@ -6,7 +6,7 @@ import type { GameState, PlayerId, PlayerState, Status, StatusKind } from '../ty
 /** Rule §12 weights (points). */
 export interface AiWeights {
   space: number; oppSpace: number; oppSpace2p: number; nonLeaderFactor: number; fp: number; card: number;
-  leadBias: number; shieldWhenLeading: number; trap: number; finalRoundResources: number; boostKeep: number;
+  leadBias: number; shieldWhenLeading: number; trap: number; trapHitChance: number; finalRoundResources: number; boostKeep: number;
   /** Multiplier on the value of opponents' statuses (1 = rule §10 values). */
   oppStatusFactor: number;
 }
@@ -29,6 +29,8 @@ export const W: AiWeights = {
   shieldWhenLeading: 1.5,
   /** A trap of yours on the board: about 3 spaces of harm × a 40% chance to be hit × 1.5. */
   trap: 1.8,
+  /** v5 traps spring when passed: the chance one is sprung before the game ends. */
+  trapHitChance: 0.85,
   /** In the final round FP, cards and later statuses barely matter. */
   finalRoundResources: 0.3,
   /** Decision D-53: boost whenever at least this many FP remain afterwards (unused FP are wasted). */
@@ -84,6 +86,8 @@ function statusSpaces(s: GameState, q: PlayerState, shieldValue: number): number
   let v = 0;
   for (const st of q.statuses) {
     if (st.kind === 'shielded') v += shieldValue;
+    // Wrong Turn: about 2 spaces not gained plus the spaces lost (its amount, rules v5).
+    else if (st.kind === 'wrongTurn' && st.amount !== undefined) v -= (st.amount + 2) * futureTurns(s, q, st);
     else v -= STATUS_SPACES[st.kind] * futureTurns(s, q, st);
   }
   return v;
@@ -96,12 +100,26 @@ export function expectedMove(s: GameState, id: PlayerId): number {
   const p = player(s, id);
   if (t.skipMove || isActive(p, 'rooted')) return 0;
   const wrong = p.statuses.find((st) => st.kind === 'wrongTurn');
-  if (wrong && wrong.from <= p.turnNo) return -s.config.balance.cards['fool.reversed'].back!;
+  if (wrong && wrong.from <= p.turnNo) return -(wrong.amount ?? s.config.balance.cards['fool.reversed'].back!);
   if (isActive(p, 'slowed')) return 1;
   if (t.rollMode === 'fixed3') return s.config.balance.cards['emperor.upright'].roll!;
   if (t.rollMode === 'advantage') return ADVANTAGE_ROLL;
   const die = s.config.balance.die;
   return die.reduce((a, b) => a + b, 0) / die.length;
+}
+
+/**
+ * Expected value of one of your traps. v3/v4 (spring when stopped on): a fixed estimate. v5 (spring when
+ * passed): nearly always sprung on the leader, so its harm in the leader's weights plus the FP bounty.
+ */
+export function trapWorth(s: GameState, kind: 'chain' | 'illusion', P: Perspective): number {
+  const b = s.config.balance;
+  if (!b.trapOnPass) return P.w.trap;
+  const top = Math.max(...P.oppSpace);
+  const harm = kind === 'illusion'
+    ? (b.illusionBack + b.leaderBonus) * top
+    : (b.chainRootedTurns * STATUS_SPACES.rooted * P.w.oppStatusFactor + (b.chainFpLoss + b.leaderBonus) * P.w.fp / 2) * top;
+  return P.w.trapHitChance * harm + P.w.fp * b.trapBounty;
 }
 
 /** Score of a state for `P.me`. Only differences between states matter. */
@@ -126,6 +144,6 @@ export function score(s: GameState, P: Perspective): number {
       v -= res * w * W.oppStatusFactor * statusSpaces(s, q, 1);
     }
   }
-  for (const t of s.traps) if (t.owner === P.me) v += res * W.trap;
+  for (const t of s.traps) if (t.owner === P.me) v += res * trapWorth(s, t.kind, P);
   return v;
 }

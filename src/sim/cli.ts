@@ -6,7 +6,7 @@ import { Stats } from './stats';
 import { textSummary } from './summary';
 import { PROPOSAL } from './proposal';
 import { buildReport } from './report';
-import { RULEBOOK_V3 } from './rulebookV3';
+import { RULEBOOK_V3 } from './rulebooks';
 import { diagnoseReversed } from './diagnose';
 import { MAJOR_ZH } from './report';
 
@@ -37,7 +37,7 @@ if (process.argv.includes('--diagnose-reversed')) {
   const games = Number(arg('games') ?? 2000);
   const t0 = Date.now();
   const st = runMany({ players: n, laps, balance: useV3 ? RULEBOOK_V3 : useProposal ? PROPOSAL : undefined }, games, `${seed}-${n}-${laps}`, new Stats());
-  console.log(`${n} players, ${laps} laps, ${useV3 ? 'rulebook v3' : useProposal ? 'proposal' : 'current rules (v4)'} (${((Date.now() - t0) / 1000).toFixed(1)} s)`);
+  console.log(`${n} players, ${laps} laps, ${useV3 ? 'rulebook v3' : useProposal ? 'proposal' : 'current rules (v5)'} (${((Date.now() - t0) / 1000).toFixed(1)} s)`);
   console.log(textSummary(st, n));
 } else {
   const games = Number(arg('games') ?? 2000);

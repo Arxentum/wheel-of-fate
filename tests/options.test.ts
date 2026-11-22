@@ -5,7 +5,7 @@ import {
   enumerateActions, hasShield, statusOf, type GameState,
 } from '../src/engine';
 import { PROPOSAL } from '../src/sim/proposal';
-import { RULEBOOK_V3 } from '../src/sim/rulebookV3';
+import { RULEBOOK_V3, RULEBOOK_V4 } from '../src/sim/rulebooks';
 import { act, autoUntil, ofType, playMinor, scenario, skill, uid } from './helpers';
 
 const P0 = 0, P1 = 1, P2 = 2;
@@ -49,7 +49,7 @@ describe('rotateStart (S1: the first player moves on each round)', () => {
 });
 
 describe('reversedAhead (S2: single-target reversed faces hit every player ahead)', () => {
-  const ahead = { reversedAhead: true };
+  const ahead = RULEBOOK_V4; // reversed faces of all kinds hit every player ahead in v4
   it('a minor reversed hits everyone ahead, nobody behind, and needs no target', () => {
     const s = scenario({ balance: ahead, players: [{ progress: 3, hand: ['swords'] }, { progress: 6 }, { progress: 1 }] });
     const card = uid(s, P0, 'swords');
@@ -221,10 +221,10 @@ describe('proposal parameters (report §6)', () => {
   });
 });
 
-describe('the defaults are rulebook v4; RULEBOOK_V3 restores v3', () => {
-  it('v4: S1 and S2 on, the M1 numbers in place, the experiments off', () => {
+describe('the defaults are rules v5; RULEBOOK_V4 / RULEBOOK_V3 restore the older rules', () => {
+  it('v5: S1, S2, the M1 numbers, the shield refund and the reversed redesign on; the experiments off', () => {
     const b = defaultBalance();
-    expect(b).toMatchObject({ rotateStart: true, reversedAhead: true, finishSafe: false, endRule: 'round', startProgressBySeat: [], startFpBySeat: [] });
+    expect(b).toMatchObject({ rotateStart: true, reversedAhead: true, majorReversedV5: true, leaderBonus: 1, trapOnPass: true, trapBounty: 1, shieldRefund: 1, finishSafe: false, endRule: 'round', startProgressBySeat: [], startFpBySeat: [] });
     expect(b.cards['hermit.upright']).toEqual({ move: 1, fp: 2, draw: 1, shield: 1 });
     expect(b.cards['hangedMan.upright']).toEqual({ skipMove: 0, move: 2, fp: 3, draw: 1, shield: 1, slowedSelf: 1 });
     expect(b.cards['world.upright']).toEqual({ max: 8 });
