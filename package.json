@@ -5,15 +5,32 @@
   "description": "Wheel of Fate - web version of a tarot racing board game (EN / zh-Hant)",
   "type": "module",
   "scripts": {
+    "dev": "vite",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc -p tsconfig.engine.json && tsc -p tsconfig.node.json",
-    "sim": "tsx src/sim/cli.ts"
+    "typecheck": "tsc -p tsconfig.engine.json && tsc -p tsconfig.node.json && tsc -p tsconfig.app.json",
+    "sim": "tsx src/sim/cli.ts",
+    "cards": "tsx scripts/build-cards.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "sharp": "^0.35.5",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
+    "vite": "^8.3.8",
     "vitest": "^5.1.1"
+  },
+  "dependencies": {
+    "@fontsource-variable/noto-sans-tc": "^5.3.1",
+    "@fontsource/anton": "^5.3.0",
+    "@fontsource/archivo-narrow": "^5.3.0",
+    "@fontsource/barlow-condensed": "^5.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   }
 }

@@ -1,0 +1,659 @@
+{
+  "faceSize2x": [
+    783,
+    1010
+  ],
+  "cards": {
+    "fool": {
+      "source": "愚者.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 22,
+        "top": 150,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "magician": {
+      "source": "魔术师.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "highPriestess": {
+      "source": "女祭司.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "empress": {
+      "source": "皇后.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "emperor": {
+      "source": "皇帝.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "hierophant": {
+      "source": "教皇.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "lovers": {
+      "source": "恋人.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "chariot": {
+      "source": "战车.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "strength": {
+      "source": "力量.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "hermit": {
+      "source": "隐士.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "wheelOfFortune": {
+      "source": "命运之轮.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "justice": {
+      "source": "正义.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "hangedMan": {
+      "source": "倒吊人.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "death": {
+      "source": "死神.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "temperance": {
+      "source": "节制.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "devil": {
+      "source": "恶魔.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "tower": {
+      "source": "高塔.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "star": {
+      "source": "星星.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "moon": {
+      "source": "月亮.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "sun": {
+      "source": "太阳.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "judgement": {
+      "source": "审判.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "world": {
+      "source": "世界.png",
+      "sourceSize": [
+        831,
+        1421
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "wands": {
+      "source": "权杖.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "pentacles": {
+      "source": "星币.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "swords": {
+      "source": "宝剑.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "cups": {
+      "source": "圣杯.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "page": {
+      "source": "侍从.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "knight": {
+      "source": "骑士.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "queen": {
+      "source": "王后.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "king": {
+      "source": "国王.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 24,
+        "top": 152,
+        "width": 783,
+        "height": 1010
+      },
+      "2x": [
+        783,
+        1010
+      ],
+      "1x": [
+        390,
+        503
+      ]
+    },
+    "back": {
+      "source": "背面.png",
+      "sourceSize": [
+        827,
+        1417
+      ],
+      "crop": {
+        "left": 36,
+        "top": 330,
+        "width": 746,
+        "height": 747
+      },
+      "2x": [
+        746,
+        747
+      ],
+      "1x": [
+        390,
+        391
+      ]
+    }
+  }
+}

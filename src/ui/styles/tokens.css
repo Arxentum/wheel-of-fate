@@ -1,0 +1,25 @@
+/* Design tokens: constructivist palette, three type faces (+ Noto Sans TC for Chinese), line weights. */
+:root {
+  --bg: #faf6f2;
+  --ink: #111111;
+  --paper: #ffffff;
+  --cream: #f2eadf;
+  --mute: #6b655f;
+
+  --fire: #d14135;
+  --earth: #eaa936;
+  --air: #3b672b;
+  --water: #1d4c7c;
+
+  --line: 2px;
+  --line-bold: 4px;
+
+  --font-zh: 'Noto Sans TC Variable', 'Noto Sans TC', sans-serif;
+  --font-title: 'Anton', var(--font-zh);
+  --font-body: 'Archivo Narrow', var(--font-zh);
+  --font-label: 'Barlow Condensed', var(--font-zh);
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --fast: 120ms;
+  --normal: 200ms;
+}

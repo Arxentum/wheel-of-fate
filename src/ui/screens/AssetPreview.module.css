@@ -1,0 +1,210 @@
+.page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 32px 40px 80px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: var(--line-bold) solid var(--ink);
+  padding-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.dots {
+  display: grid;
+  gap: 6px;
+}
+
+.dots i {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.title {
+  font-size: 56px;
+  text-transform: uppercase;
+}
+
+.tagline {
+  margin: 6px 0 0;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+}
+
+.note {
+  margin: 20px 0 8px;
+  color: var(--mute);
+}
+
+.tag {
+  display: inline-block;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-label);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 1px 8px;
+  margin-right: 6px;
+}
+
+section {
+  margin-top: 40px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 32px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.number {
+  display: inline-grid;
+  place-items: center;
+  min-width: 52px;
+  height: 44px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 26px;
+}
+
+.boardWrap {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.caption {
+  color: var(--mute);
+  max-width: 760px;
+  margin: 12px auto 0;
+  text-align: center;
+}
+
+.elements {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.element {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: var(--line-bold) solid var(--ink);
+  background: var(--paper);
+  padding: 14px 16px;
+}
+
+.swatch {
+  width: 18px;
+  align-self: stretch;
+}
+
+.elementName {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.subhead {
+  font-size: 22px;
+  text-transform: uppercase;
+  margin: 24px 0 12px;
+}
+
+.cards {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  border: var(--line-bold) solid var(--ink);
+  background: var(--paper);
+}
+
+.art img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.back {
+  aspect-ratio: 390 / 503;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+}
+
+.cardName {
+  border-top: var(--line-bold) solid var(--ink);
+  padding: 6px 8px;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardNumber {
+  flex-shrink: 0;
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 22px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 13px;
+}
+
+.signs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.signTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border: var(--line) solid var(--ink);
+  background: var(--paper);
+  padding: 12px 8px 8px;
+  font-family: var(--font-label);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

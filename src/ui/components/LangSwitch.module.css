@@ -1,0 +1,37 @@
+.switch {
+  display: inline-flex;
+  border: var(--line-bold) solid var(--ink);
+  background: var(--paper);
+}
+
+.option {
+  border: 0;
+  background: transparent;
+  padding: 6px 14px;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+
+.option[lang='zh-Hant'] {
+  font-family: var(--font-zh);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.option + .option {
+  border-left: var(--line-bold) solid var(--ink);
+}
+
+.option:hover {
+  background: var(--cream);
+}
+
+.on,
+.on:hover {
+  background: var(--ink);
+  color: var(--paper);
+}

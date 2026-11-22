@@ -1,0 +1,65 @@
+.board {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.signName {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.board[data-lang='zh-Hant'] .signName {
+  font-family: var(--font-zh);
+  font-size: 21px;
+  letter-spacing: 0.02em;
+}
+
+.sign {
+  outline: none;
+}
+
+.selectable {
+  cursor: pointer;
+}
+
+.pickOutline {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 6;
+  stroke-dasharray: 14 9;
+  pointer-events: none;
+}
+
+.selectable:hover .pickOutline,
+.selectable:focus-visible .pickOutline {
+  stroke-dasharray: none;
+  stroke-width: 8;
+}
+
+.piece {
+  transition: transform var(--normal) var(--ease);
+}
+
+.start {
+  pointer-events: none;
+}
+
+.startLabel {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  fill: var(--ink);
+}
+
+.board[data-lang='zh-Hant'] .startLabel {
+  font-family: var(--font-zh);
+  letter-spacing: 0.1em;
+}
