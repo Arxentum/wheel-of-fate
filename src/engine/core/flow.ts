@@ -219,7 +219,7 @@ export function finishTurn(ctx: Ctx): void {
   const s = ctx.s;
   const p = current(s);
   s.pending = null;
-  expireStatuses(p);
+  expireStatuses(ctx, p.id);
   const order = roundOrder(s);
   const idx = order.indexOf(p.id);
   const last = idx === order.length - 1;

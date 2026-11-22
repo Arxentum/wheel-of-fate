@@ -218,21 +218,22 @@ describe('statuses (rule §6, D-17)', () => {
     expect(statusOf(s.players[P0]!, 'drained')).toMatchObject({ from: 2, until: 2 });
   });
   it('the same status does not stack; the longer one stays', () => {
-    const s = scenario({ players: [{ hand: ['wands'], major: 'temperance', orientation: 'reversed' }, {}, {}] });
-    skill(s, { target: P1 });
+    const s = scenario({ players: [{ hand: ['wands'], major: 'temperance', orientation: 'reversed' }, { progress: 3 }, {}] });
+    skill(s);
     s.pending = { kind: 'chooseAction', player: P0 };
     s.players[P0]!.lastSkillTurn = null;
-    playMinor(s, 'wands', 'reversed', P1);
+    playMinor(s, 'wands', 'reversed');
     expect(s.players[P1]!.statuses.filter((x) => x.kind === 'slowed')).toEqual([expect.objectContaining({ from: 2, until: 3 })]);
   });
   it('Stunned: skips Play and Flip, still draws and moves', () => {
-    const s = scenario({ current: P2, players: [{ statuses: [status('stunned', 2, 2)] }, {}, {}], balance: { die: [1] } });
+    // v4 rotates the first player: round 2 starts with P1.
+    const s = scenario({ current: P2, players: [{}, { statuses: [status('stunned', 2, 2)] }, {}], balance: { die: [1] } });
     act(s, { type: 'meditate' }, false);
-    const ev = autoUntil(s, (x) => x.turn.player === P0);
-    expect(s.turn.player).toBe(P0);
+    const ev = autoUntil(s, (x) => x.turn.player === P1);
+    expect(s.turn.player).toBe(P1);
     const all = [...ev, ...autoUntil(s)];
-    expect(all.some((e) => e.t === 'actionSkipped' && e.p === P0)).toBe(true);
-    expect(s.players[P0]!.progress).toBe(1);
+    expect(all.some((e) => e.t === 'actionSkipped' && e.p === P1)).toBe(true);
+    expect(s.players[P1]!.progress).toBe(1);
   });
 });
 
@@ -407,5 +408,21 @@ describe('engine guarantees', () => {
     expect(s.pending?.kind).toBe('move');
     expect(canBoost(s)).toBe(false);
     expect(canReroll(s)).toBe(true);
+  });
+});
+
+describe('shield refund (decision D-59)', () => {
+  it('a shield that runs out unused returns 1 FP; a used one returns nothing', () => {
+    const s = scenario({ players: [{ fp: 0, statuses: [status('shielded', 1, 1, 'king.upright')] }, {}, {}], balance: { die: [1] } });
+    act(s, { type: 'meditate' }, false);
+    const ev = autoUntil(s);
+    expect(ofType(ev, 'shieldExpire')).toHaveLength(1);
+    expect(ofType(ev, 'fp').some((e) => e.reason === 'shieldRefund' && e.delta === 1)).toBe(true);
+
+    const u = scenario({ current: P1, players: [{ fp: 0, statuses: [status('shielded', 1, 1, 'king.upright')] }, { progress: 0, hand: ['swords'] }, {}], balance: { die: [1] } });
+    u.players[P0]!.progress = 3;
+    playMinor(u, 'swords', 'reversed', P0, false);
+    autoUntil(u, (x) => x.turn.player === P0);
+    expect(hasShield(u.players[P0]!)).toBe(false);
   });
 });

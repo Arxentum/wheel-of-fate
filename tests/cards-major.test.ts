@@ -1,4 +1,5 @@
-// Rule §9.3: both faces of the 22 characters.
+// Rulebook v4 §9.3: both faces of the 22 characters (v4 = v3 + the M1 balance changes, D-58).
+// Single-target reversed faces hit every player ahead of you, so targets are placed ahead.
 import { describe, expect, it } from 'vitest';
 import { canReroll, checkAction, hasShield, statusOf, trapAt, type MajorId, type Orientation, type PlayerId } from '../src/engine';
 import { act, autoUntil, handDefs, ofType, scenario, skill, status, uid, type PSpec, type Spec } from './helpers';
@@ -23,20 +24,23 @@ describe('0 The Fool', () => {
     expect(s.players[P0]!.fp).toBe(2);
   });
   it('reversed: Wrong Turn on the target (consumed by their next Move step, D-16)', () => {
-    const s = withMajor('fool', 'reversed');
-    skill(s, { target: P1 });
+    const s = withMajor('fool', 'reversed', {}, [{ progress: 4 }, {}]);
+    skill(s);
     expect(statusOf(s.players[P1]!, 'wrongTurn')).toMatchObject({ from: 2 });
+    expect(statusOf(s.players[P2]!, 'wrongTurn')).toBeUndefined();
   });
 });
 
 describe('1 The Magician', () => {
-  it('upright: draw 2, then may play one Minor card for free (with resonance)', () => {
+  it('upright: draw 2, then may play up to two Minor cards for free (with resonance, M14)', () => {
     const s = withMajor('magician', 'upright', { progress: 1 }, [{}, {}], { deckTop: ['pentacles', 'wands'] });
     skill(s);
-    expect(s.pending).toMatchObject({ kind: 'conjure', player: P0 });
+    expect(s.pending).toMatchObject({ kind: 'conjure', player: P0, left: 2 });
     act(s, { type: 'conjurePlay', play: { card: uid(s, P0, 'pentacles'), orientation: 'upright' } });
     expect(s.players[P0]!.fp).toBe(3 - 1 + 2 + 1);
-    expect(handDefs(s, P0)).toEqual(['wands']);
+    expect(s.pending).toMatchObject({ kind: 'conjure', left: 1 });
+    act(s, { type: 'conjurePlay', play: { card: uid(s, P0, 'wands'), orientation: 'upright' } });
+    expect(s.players[P0]!.progress).toBe(2);
     expect(s.pending).toBeNull();
   });
   it('upright: the extra play may be skipped', () => {
@@ -52,8 +56,8 @@ describe('1 The Magician', () => {
     expect(s.players[P0]!.hand).toHaveLength(2);
   });
   it('reversed: steal a random card; the target is Silenced next turn', () => {
-    const s = withMajor('magician', 'reversed', {}, [{ hand: ['cups', 'swords'] }, {}]);
-    skill(s, { target: P1 });
+    const s = withMajor('magician', 'reversed', {}, [{ progress: 3, hand: ['cups', 'swords'] }, {}]);
+    skill(s);
     expect(s.players[P0]!.hand).toHaveLength(1);
     expect(s.players[P1]!.hand).toHaveLength(1);
     expect(statusOf(s.players[P1]!, 'silenced')).toMatchObject({ from: 2 });
@@ -61,7 +65,7 @@ describe('1 The Magician', () => {
 });
 
 describe('2 The High Priestess', () => {
-  it('upright: look at 3, use one Minor upright, keep one, the rest to the bottom, +1 FP', () => {
+  it('upright: forward 1, look at 3, use one Minor upright, keep one, the rest to the bottom (M10)', () => {
     const s = withMajor('highPriestess', 'upright', { progress: 1 }, [{}, {}], { deckTop: ['wands', 'cups', 'king'] });
     skill(s);
     const d = s.pending!;
@@ -69,10 +73,10 @@ describe('2 The High Priestess', () => {
     const cards = d.kind === 'foresight' ? d.cards : [];
     const [w, c, k] = cards;
     act(s, { type: 'foresightPick', use: w!, take: k! });
-    expect(s.players[P0]!.progress).toBe(2); // Wands upright
+    expect(s.players[P0]!.progress).toBe(3); // 1 + forward 1 + Wands upright
     expect(handDefs(s, P0)).toEqual(['king']);
     expect(s.deck[0]).toBe(c); // Cups to the bottom
-    expect(s.players[P0]!.fp).toBe(3 - 1 + 1);
+    expect(s.players[P0]!.fp).toBe(3 - 1);
   });
   it('upright with no Minor among the three: keep one, use nothing (D-05)', () => {
     const s = withMajor('highPriestess', 'upright', {}, [{}, {}], { deckTop: ['page', 'knight', 'queen'] });
@@ -99,32 +103,33 @@ describe('2 The High Priestess', () => {
 });
 
 describe('3 The Empress', () => {
-  it('upright: +3 FP and draw 2', () => {
+  it('upright: forward 1, +3 FP and draw 1 (M8)', () => {
     const s = withMajor('empress', 'upright');
     skill(s);
+    expect(s.players[P0]!.progress).toBe(1);
     expect(s.players[P0]!.fp).toBe(5);
-    expect(s.players[P0]!.hand).toHaveLength(2);
+    expect(s.players[P0]!.hand).toHaveLength(1);
   });
   it('reversed: target Rooted next turn and −1 FP', () => {
-    const s = withMajor('empress', 'reversed');
-    skill(s, { target: P1 });
+    const s = withMajor('empress', 'reversed', {}, [{ progress: 2 }, {}]);
+    skill(s);
     expect(statusOf(s.players[P1]!, 'rooted')).toMatchObject({ from: 2, until: 2 });
     expect(s.players[P1]!.fp).toBe(2);
   });
 });
 
 describe('4 The Emperor', () => {
-  it('upright: +2 FP, a shield, and the Move roll counts as 3 (no reroll, boost allowed, D-11)', () => {
+  it('upright: +1 FP, a shield, and the Move roll counts as 4 (no reroll, boost allowed, D-11, M13)', () => {
     const s = withMajor('emperor', 'upright', { progress: 1 });
     skill(s, {}, false);
-    expect(s.players[P0]!.fp).toBe(4);
+    expect(s.players[P0]!.fp).toBe(3);
     expect(hasShield(s.players[P0]!)).toBe(true);
     const ev = act(s, { type: 'flip', flip: false }, false);
-    expect(ofType(ev, 'roll')[0]).toMatchObject({ value: 3, mode: 'fixed' });
+    expect(ofType(ev, 'roll')[0]).toMatchObject({ value: 4, mode: 'fixed' });
     expect(s.pending?.kind).toBe('move');
     expect(canReroll(s)).toBe(false);
     act(s, { type: 'boost' }, false);
-    expect(s.players[P0]!.progress).toBe(5);
+    expect(s.players[P0]!.progress).toBe(6);
   });
   it('reversed: all other players Silenced, the leader among them also Drained', () => {
     const s = withMajor('emperor', 'reversed', {}, [{ progress: 5 }, { progress: 3 }]);
@@ -149,6 +154,7 @@ describe('5 The Hierophant', () => {
     skill(s);
     const p = s.players[P0]!;
     expect(p.statuses.map((st) => st.kind)).toEqual(['shielded']);
+    expect(p.progress).toBe(1);
     expect(p.fp).toBe(4);
     expect(p.hand).toHaveLength(1);
   });
@@ -160,10 +166,10 @@ describe('5 The Hierophant', () => {
 });
 
 describe('6 The Lovers', () => {
-  it('upright: to the space of the nearest player ahead within 5, then 1 more', () => {
+  it('upright: to the space of the nearest player ahead within 5 (M3)', () => {
     const s = withMajor('lovers', 'upright', { progress: 1 }, [{ progress: 4 }, { progress: 9 }]);
     skill(s);
-    expect(s.players[P0]!.progress).toBe(5);
+    expect(s.players[P0]!.progress).toBe(4);
   });
   it('upright: nobody within 5 ahead → forward 2', () => {
     const s = withMajor('lovers', 'upright', { progress: 1 }, [{ progress: 7 }, { progress: 10 }]);
@@ -213,53 +219,54 @@ describe('7 The Chariot', () => {
 });
 
 describe('8 Strength', () => {
-  it('upright: to the next Fire sign and a shield', () => {
+  it('upright: to the next Fire sign, no shield (M1)', () => {
     const s = withMajor('strength', 'upright', { progress: 1 });
     skill(s);
     expect(s.players[P0]!.progress).toBe(4);
-    expect(hasShield(s.players[P0]!)).toBe(true);
+    expect(hasShield(s.players[P0]!)).toBe(false);
   });
   it('reversed: target Stunned and −1 FP', () => {
-    const s = withMajor('strength', 'reversed');
-    skill(s, { target: P1 });
+    const s = withMajor('strength', 'reversed', {}, [{ progress: 2 }, {}]);
+    skill(s);
     expect(statusOf(s.players[P1]!, 'stunned')).toBeDefined();
     expect(s.players[P1]!.fp).toBe(2);
   });
 });
 
 describe('9 The Hermit', () => {
-  it('upright: +2 FP, draw 2, shield', () => {
+  it('upright: forward 1, +2 FP, draw 1, shield (M7)', () => {
     const s = withMajor('hermit', 'upright');
     skill(s);
+    expect(s.players[P0]!.progress).toBe(1);
     expect(s.players[P0]!.fp).toBe(4);
-    expect(s.players[P0]!.hand).toHaveLength(2);
+    expect(s.players[P0]!.hand).toHaveLength(1);
     expect(hasShield(s.players[P0]!)).toBe(true);
   });
   it('reversed: target Drained for their next 2 turns', () => {
-    const s = withMajor('hermit', 'reversed');
-    skill(s, { target: P1 });
+    const s = withMajor('hermit', 'reversed', {}, [{ progress: 2 }, {}]);
+    skill(s);
     expect(statusOf(s.players[P1]!, 'drained')).toMatchObject({ from: 2, until: 3 });
   });
 });
 
 describe('10 Wheel of Fortune', () => {
-  it('upright: roll twice, move the higher, gain the lower in FP', () => {
-    const s = withMajor('wheelOfFortune', 'upright', {}, [{}, {}], { balance: { die: [3] } });
-    skill(s);
-    expect(s.players[P0]!.progress).toBe(3);
-    expect(s.players[P0]!.fp).toBe(5);
+  it('upright: roll twice, move the lower, gain the higher in FP (M2)', () => {
+    const s = withMajor('wheelOfFortune', 'upright', {}, [{}, {}], { balance: { die: [1, 3] } });
+    const ev = skill(s);
+    const dice = ofType(ev, 'effectRoll')[0]!.dice;
+    expect(s.players[P0]!.progress).toBe(Math.min(...dice));
+    expect(s.players[P0]!.fp).toBe(2 + Math.max(...dice));
   });
   it('reversed: everyone from you reveals the top card and uses its reversed face; courts discarded (D-32)', () => {
     const s = withMajor('wheelOfFortune', 'reversed', {}, [{ progress: 5 }, {}], { deckTop: ['swords', 'page', 'pentacles'] });
     skill(s);
-    expect(s.pending).toMatchObject({ kind: 'wheelTarget', player: P0 });
-    act(s, { type: 'chooseTarget', target: P1 });
-    expect(s.players[P1]!.progress).toBe(4);
-    expect(s.pending).toMatchObject({ kind: 'wheelTarget', player: P2 });
-    act(s, { type: 'chooseTarget', target: P0 });
-    expect(s.players[P0]!.fp).toBe(1);
-    expect(s.players[P2]!.fp).toBe(4);
+    // P0 (at 0) reveals Swords: everyone ahead (P1) back 1. P1 reveals a Page: discarded.
+    // P2 (at 0) reveals Pentacles: steals 1 FP from everyone ahead of P2 (P1).
     expect(s.pending).toBeNull();
+    expect(s.players[P1]!.progress).toBe(4);
+    expect(s.players[P1]!.fp).toBe(2);
+    expect(s.players[P2]!.fp).toBe(4);
+    expect(s.players[P0]!.fp).toBe(2);
     expect(s.discard).toHaveLength(3);
   });
 });
@@ -273,11 +280,16 @@ describe('11 Justice', () => {
     skill(t);
     expect(t.players[P0]!.progress).toBe(6);
   });
-  it('upright, leading (a tie counts, D-26): +2 FP', () => {
+  it('upright, leading (a tie counts, D-26): forward 1 and +2 FP (M15)', () => {
     const s = withMajor('justice', 'upright', { progress: 6 }, [{ progress: 6 }, {}]);
     skill(s);
-    expect(s.players[P0]!.progress).toBe(6);
+    expect(s.players[P0]!.progress).toBe(7);
     expect(s.players[P0]!.fp).toBe(4);
+  });
+  it('upright, behind by 1: still at least 2 (M15)', () => {
+    const s = withMajor('justice', 'upright', { progress: 3 }, [{ progress: 4 }, {}]);
+    skill(s);
+    expect(s.players[P0]!.progress).toBe(5);
   });
   it('reversed: the leading other player back 2 and −1 FP', () => {
     const s = withMajor('justice', 'reversed', {}, [{ progress: 8 }, { progress: 4 }]);
@@ -294,62 +306,66 @@ describe('11 Justice', () => {
 });
 
 describe('12 The Hanged Man', () => {
-  it('upright: no Move step this turn; +4 FP, draw 2, shield', () => {
-    const s = withMajor('hangedMan', 'upright', { progress: 1, element: 'earth' }, [{ element: 'fire' }, {}]);
+  it('upright: forward 2, +3 FP, draw 1, shield; Slowed next turn; this turn moves normally (M18)', () => {
+    const s = withMajor('hangedMan', 'upright', { progress: 1 }, [{}, {}], { balance: { die: [2] } });
     skill(s, {}, false);
-    expect(s.players[P0]!.fp).toBe(6);
-    expect(s.players[P0]!.hand).toHaveLength(2);
-    expect(hasShield(s.players[P0]!)).toBe(true);
-    const ev = act(s, { type: 'flip', flip: false }, false);
-    expect(ofType(ev, 'moveSkipped')[0]).toMatchObject({ p: P0, reason: 'hangedMan' });
-    expect(ofType(ev, 'fp').filter((e) => e.reason === 'element')).toHaveLength(0);
+    const p = s.players[P0]!;
+    expect(p.progress).toBe(3);
+    expect(p.fp).toBe(5);
+    expect(p.hand).toHaveLength(1);
+    expect(hasShield(p)).toBe(true);
+    expect(statusOf(p, 'slowed')).toMatchObject({ from: 2, until: 2 });
+    const ev = [...act(s, { type: 'flip', flip: false }, false), ...autoUntil(s)];
+    expect(ofType(ev, 'moveSkipped')).toHaveLength(0);
+    expect(s.players[P0]!.progress).toBe(5);
   });
   it('reversed: target Rooted and Drained next turn', () => {
-    const s = withMajor('hangedMan', 'reversed');
-    skill(s, { target: P1 });
+    const s = withMajor('hangedMan', 'reversed', {}, [{ progress: 2 }, {}]);
+    skill(s);
     expect(statusOf(s.players[P1]!, 'rooted')).toBeDefined();
     expect(statusOf(s.players[P1]!, 'drained')).toBeDefined();
   });
 });
 
 describe('13 Death', () => {
-  it('upright: discard any, draw up to 5, clear statuses, +1 FP', () => {
+  it('upright: forward 2, discard any, draw up to 5, clear statuses, +1 FP (M11)', () => {
     const s = withMajor('death', 'upright', { hand: ['page', 'knight', 'wands'], statuses: [status('slowed', 1, 1)] });
     skill(s, { discard: [uid(s, P0, 'page'), uid(s, P0, 'knight')] });
     const p = s.players[P0]!;
+    expect(p.progress).toBe(2);
     expect(p.hand).toHaveLength(5);
     expect(p.statuses).toHaveLength(0);
     expect(p.fp).toBe(3);
   });
   it('reversed: target −3 FP and discards 1 random card', () => {
-    const s = withMajor('death', 'reversed', {}, [{ hand: ['wands', 'cups'] }, {}]);
-    skill(s, { target: P1 });
+    const s = withMajor('death', 'reversed', {}, [{ progress: 2, hand: ['wands', 'cups'] }, {}]);
+    skill(s);
     expect(s.players[P1]!.fp).toBe(0);
     expect(s.players[P1]!.hand).toHaveLength(1);
   });
 });
 
 describe('14 Temperance', () => {
-  it('upright: to the next Water sign and draw 1', () => {
+  it('upright: to the next Water sign, no card (M5)', () => {
     const s = withMajor('temperance', 'upright');
     skill(s);
     expect(s.players[P0]!.progress).toBe(3);
-    expect(s.players[P0]!.hand).toHaveLength(1);
+    expect(s.players[P0]!.hand).toHaveLength(0);
   });
   it('reversed: target Slowed for 2 turns', () => {
-    const s = withMajor('temperance', 'reversed');
-    skill(s, { target: P1 });
+    const s = withMajor('temperance', 'reversed', {}, [{ progress: 2 }, {}]);
+    skill(s);
     expect(statusOf(s.players[P1]!, 'slowed')).toMatchObject({ from: 2, until: 3 });
   });
 });
 
 describe('15 The Devil', () => {
-  it('upright: +5 FP, forward 1, and you are Drained next turn (your own shield does not stop it)', () => {
+  it('upright: +5 FP, forward 2, and you are Drained next turn (your own shield does not stop it, M12)', () => {
     const s = withMajor('devil', 'upright', { statuses: [status('shielded', 1, 2, 'king.upright')] });
     skill(s);
     const p = s.players[P0]!;
     expect(p.fp).toBe(7);
-    expect(p.progress).toBe(1);
+    expect(p.progress).toBe(2);
     expect(statusOf(p, 'drained')).toMatchObject({ from: 2, until: 2 });
     expect(hasShield(p)).toBe(true);
   });
@@ -381,29 +397,30 @@ describe('16 The Tower', () => {
 });
 
 describe('17 The Star', () => {
-  it('upright: to the next Water sign; FP back up to 3 (after paying, D-34)', () => {
+  it('upright: to the next Water sign; FP back up to 2 (after paying, D-34, M4)', () => {
     const s = withMajor('star', 'upright', { progress: 1, fp: 1 });
     skill(s);
     expect(s.players[P0]!.progress).toBe(3);
-    expect(s.players[P0]!.fp).toBe(3);
+    expect(s.players[P0]!.fp).toBe(2);
     const t = withMajor('star', 'upright', { progress: 1, fp: 5 });
     skill(t);
     expect(t.players[P0]!.fp).toBe(4);
   });
   it('reversed: steal 2 FP', () => {
-    const s = withMajor('star', 'reversed');
-    skill(s, { target: P1 });
+    const s = withMajor('star', 'reversed', {}, [{ progress: 2 }, {}]);
+    skill(s);
     expect(s.players[P1]!.fp).toBe(1);
     expect(s.players[P0]!.fp).toBe(4);
   });
 });
 
 describe('18 The Moon', () => {
-  it('upright: forward 2, a shield, and traps do not affect you this turn', () => {
+  it('upright: forward 2, +1 FP, a shield, and traps do not affect you this turn (M17)', () => {
     const s = withMajor('moon', 'upright');
     skill(s);
     const p = s.players[P0]!;
     expect(p.progress).toBe(2);
+    expect(p.fp).toBe(3);
     expect(hasShield(p)).toBe(true);
     expect(p.trapImmuneTurn).toBe(p.turnNo);
   });
@@ -422,21 +439,21 @@ describe('19 The Sun', () => {
     expect(s.players[P0]!.fp).toBe(4);
   });
   it('reversed: target −2 FP and Slowed', () => {
-    const s = withMajor('sun', 'reversed');
-    skill(s, { target: P1 });
+    const s = withMajor('sun', 'reversed', {}, [{ progress: 2 }, {}]);
+    skill(s);
     expect(s.players[P1]!.fp).toBe(1);
     expect(statusOf(s.players[P1]!, 'slowed')).toBeDefined();
   });
 });
 
 describe('20 Judgement', () => {
-  it('upright: discard up to 4, forward 1 per card, then draw 1', () => {
+  it('upright: discard up to 4, forward 1 per card, then draw 2 (M16)', () => {
     const s = withMajor('judgement', 'upright', { hand: ['wands', 'cups', 'page', 'king', 'swords'] });
     const all = s.players[P0]!.hand;
     expect(checkAction(s, { type: 'useSkill', choice: { discard: [...all] } })).toEqual({ ok: false, reason: 'invalidChoice' });
     skill(s, { discard: all.slice(0, 3) });
     expect(s.players[P0]!.progress).toBe(3);
-    expect(s.players[P0]!.hand).toHaveLength(3);
+    expect(s.players[P0]!.hand).toHaveLength(4);
   });
   it('reversed: pool all FP and split evenly, the remainder to you (D-33)', () => {
     const s = withMajor('judgement', 'reversed', {}, [{ fp: 9 }, { fp: 0 }]);
@@ -462,6 +479,11 @@ describe('21 The World', () => {
     s.turn.player = P0;
     s.pending = { kind: 'chooseAction', player: P0 };
     expect(checkAction(s, { type: 'useSkill' })).toEqual({ ok: false, reason: 'onceUsed' });
+  });
+  it('upright: at most 8 spaces (M6)', () => {
+    const s = withMajor('world', 'upright', { progress: 12 });
+    skill(s);
+    expect(s.players[P0]!.progress).toBe(20);
   });
   it('upright: not usable on Pisces (D-30)', () => {
     const s = withMajor('world', 'upright', { progress: 23 });

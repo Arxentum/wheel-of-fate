@@ -1,4 +1,5 @@
 import { emit, player, type Ctx } from '../core/context';
+import { gainFp } from './fp';
 import type { FaceKey, GameState, PlayerId, PlayerState, Status, StatusKind } from '../types';
 
 /** Wrong Turn lasts until consumed; a big number keeps GameState JSON-safe. */
@@ -91,7 +92,16 @@ export function cleanseNegatives(ctx: Ctx, id: PlayerId): void {
   emit(ctx, { t: 'statusCleared', p: id, kinds });
 }
 
-/** End of the player's turn: drop statuses whose last turn was this one (rule §5 ⑥). */
-export function expireStatuses(p: PlayerState): void {
+/**
+ * End of the player's turn: drop statuses whose last turn was this one (rule §5 ⑥).
+ * Decision D-59: a shield that runs out without blocking anything returns FP.
+ */
+export function expireStatuses(ctx: Ctx, id: PlayerId): void {
+  const p = player(ctx.s, id);
+  const shield = statusOf(p, 'shielded');
   p.statuses = p.statuses.filter((st) => st.until > p.turnNo);
+  if (shield && shield.until <= p.turnNo) {
+    emit(ctx, { t: 'shieldExpire', p: id });
+    gainFp(ctx, id, ctx.s.config.balance.shieldRefund, 'shieldRefund');
+  }
 }

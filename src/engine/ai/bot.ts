@@ -274,3 +274,10 @@ export function chooseAiAction(s: GameState, tuning?: Partial<AiWeights>): Actio
 }
 
 export { skillChoices };
+
+/** The AI's pick among a given set of legal actions (used by the simulator's diagnostics). */
+export function chooseAmong(s: GameState, actions: readonly Action[], tuning?: Partial<AiWeights>): Action {
+  const d = s.pending;
+  if (!d) throw new Error('no decision pending');
+  return best(s, d.player, actions, tuning ? { ...W, ...tuning } : W);
+}

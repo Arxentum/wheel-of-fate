@@ -5,6 +5,7 @@ import {
   enumerateActions, hasShield, statusOf, type GameState,
 } from '../src/engine';
 import { PROPOSAL } from '../src/sim/proposal';
+import { RULEBOOK_V3 } from '../src/sim/rulebookV3';
 import { act, autoUntil, ofType, playMinor, scenario, skill, uid } from './helpers';
 
 const P0 = 0, P1 = 1, P2 = 2;
@@ -220,15 +221,31 @@ describe('proposal parameters (report §6)', () => {
   });
 });
 
-describe('the defaults are rulebook v3', () => {
-  it('every experimental switch is off and the new card parameters are neutral', () => {
+describe('the defaults are rulebook v4; RULEBOOK_V3 restores v3', () => {
+  it('v4: S1 and S2 on, the M1 numbers in place, the experiments off', () => {
     const b = defaultBalance();
-    expect(b).toMatchObject({ rotateStart: false, reversedAhead: false, finishSafe: false, endRule: 'round', startProgressBySeat: [], startFpBySeat: [] });
+    expect(b).toMatchObject({ rotateStart: true, reversedAhead: true, finishSafe: false, endRule: 'round', startProgressBySeat: [], startFpBySeat: [] });
+    expect(b.cards['hermit.upright']).toEqual({ move: 1, fp: 2, draw: 1, shield: 1 });
+    expect(b.cards['hangedMan.upright']).toEqual({ skipMove: 0, move: 2, fp: 3, draw: 1, shield: 1, slowedSelf: 1 });
+    expect(b.cards['world.upright']).toEqual({ max: 8 });
+    expect(b.cards['emperor.upright']).toEqual({ fp: 1, roll: 4, shield: 1 });
+  });
+  it('v3 through the patch', () => {
+    const b = applyBalancePatch(defaultBalance(), RULEBOOK_V3);
+    expect(b).toMatchObject({ rotateStart: false, reversedAhead: false });
     expect(b.cards['hermit.upright']).toEqual({ move: 0, fp: 2, draw: 2, shield: 1 });
     expect(b.cards['hangedMan.upright']).toEqual({ skipMove: 1, move: 0, fp: 4, draw: 2, shield: 1, slowedSelf: 0 });
     expect(b.cards['world.upright']).toEqual({ max: 11 });
     expect(b.cards['emperor.upright']).toEqual({ fp: 2, roll: 3, shield: 1 });
     expect(b.cards['wheelOfFortune.upright']).toEqual({ moveHigher: 1 });
     expect(b.cards['justice.upright']).toEqual({ min: 0, max: 5, fpIfLeading: 2, moveIfLeading: 0 });
+  });
+  it('v3 single-target reversed faces still work with the option off', () => {
+    const s = scenario({ balance: RULEBOOK_V3, players: [{ hand: ['swords'] }, { progress: 0 }, {}] });
+    playMinor(s, 'swords', 'reversed', P1);
+    expect(s.players[P1]!.progress).toBe(0);
+    const c = scenario({ balance: RULEBOOK_V3, players: [{ major: 'chariot', orientation: 'reversed', progress: 5 }, { progress: 3 }, {}] });
+    skill(c, { target: P1 });
+    expect(c.players[P1]!.progress).toBe(1);
   });
 });

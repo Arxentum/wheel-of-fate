@@ -1,6 +1,6 @@
 // Builds docs/balance-report.md (in Chinese, as the project's documents are).
 import { COURTS, MAJORS, SUITS, RULEBOOK_AI_WEIGHTS, AI_WEIGHTS, type BalancePatch, type FateCardId, type MajorId } from '../engine';
-import { PROPOSAL } from './proposal';
+import { RULEBOOK_V3 } from './rulebookV3';
 import { runMany } from './runGame';
 import { Stats } from './stats';
 import { tournament } from './tournament';
@@ -91,7 +91,8 @@ const NOTES: { id: string; what: string; v3: string; proposal: string; why: stri
 
 export function buildReport(o: ReportOptions): string {
   const t0 = Date.now();
-  const v3Patch: BalancePatch = {};
+  const v3Patch: BalancePatch = RULEBOOK_V3;
+  const PROPOSAL: BalancePatch = {};
   const matrix = new Map<string, Run>();
   for (const n of COUNTS) {
     for (const laps of LAPS) {

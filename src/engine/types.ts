@@ -176,6 +176,8 @@ export interface BalanceConfig {
   chainRootedTurns: number;
   chainFpLoss: number;
   illusionBack: number;
+  /** FP returned when a shield runs out without having blocked anything (decision D-59). */
+  shieldRefund: number;
   /** Extra starting progress by position in the turn order (seat 1 first). Empty = none. */
   startProgressBySeat: number[];
   /** Extra starting FP by position in the turn order. Empty = none. */
@@ -241,7 +243,7 @@ export interface GameState {
 export type MoveCause = 'move' | 'card' | 'wrongTurn' | 'trap' | 'swap';
 export type FpReason =
   | 'resonance' | 'element' | 'lap' | 'meditate' | 'card' | 'steal' | 'trap'
-  | 'reroll' | 'boost' | 'flip' | 'skill' | 'reckoning';
+  | 'reroll' | 'boost' | 'flip' | 'skill' | 'reckoning' | 'shieldRefund';
 export type CardsReason = 'random' | 'chosen' | 'limit' | 'whole' | 'combo' | 'played';
 
 export type GameEvent =
@@ -268,6 +270,7 @@ export type GameEvent =
   | { t: 'status'; p: PlayerId; kind: StatusKind; from: number; until: number }
   | { t: 'statusCleared'; p: PlayerId; kinds: StatusKind[] }
   | { t: 'shieldBlock'; p: PlayerId; source: FaceKey | 'trap' }
+  | { t: 'shieldExpire'; p: PlayerId }
   | { t: 'finishSafe'; p: PlayerId; source: FaceKey | 'trap' }
   | { t: 'swapFailed'; targets: PlayerId[] }
   | { t: 'trapPlace'; trap: Trap }

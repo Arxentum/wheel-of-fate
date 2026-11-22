@@ -7,7 +7,7 @@ function defaultCardParams(): Record<FaceKey, Record<string, number>> {
   return out;
 }
 
-/** The numbers of rulebook v3 (§3–§9). */
+/** The rules and numbers of rulebook v4 (v3 + the M1 balance changes, decision D-58). */
 export function defaultBalance(): BalanceConfig {
   return {
     startFp: 3,
@@ -31,12 +31,13 @@ export function defaultBalance(): BalanceConfig {
     chainRootedTurns: 1,
     chainFpLoss: 2,
     illusionBack: 3,
+    shieldRefund: 1,
     startProgressBySeat: [],
     startFpBySeat: [],
     finishSafe: false,
     endRule: 'round',
-    rotateStart: false,
-    reversedAhead: false,
+    rotateStart: true,
+    reversedAhead: true,
     cards: defaultCardParams(),
   };
 }
