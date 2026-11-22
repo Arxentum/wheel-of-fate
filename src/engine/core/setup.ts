@@ -1,4 +1,4 @@
-import { applyBalancePatch, defaultBalance } from '../data/balance';
+import { applyBalancePatch, balanceForPlayers, defaultBalance } from '../data/balance';
 import { BOARD_SIZE, ELEMENT_ORDER } from '../data/board';
 import { DECK_SIZE, MAJORS } from '../data/cards';
 import { drawCards } from '../rules/deck';
@@ -22,7 +22,7 @@ export function createGame(setup: GameSetup, seed: string | number): { state: Ga
   validateSetup(setup);
   const seedText = String(seed);
   const rng = seedFromString(seedText);
-  const balance = applyBalancePatch(defaultBalance(), setup.balance);
+  const balance = balanceForPlayers(applyBalancePatch(defaultBalance(), setup.balance), setup.players.length);
 
   const deck = shuffle(rng, Array.from({ length: DECK_SIZE }, (_, i) => i));
   const taken = new Set(setup.players.map((p) => p.major).filter(Boolean));

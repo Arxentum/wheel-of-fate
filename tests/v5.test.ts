@@ -1,5 +1,5 @@
-// Rules v5 (decision D-60): character reversed faces target one player ahead of you, are +1 against
-// the leader, and always cost position; traps spring when passed and pay their owner.
+// Rules v5 (decisions D-60 – D-63): character reversed faces target one player ahead of you, are +2
+// against the leader (not in 2-player games), and always cost position; traps spring when passed.
 import { describe, expect, it } from 'vitest';
 import { checkAction, enumerateActions, hasShield, statusOf, trapAt, type MajorId, type PlayerId } from '../src/engine';
 import { act, autoUntil, handDefs, ofType, playMinor, scenario, skill, status, uid, type PSpec, type Spec } from './helpers';
@@ -33,31 +33,31 @@ describe('targeting (D-60 rule 1)', () => {
   });
 });
 
-describe('every v5 reversed face: base effect and +1 against the leader', () => {
-  it('0 Fool: next Move step goes back 1 (leader 2) instead of rolling', () => {
+describe('every v5 reversed face: base effect and +2 against the leader', () => {
+  it('0 Fool: next Move step goes back 2 (leader 4) instead of rolling', () => {
     const s = rev('fool');
     skill(s, { target: CHASER });
-    expect(statusOf(s.players[CHASER]!, 'wrongTurn')).toMatchObject({ amount: 1 });
+    expect(statusOf(s.players[CHASER]!, 'wrongTurn')).toMatchObject({ amount: 2 });
     const t = rev('fool');
     skill(t, { target: LEADER }, false);
-    expect(statusOf(t.players[LEADER]!, 'wrongTurn')).toMatchObject({ amount: 2 });
+    expect(statusOf(t.players[LEADER]!, 'wrongTurn')).toMatchObject({ amount: 4 });
     // The leader's next Move step: back 2.
     autoUntil(t, (x) => x.turn.player === LEADER);
     act(t, { type: 'meditate' }, false);
     const ev = autoUntil(t, (x) => x.turn.player !== LEADER);
-    expect(ofType(ev, 'move').find((e) => e.p === LEADER && e.cause === 'wrongTurn')).toMatchObject({ from: 5, to: 3 });
+    expect(ofType(ev, 'move').find((e) => e.p === LEADER && e.cause === 'wrongTurn')).toMatchObject({ from: 5, to: 1 });
   });
-  it('1 Magician: back 2 (leader 3) and you steal a random card', () => {
+  it('1 Magician: back 3 (leader 5) and you steal a random card', () => {
     const s = rev('magician', {}, {}, { hand: ['cups'] });
     skill(s, { target: CHASER });
-    expect(s.players[CHASER]!.progress).toBe(1);
+    expect(s.players[CHASER]!.progress).toBe(0);
     expect(s.players[P0]!.hand).toHaveLength(1);
     expect(statusOf(s.players[CHASER]!, 'silenced')).toBeUndefined();
     const t = rev('magician');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(2);
+    expect(t.players[LEADER]!.progress).toBe(0);
   });
-  it('2 High Priestess: back 1 (leader 2), Slowed; you discard 1 card of your choice from their hand', () => {
+  it('2 High Priestess: back 1 (leader 3), Slowed; you discard 1 card of your choice from their hand', () => {
     const s = rev('highPriestess', {}, {}, { hand: ['wands', 'cups'] });
     skill(s, { target: CHASER });
     expect(s.players[CHASER]!.progress).toBe(2);
@@ -68,59 +68,59 @@ describe('every v5 reversed face: base effect and +1 against the leader', () => 
     expect(statusOf(s.players[CHASER]!, 'drained')).toBeUndefined();
     const t = rev('highPriestess', {}, { hand: ['wands'] });
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(3);
+    expect(t.players[LEADER]!.progress).toBe(2);
     expect(t.players[LEADER]!.hand).toHaveLength(0);
     expect(t.pending).toBeNull();
   });
-  it('3 Empress: Rooted and −1 FP; the leader also back 1', () => {
+  it('3 Empress: Rooted, −1 FP and back 1 (leader 3)', () => {
     const s = rev('empress');
     skill(s, { target: CHASER });
     expect(statusOf(s.players[CHASER]!, 'rooted')).toBeDefined();
     expect(s.players[CHASER]!.fp).toBe(2);
-    expect(s.players[CHASER]!.progress).toBe(3);
+    expect(s.players[CHASER]!.progress).toBe(2);
     const t = rev('empress');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(4);
+    expect(t.players[LEADER]!.progress).toBe(2);
   });
-  it('4 Emperor: back 2 (leader 3) and Silenced', () => {
+  it('4 Emperor: back 3 (leader 5) and Silenced', () => {
     const s = rev('emperor');
     skill(s, { target: CHASER });
-    expect(s.players[CHASER]!.progress).toBe(1);
+    expect(s.players[CHASER]!.progress).toBe(0);
     expect(statusOf(s.players[CHASER]!, 'silenced')).toBeDefined();
     expect(statusOf(s.players[LEADER]!, 'silenced')).toBeUndefined();
     const t = rev('emperor');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(2);
+    expect(t.players[LEADER]!.progress).toBe(0);
   });
-  it('5 Hierophant: back to the previous Earth sign (the leader 1 more)', () => {
+  it('5 Hierophant: back to the previous Earth sign (the leader 2 more)', () => {
     const s = rev('hierophant');
     skill(s, { target: CHASER });
     expect(s.players[CHASER]!.progress).toBe(1);
     const t = rev('hierophant', {}, { progress: 7 });
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(4);
+    expect(t.players[LEADER]!.progress).toBe(3);
   });
-  it('6 Lovers: back to the nearest player behind them (max 4, else 2; the leader 1 more)', () => {
-    const s = rev('lovers');
-    skill(s, { target: CHASER }); // nearest behind P2 (3) is P0 (0): 3 spaces
+  it('6 Lovers: back to the nearest player behind them (max 4, else 2), then 1 more (the leader 3 more)', () => {
+    const s = rev('lovers', {}, {}, { progress: 4 });
+    skill(s, { target: CHASER }); // nearest behind P2 (4) is P0 (0): 4 + 1
     expect(s.players[CHASER]!.progress).toBe(0);
-    const t = rev('lovers');
-    skill(t, { target: LEADER }); // nearest behind P1 (5) is P2 (3): 2 + 1
-    expect(t.players[LEADER]!.progress).toBe(2);
+    const t = rev('lovers', {}, { progress: 9 }, { progress: 7 });
+    skill(t, { target: LEADER }); // nearest behind P1 (9) is P2 (7): 2 + 1 + 2
+    expect(t.players[LEADER]!.progress).toBe(4);
     const far = rev('lovers', {}, { progress: 12 }, { progress: 1 });
-    skill(far, { target: LEADER }); // nearest behind is 11 away: fallback 2 + 1
-    expect(far.players[LEADER]!.progress).toBe(9);
+    skill(far, { target: LEADER }); // nearest behind is 11 away: fallback 2 + 1 + 2
+    expect(far.players[LEADER]!.progress).toBe(7);
   });
-  it('7 Chariot: back 2 (leader 3) and Slowed', () => {
+  it('7 Chariot: back 2 (leader 4) and Slowed', () => {
     const s = rev('chariot');
     skill(s, { target: CHASER });
     expect(s.players[CHASER]!.progress).toBe(1);
     expect(statusOf(s.players[CHASER]!, 'slowed')).toBeDefined();
     const t = rev('chariot');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(2);
+    expect(t.players[LEADER]!.progress).toBe(1);
   });
-  it('8 Strength: back 1 (leader 2), Stunned, −1 FP', () => {
+  it('8 Strength: back 1 (leader 3), Stunned, −1 FP', () => {
     const s = rev('strength');
     skill(s, { target: CHASER });
     expect(s.players[CHASER]!.progress).toBe(2);
@@ -128,35 +128,35 @@ describe('every v5 reversed face: base effect and +1 against the leader', () => 
     expect(s.players[CHASER]!.fp).toBe(2);
     const t = rev('strength');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(3);
+    expect(t.players[LEADER]!.progress).toBe(2);
   });
-  it('9 Hermit: back 2 (leader 3) and Drained next turn', () => {
+  it('9 Hermit: back 2 (leader 4) and Drained next turn', () => {
     const s = rev('hermit');
     skill(s, { target: CHASER });
     expect(s.players[CHASER]!.progress).toBe(1);
     expect(statusOf(s.players[CHASER]!, 'drained')).toMatchObject({ from: 2, until: 2 });
     const t = rev('hermit');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(2);
+    expect(t.players[LEADER]!.progress).toBe(1);
   });
-  it('10 Wheel of Fortune (A): the target rolls and goes back that many (leader +1)', () => {
+  it('10 Wheel of Fortune (A): the target rolls and goes back that many (leader +2)', () => {
     const s = rev('wheelOfFortune', {}, {}, {}, { balance: { die: [2] } });
     skill(s, { target: CHASER });
     expect(s.players[CHASER]!.progress).toBe(1);
     const t = rev('wheelOfFortune', {}, {}, {}, { balance: { die: [2] } });
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(2);
+    expect(t.players[LEADER]!.progress).toBe(1);
   });
-  it('11 Justice: any player ahead, back 2 (leader 3) and −1 FP', () => {
+  it('11 Justice: any player ahead, back 3 (leader 5) and −1 FP', () => {
     const s = rev('justice');
     skill(s, { target: CHASER });
-    expect(s.players[CHASER]!.progress).toBe(1);
+    expect(s.players[CHASER]!.progress).toBe(0);
     expect(s.players[CHASER]!.fp).toBe(2);
     const t = rev('justice');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(2);
+    expect(t.players[LEADER]!.progress).toBe(0);
   });
-  it('12 Hanged Man: Rooted and Drained; the leader also back 1', () => {
+  it('12 Hanged Man: Rooted and Drained; the leader also back 2', () => {
     const s = rev('hangedMan');
     skill(s, { target: CHASER });
     expect(statusOf(s.players[CHASER]!, 'rooted')).toBeDefined();
@@ -164,32 +164,34 @@ describe('every v5 reversed face: base effect and +1 against the leader', () => 
     expect(s.players[CHASER]!.progress).toBe(3);
     const t = rev('hangedMan');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(4);
+    expect(t.players[LEADER]!.progress).toBe(3);
   });
-  it('13 Death: back 2 (leader 3) and −2 FP', () => {
+  it('13 Death: back 3 (leader 5) and −2 FP', () => {
     const s = rev('death');
     skill(s, { target: CHASER });
-    expect(s.players[CHASER]!.progress).toBe(1);
+    expect(s.players[CHASER]!.progress).toBe(0);
     expect(s.players[CHASER]!.fp).toBe(1);
     const t = rev('death');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(2);
+    expect(t.players[LEADER]!.progress).toBe(0);
   });
-  it('14 Temperance: Slowed for 2 turns (the leader 3)', () => {
+  it('14 Temperance: back 1 and Slowed for 2 turns (the leader 4 turns)', () => {
     const s = rev('temperance');
     skill(s, { target: CHASER });
     expect(statusOf(s.players[CHASER]!, 'slowed')).toMatchObject({ from: 2, until: 3 });
+    expect(s.players[CHASER]!.progress).toBe(2);
     const t = rev('temperance');
     skill(t, { target: LEADER });
-    expect(statusOf(t.players[LEADER]!, 'slowed')).toMatchObject({ from: 2, until: 4 });
+    expect(statusOf(t.players[LEADER]!, 'slowed')).toMatchObject({ from: 2, until: 5 });
+    expect(t.players[LEADER]!.progress).toBe(4);
   });
-  it('16 Tower: every player ahead back 2, the leader back 3', () => {
+  it('16 Tower: every player ahead back 2, the leader back 4', () => {
     const s = rev('tower');
     skill(s);
     expect(s.players[CHASER]!.progress).toBe(1);
-    expect(s.players[LEADER]!.progress).toBe(2);
+    expect(s.players[LEADER]!.progress).toBe(1);
   });
-  it('17 Star: back 2 (leader 3) and you steal 1 FP', () => {
+  it('17 Star: back 2 (leader 4) and you steal 1 FP', () => {
     const s = rev('star');
     skill(s, { target: CHASER });
     expect(s.players[CHASER]!.progress).toBe(1);
@@ -197,31 +199,31 @@ describe('every v5 reversed face: base effect and +1 against the leader', () => 
     expect(s.players[P0]!.fp).toBe(3);
     const t = rev('star');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(2);
+    expect(t.players[LEADER]!.progress).toBe(1);
   });
-  it('19 Sun: back 1 (leader 2), Slowed, −1 FP', () => {
+  it('19 Sun: back 2 (leader 4), Slowed, −1 FP', () => {
     const s = rev('sun');
     skill(s, { target: CHASER });
-    expect(s.players[CHASER]!.progress).toBe(2);
+    expect(s.players[CHASER]!.progress).toBe(1);
     expect(statusOf(s.players[CHASER]!, 'slowed')).toBeDefined();
     expect(s.players[CHASER]!.fp).toBe(2);
     const t = rev('sun');
     skill(t, { target: LEADER });
-    expect(t.players[LEADER]!.progress).toBe(3);
+    expect(t.players[LEADER]!.progress).toBe(1);
   });
-  it('20 Judgement: back half the distance between you (round up, max 4; leader +1)', () => {
+  it('20 Judgement: back half the distance between you (round up, max 4; leader +2)', () => {
     const s = rev('judgement');
     skill(s, { target: CHASER }); // gap 3 → 2
     expect(s.players[CHASER]!.progress).toBe(1);
     const t = rev('judgement', {}, { progress: 11 });
-    skill(t, { target: LEADER }); // gap 11 → max 4, + 1
-    expect(t.players[LEADER]!.progress).toBe(6);
+    skill(t, { target: LEADER }); // gap 11 → max 4, + 2
+    expect(t.players[LEADER]!.progress).toBe(5);
   });
-  it('21 World: once per game, every player ahead Rooted; the leader also back 1', () => {
+  it('21 World: once per game, every player ahead Rooted; the leader also back 2', () => {
     const s = rev('world', { progress: 1 }, {}, { progress: 0 });
     skill(s);
     expect(statusOf(s.players[LEADER]!, 'rooted')).toBeDefined();
-    expect(s.players[LEADER]!.progress).toBe(4);
+    expect(s.players[LEADER]!.progress).toBe(3);
     expect(statusOf(s.players[P2]!, 'rooted')).toBeUndefined();
     expect(s.players[P0]!.onceUsed.reversed).toBe(true);
   });
@@ -245,7 +247,7 @@ describe('traps spring when passed (D-60)', () => {
     expect(ofType(ev, 'trapTrigger')[0]).toMatchObject({ p: P0, blocked: false });
     expect(s.players[P0]!.progress).toBe(4);
     expect(statusOf(s.players[P0]!, 'rooted')).toBeDefined();
-    expect(s.players[P0]!.fp).toBe(3 + 1 - 2 + 1); // meditate, trap, element bonus on Leo
+    expect(s.players[P0]!.fp).toBe(3 + 1 - 3 + 1); // meditate, Chain Trap (−3), element bonus on Leo
     expect(s.players[P1]!.fp).toBe(4);
     expect(trapAt(s, 3)).toBeUndefined();
   });
@@ -253,7 +255,7 @@ describe('traps spring when passed (D-60)', () => {
     const s = scenario({ players: [{ progress: 1 }, { progress: 0 }, {}], traps: [{ sign: 3, kind: 'illusion', owner: P1, seq: 0 }], balance: { die: [3] } });
     act(s, { type: 'meditate' }, false);
     autoUntil(s);
-    expect(s.players[P0]!.progress).toBe(0); // reached 3 as the leader: back 3 + 1, stops
+    expect(s.players[P0]!.progress).toBe(0); // reached 3 as the leader: back 4 + 2, stops
   });
   it('your own card movement springs it; being pushed by someone else does not', () => {
     const own = scenario({ players: [{ progress: 1, hand: ['wands', 'wands', 'wands'] }, { progress: 9 }, {}], traps: [{ sign: 2, kind: 'chain', owner: P1, seq: 0 }] });
@@ -298,5 +300,43 @@ describe('traps spring when passed (D-60)', () => {
     const s = scenario({ players: [{ major: 'moon', orientation: 'reversed' }, { progress: 6 }, { progress: 2 }] });
     const sign = (enumerateActions(s).find((a) => a.type === 'useSkill') as { choice?: { sign?: number } } | undefined)?.choice?.sign;
     expect(typeof sign).toBe('number');
+  });
+});
+
+describe('rules v5 upright changes and 2-player lines (D-63)', () => {
+  it('2-player games: Hanged Man forward 3, Hermit draws 2, Hierophant +2 FP, Lovers fallback 2', () => {
+    const hm = scenario({ players: [{ major: 'hangedMan' }, { major: 'sun' }] });
+    skill(hm);
+    expect(hm.players[P0]!.progress).toBe(3);
+    const hm3 = scenario({ players: [{ major: 'hangedMan' }, { major: 'sun' }, { major: 'chariot' }] });
+    skill(hm3);
+    expect(hm3.players[P0]!.progress).toBe(2);
+    const he = scenario({ players: [{ major: 'hermit' }, { major: 'sun' }] });
+    skill(he);
+    expect(he.players[P0]!.hand).toHaveLength(2);
+    const hi = scenario({ players: [{ major: 'hierophant' }, { major: 'sun' }] });
+    skill(hi);
+    expect(hi.players[P0]!.fp).toBe(4);
+    const lo = scenario({ players: [{ major: 'lovers' }, { major: 'sun', progress: 9 }] });
+    skill(lo);
+    expect(lo.players[P0]!.progress).toBe(2);
+    const lo3 = scenario({ players: [{ major: 'lovers' }, { major: 'sun', progress: 9 }, { major: 'chariot', progress: 10 }] });
+    skill(lo3);
+    expect(lo3.players[P0]!.progress).toBe(3);
+  });
+  it('The Tower upright: forward 4, only 3 while you lead', () => {
+    const s = scenario({ players: [{ major: 'tower', progress: 2 }, { major: 'sun', progress: 5 }, {}] });
+    skill(s);
+    expect(s.players[P0]!.progress).toBe(6);
+    const t = scenario({ players: [{ major: 'tower', progress: 6 }, { major: 'sun', progress: 5 }, {}] });
+    skill(t);
+    expect(t.players[P0]!.progress).toBe(9);
+  });
+  it('The Moon upright: forward 2 and immune to traps, no shield and no FP', () => {
+    const s = scenario({ players: [{ major: 'moon' }, {}, {}] });
+    skill(s);
+    expect(s.players[P0]!.progress).toBe(2);
+    expect(hasShield(s.players[P0]!)).toBe(false);
+    expect(s.players[P0]!.fp).toBe(2);
   });
 });

@@ -29,14 +29,15 @@ export function defaultBalance(): BalanceConfig {
     die: [1, 2, 3],
     maxTraps: 3,
     chainRootedTurns: 1,
-    chainFpLoss: 2,
-    illusionBack: 3,
+    chainFpLoss: 3,
+    illusionBack: 4,
     shieldRefund: 1,
     majorReversedV5: true,
-    leaderBonus: 1,
+    leaderBonus: 2,
     trapOnPass: true,
     trapBounty: 1,
     trapReach: 3,
+    leaderBonusCards: 0,
     startProgressBySeat: [],
     startFpBySeat: [],
     finishSafe: false,
@@ -44,13 +45,34 @@ export function defaultBalance(): BalanceConfig {
     rotateStart: true,
     reversedAhead: true,
     cards: defaultCardParams(),
+    // Rules v5: "2-player game: ..." lines (decision D-63).
+    cards2p: {
+      'hangedMan.upright': { move: 3 },
+      'hermit.upright': { draw: 2 },
+      'hierophant.upright': { fp: 2 },
+      'lovers.upright': { fallback: 2 },
+    },
   };
+}
+
+/** The balance a game actually uses: 2-player games take the cards2p changes. */
+export function balanceForPlayers(b: BalanceConfig, players: number): BalanceConfig {
+  if (players !== 2 || Object.keys(b.cards2p).length === 0) return b;
+  const cards = { ...b.cards };
+  for (const key of Object.keys(b.cards2p) as FaceKey[]) cards[key] = { ...cards[key], ...b.cards2p[key] };
+  return { ...b, cards };
 }
 
 export function applyBalancePatch(base: BalanceConfig, patch?: BalancePatch): BalanceConfig {
   if (!patch) return base;
-  const { cards, ...rest } = patch;
-  const merged: BalanceConfig = { ...base, ...rest, cards: { ...base.cards } };
+  const { cards, cards2p, ...rest } = patch;
+  const merged: BalanceConfig = { ...base, ...rest, cards: { ...base.cards }, cards2p: { ...base.cards2p } };
+  if (cards2p) {
+    for (const key of Object.keys(cards2p) as FaceKey[]) {
+      if (!(key in FACES)) throw new Error(`unknown face ${key}`);
+      merged.cards2p[key] = { ...base.cards2p[key], ...cards2p[key] };
+    }
+  }
   if (cards) {
     for (const key of Object.keys(cards) as FaceKey[]) {
       if (!(key in FACES)) throw new Error(`unknown face ${key}`);

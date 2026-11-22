@@ -87,6 +87,11 @@ export function leaderBonusOn(s: GameState, id: PlayerId): number {
   return s.players.length >= 3 && isLeading(s, id) ? s.config.balance.leaderBonus : 0;
 }
 
+/** The same for minor and court reversed faces (balance.leaderBonusCards). */
+export function cardLeaderBonusOn(s: GameState, id: PlayerId): number {
+  return s.players.length >= 3 && isLeading(s, id) ? s.config.balance.leaderBonusCards : 0;
+}
+
 /** Decision D-27: players ahead of you by progress. */
 export function playersAhead(s: GameState, id: PlayerId): PlayerId[] {
   const me = player(s, id).progress;

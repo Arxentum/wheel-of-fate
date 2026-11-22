@@ -189,6 +189,8 @@ export interface BalanceConfig {
   trapOnPass: boolean;
   /** FP the owner gains when their trap springs. */
   trapBounty: number;
+  /** Leader bonus of minor and court reversed faces (their main number +N against the leader; 0 = none). */
+  leaderBonusCards: number;
   /** A trap must go 1..N signs in front of a player ahead of you (0 = any free sign). */
   trapReach: number;
   /** Extra starting progress by position in the turn order (seat 1 first). Empty = none. */
@@ -205,11 +207,14 @@ export interface BalanceConfig {
   rotateStart: boolean;
   /** Full parameter table of every face (defaults from data/cards.ts). */
   cards: Record<FaceKey, Record<string, number>>;
+  /** Changes to `cards` in 2-player games (like the rulebook's "2-player game: ..." lines). */
+  cards2p: Partial<Record<FaceKey, Record<string, number>>>;
 }
 
 /** A partial override of BalanceConfig; `cards` merges per face. */
-export type BalancePatch = Partial<Omit<BalanceConfig, 'cards'>> & {
+export type BalancePatch = Partial<Omit<BalanceConfig, 'cards' | 'cards2p'>> & {
   cards?: Partial<Record<FaceKey, Record<string, number>>>;
+  cards2p?: Partial<Record<FaceKey, Record<string, number>>>;
 };
 
 export interface PlayerSetup {

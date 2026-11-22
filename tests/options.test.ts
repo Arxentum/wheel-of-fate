@@ -178,10 +178,10 @@ describe('proposal parameters (report §6)', () => {
     expect(m.pending).toBeNull();
   });
   it('M15 Justice: at least 2 when behind; +1 space and 2 FP when leading', () => {
-    const s = scenario({ balance: B({ cards: { 'justice.upright': { min: 2, moveIfLeading: 1 } } }), players: [{ major: 'justice', progress: 3 }, { progress: 4 }, {}] });
+    const s = scenario({ balance: B({ cards: { 'justice.upright': { min: 2, moveIfLeading: 1, fpIfLeading: 2 } } }), players: [{ major: 'justice', progress: 3 }, { progress: 4 }, {}] });
     skill(s);
     expect(s.players[P0]!.progress).toBe(5);
-    const l = scenario({ balance: B({ cards: { 'justice.upright': { min: 2, moveIfLeading: 1 } } }), players: [{ major: 'justice', progress: 6 }, { progress: 4 }, {}] });
+    const l = scenario({ balance: B({ cards: { 'justice.upright': { min: 2, moveIfLeading: 1, fpIfLeading: 2 } } }), players: [{ major: 'justice', progress: 6 }, { progress: 4 }, {}] });
     skill(l);
     expect(l.players[P0]!.progress).toBe(7);
     expect(l.players[P0]!.fp).toBe(4);
@@ -224,10 +224,11 @@ describe('proposal parameters (report §6)', () => {
 describe('the defaults are rules v5; RULEBOOK_V4 / RULEBOOK_V3 restore the older rules', () => {
   it('v5: S1, S2, the M1 numbers, the shield refund and the reversed redesign on; the experiments off', () => {
     const b = defaultBalance();
-    expect(b).toMatchObject({ rotateStart: true, reversedAhead: true, majorReversedV5: true, leaderBonus: 1, trapOnPass: true, trapBounty: 1, shieldRefund: 1, finishSafe: false, endRule: 'round', startProgressBySeat: [], startFpBySeat: [] });
+    expect(b).toMatchObject({ rotateStart: true, reversedAhead: true, majorReversedV5: true, leaderBonus: 2, leaderBonusCards: 0, trapOnPass: true, trapBounty: 1, trapReach: 3, chainFpLoss: 3, illusionBack: 4, shieldRefund: 1, finishSafe: false, endRule: 'round', startProgressBySeat: [], startFpBySeat: [] });
+    expect(b.cards2p).toEqual({ 'hangedMan.upright': { move: 3 }, 'hermit.upright': { draw: 2 }, 'hierophant.upright': { fp: 2 }, 'lovers.upright': { fallback: 2 } });
     expect(b.cards['hermit.upright']).toEqual({ move: 1, fp: 2, draw: 1, shield: 1 });
-    expect(b.cards['hangedMan.upright']).toEqual({ skipMove: 0, move: 2, fp: 3, draw: 1, shield: 1, slowedSelf: 1 });
-    expect(b.cards['world.upright']).toEqual({ max: 8 });
+    expect(b.cards['hangedMan.upright']).toEqual({ skipMove: 0, move: 2, fp: 1, draw: 1, shield: 1, slowedSelf: 1 });
+    expect(b.cards['world.upright']).toEqual({ max: 9 });
     expect(b.cards['emperor.upright']).toEqual({ fp: 1, roll: 4, shield: 1 });
   });
   it('v3 through the patch', () => {

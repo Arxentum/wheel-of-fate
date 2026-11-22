@@ -150,13 +150,13 @@ describe('Move (rule §5 ④, decisions D-09 – D-12)', () => {
     expect(s.players[P0]!.progress).toBe(2);
   });
   it('Wrong Turn: back 1 instead of rolling; a Rooted turn does not use it up (D-16)', () => {
-    const s = scenario({ players: [{ progress: 5, statuses: [status('wrongTurn', 1, 1_000_000, 'fool.reversed'), status('rooted', 1, 1)] }, {}, {}], balance: { die: [3] } });
+    const s = scenario({ players: [{ progress: 5, statuses: [{ ...status('wrongTurn', 1, 1_000_000, 'fool.reversed'), amount: 1 }, status('rooted', 1, 1)] }, {}, {}], balance: { die: [3] } });
     act(s, { type: 'meditate' }, false);
     autoUntil(s);
     expect(s.players[P0]!.progress).toBe(5);
     expect(statusOf(s.players[P0]!, 'wrongTurn')).toBeDefined();
 
-    const t = scenario({ players: [{ progress: 5, fp: 9, statuses: [status('wrongTurn', 1, 1_000_000, 'fool.reversed')] }, {}, {}], balance: { die: [3] } });
+    const t = scenario({ players: [{ progress: 5, fp: 9, statuses: [{ ...status('wrongTurn', 1, 1_000_000, 'fool.reversed'), amount: 1 }] }, {}, {}], balance: { die: [3] } });
     act(t, { type: 'meditate' }, false);
     const ev = autoUntil(t);
     expect(ofType(ev, 'move')[0]).toMatchObject({ from: 5, to: 4, cause: 'wrongTurn' });
@@ -303,7 +303,7 @@ describe('traps (rule §7, D-23 – D-25)', () => {
     expect(s.players[P0]!.fp).toBe(4);
   });
   it('The Moon: immune this turn, the trap and the shield stay (D-24)', () => {
-    const s = scenario({ players: [{ progress: 0, major: 'moon' }, {}, {}], traps: [{ sign: 3, kind: 'chain', owner: P1, seq: 0 }], balance: { die: [1] } });
+    const s = scenario({ players: [{ progress: 0, major: 'moon' }, {}, {}], traps: [{ sign: 3, kind: 'chain', owner: P1, seq: 0 }], balance: { ...RULEBOOK_V4, die: [1] } });
     skill(s, {}, false);
     const ev = autoUntil(s);
     expect(ofType(ev, 'trapIgnored')).toHaveLength(1);
