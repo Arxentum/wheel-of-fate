@@ -28,7 +28,18 @@ export function FitText({ children, max, min, className }: Props) {
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
-    return () => ro.disconnect();
+    // The first measure may use a fallback font: measure again once the web fonts are in.
+    let live = true;
+    const refit = () => {
+      if (live) fit();
+    };
+    document.fonts?.ready.then(refit);
+    document.fonts?.addEventListener('loadingdone', refit);
+    return () => {
+      live = false;
+      ro.disconnect();
+      document.fonts?.removeEventListener('loadingdone', refit);
+    };
   }, [children, max, min]);
 
   return (

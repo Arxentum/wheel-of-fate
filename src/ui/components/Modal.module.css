@@ -1,0 +1,50 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(17 17 17 / 55%);
+  display: grid;
+  place-items: center;
+  z-index: 20;
+  animation: fade 160ms var(--ease);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+}
+
+.modal {
+  background: var(--bg);
+  border: var(--line-bold) solid var(--ink);
+  box-shadow: 10px 10px 0 var(--ink);
+  padding: 20px 24px;
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  animation: pop 200ms var(--ease);
+}
+
+.md {
+  max-width: min(640px, calc(100vw - 40px));
+}
+
+.wide {
+  max-width: min(900px, calc(100vw - 40px));
+}
+
+.full {
+  width: min(1240px, calc(100vw - 48px));
+  height: calc(100vh - 48px);
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

@@ -21,8 +21,9 @@ function storedLang(): Lang {
   return DEFAULT_LANG;
 }
 
-export function LangProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(storedLang);
+/** `initial` fixes the starting language (tests); otherwise the saved one or the default. */
+export function LangProvider({ children, initial }: { children: ReactNode; initial?: Lang }) {
+  const [lang, setLangState] = useState<Lang>(() => initial ?? storedLang());
 
   useEffect(() => {
     document.documentElement.lang = lang;

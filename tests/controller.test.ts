@@ -62,6 +62,22 @@ describe('GameController', () => {
     expect(sch.pending()).toBe(0);
   });
 
+  it('holds the playback and the computer turns while paused', () => {
+    const sch = manualScheduler();
+    const c = new GameController(allAi, 'ctl-pause', { scheduler: sch });
+    sch.flush(40);
+    const logged = c.getView().log.length;
+    c.setPaused(true);
+    expect(c.getView().paused).toBe(true);
+    expect(sch.pending()).toBe(0);
+    sch.flush();
+    expect(c.getView().log.length).toBe(logged);
+    c.setPaused(false);
+    sch.flush();
+    expect(c.getView().latest.result).not.toBeNull();
+    expect(c.getView().log.at(-1)!.event.t).toBe('gameOver');
+  });
+
   it('waits for the human, then plays their action back', () => {
     const sch = manualScheduler();
     const setup: GameSetup = { players: [{ controller: 'human', element: 'fire' }, { controller: 'ai', element: 'water' }], laps: 1 };

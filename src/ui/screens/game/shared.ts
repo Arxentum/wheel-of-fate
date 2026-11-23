@@ -39,3 +39,11 @@ export function targetOf(a: Action): PlayerId | undefined {
   if (a.type === 'conjurePlay') return a.play?.target;
   return undefined;
 }
+
+/** Why an option is greyed out, with the game's own costs and trap reach. */
+export function reasonText(t: T, s: GameState, reason: string | undefined): string | undefined {
+  if (!reason) return undefined;
+  const b = s.config.balance;
+  const n = reason === 'cannotReroll' ? b.rerollCost : reason === 'cannotBoost' ? b.boostCost : reason === 'cannotFlip' ? b.flipCost : 0;
+  return t(`reason.${reason}` as MessageKey, { n, reach: b.trapReach > 0 ? b.trapReach : 12 });
+}

@@ -11,6 +11,7 @@ import { Hand } from './Hand';
 import { LogPanel } from './LogPanel';
 import { CardInspector, CardViewer, GameOver, Handoff } from './Overlays';
 import { PlayerPanel } from './PlayerPanel';
+import { Reference } from './Reference';
 import { targetOf, useGameView, type UiMode } from './shared';
 import styles from './Game.module.css';
 
@@ -29,6 +30,12 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
   const [selected, setSelected] = useState<CardUid[]>([]);
   const [overOpen, setOverOpen] = useState(true);
   const [confirmLeave, setConfirmLeave] = useState(false);
+  const [rulesOpen, setRulesOpen] = useState(false);
+  // The game waits while the rules are open.
+  const openRules = (on: boolean) => {
+    setRulesOpen(on);
+    c.setPaused(on);
+  };
 
   // A new decision (or a new playback) clears what was being chosen.
   const decisionKey = `${v.latest.pending?.kind ?? 'none'}-${v.latest.pending?.player ?? -1}-${v.log.length}`;
@@ -117,6 +124,9 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
           <Button size="sm" variant="ghost" onClick={() => c.skip()} disabled={!v.busy || v.handoffTo !== null} title={t('game.skipTitle')}>
             {t('game.skip')}
           </Button>
+          <Button size="sm" onClick={() => openRules(true)} title={t('game.rulesTitle')}>
+            {t('game.rules')}
+          </Button>
           <LangSwitch compact />
           {confirmLeave ? (
             <Button size="sm" variant="danger" onClick={onNewGame}>
@@ -182,6 +192,7 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
         <CardViewer s={s} id={ui.id} turned={ui.turned} owner={ui.owner} onClose={() => setUi({ kind: 'idle' })} />
       )}
       {v.handoffTo !== null && !v.busy && <Handoff s={v.latest} to={v.handoffTo} onReady={() => c.takeOver()} onLeave={onNewGame} />}
+      {rulesOpen && <Reference s={v.latest} onClose={() => openRules(false)} />}
       {over && overOpen && <GameOver s={v.latest} seed={seed} onAgain={onRematch} onNew={onNewGame} onClose={() => setOverOpen(false)} />}
       {over && !overOpen && (
         <div className={styles.overBar}>

@@ -63,6 +63,8 @@ export interface GameView {
   dice: DiceView | null;
   /** The player whose piece is moving right now. */
   moving: PlayerId | null;
+  /** Playback and computer turns are held (the rules are open over the game). */
+  paused: boolean;
 }
 
 export interface Timing {
@@ -131,6 +133,7 @@ export class GameController {
       spotlight: null,
       dice: null,
       moving: null,
+      paused: false,
     };
     this.enqueue(events);
   }
@@ -180,6 +183,18 @@ export class GameController {
     this.set({ speed });
   }
 
+  /** Holds the playback and the computer turns (e.g. while the rules are open), or lets them go on. */
+  setPaused(on: boolean): void {
+    if (this.view.paused === on) return;
+    this.set({ paused: on });
+    if (on) {
+      if (this.timer !== null) this.scheduler.clear(this.timer);
+      this.timer = null;
+    } else {
+      this.pump();
+    }
+  }
+
   /** Plays everything back at once and lets the computers act without pauses until a human decides. */
   skip(): void {
     this.skipping = true;
@@ -221,7 +236,8 @@ export class GameController {
   }
 
   private schedule(fn: () => void, ms: number): void {
-    if (this.disposed) return;
+    // While paused nothing is scheduled; resuming pumps again and idle() schedules anew.
+    if (this.disposed || this.view.paused) return;
     const d = this.delay(ms);
     if (d <= 0) {
       fn();
@@ -235,7 +251,7 @@ export class GameController {
 
   /** Plays the next queued event, or moves the game on when the queue is empty. */
   private pump(): void {
-    if (this.disposed || this.timer !== null) return;
+    if (this.disposed || this.view.paused || this.timer !== null) return;
     // Loop instead of recursing while delays are zero (skip mode).
     for (;;) {
       const step = this.queue[0];

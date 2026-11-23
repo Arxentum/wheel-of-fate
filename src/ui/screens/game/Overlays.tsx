@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import {
   SUIT_ELEMENT,
   cardDef,
@@ -15,41 +15,14 @@ import {
 import { ELEMENT_COLOR } from '../../art/colors';
 import { Card } from '../../components/Card';
 import { Button } from '../../components/controls';
+import { Modal } from '../../components/Modal';
 import { Piece } from '../../components/Piece';
 import { renderFace } from '../../game/cardText';
 import { playerName } from '../../game/logText';
 import { cardSideOption } from '../../game/options';
 import { useLang } from '../../hooks/useLang';
-import { targetOf, type T } from './shared';
+import { reasonText, targetOf, type T } from './shared';
 import styles from './Game.module.css';
-
-/** A dialog over the game; Escape or the backdrop closes it. */
-export function Modal({ children, onClose, label, wide = false }: { children: ReactNode; onClose: () => void; label: string; wide?: boolean }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-  return (
-    <div className={styles.backdrop} onClick={onClose}>
-      <div
-        className={wide ? `${styles.modal} ${styles.modalWide}` : styles.modal}
-        role="dialog"
-        aria-modal="true"
-        aria-label={label}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function reasonText(t: T, reason: string | undefined): string | undefined {
-  return reason ? t(`reason.${reason}` as Parameters<T>[0]) : undefined;
-}
 
 /** Label of a court combo's fuel and/or target. */
 function variantLabel(t: T, s: GameState, a: Action): string {
@@ -72,7 +45,7 @@ export function CardInspector({ s, card, onPlay, onClose }: { s: GameState; card
   const me = s.pending ? s.players[s.pending.player]! : null;
   const resonance = me && isSuit(id) && elementOfSign(signOf(me.progress)) === SUIT_ELEMENT[id];
   return (
-    <Modal onClose={onClose} label={t(`card.${id}`)} wide>
+    <Modal onClose={onClose} label={t(`card.${id}`)} size="wide">
       <div className={styles.inspector}>
         <div className={styles.inspectorCard} style={{ ['--card-w' as string]: 'min(290px, calc((100vh - 120px) / 2.06))' }}>
           <Card id={id} balance={s.config.balance} players={s.players.length} turned={preview === 'reversed'} eager />
@@ -115,7 +88,7 @@ export function CardInspector({ s, card, onPlay, onClose }: { s: GameState; card
                     ))}
                   </div>
                 )}
-                {!opt.ok && <p className={styles.reasonLine}>{reasonText(t, opt.reason)}</p>}
+                {!opt.ok && <p className={styles.reasonLine}>{reasonText(t, s, opt.reason)}</p>}
               </div>
             );
           })}
@@ -134,7 +107,7 @@ export function CardViewer({ s, id, turned, owner, onClose }: { s: GameState; id
   const [flip, setFlip] = useState(turned);
   const current = owner !== undefined ? s.players[owner]!.orientation : undefined;
   return (
-    <Modal onClose={onClose} label={t(`card.${id}`)} wide>
+    <Modal onClose={onClose} label={t(`card.${id}`)} size="wide">
       <div className={styles.inspector}>
         <div className={styles.inspectorCard} style={{ ['--card-w' as string]: 'min(290px, calc((100vh - 120px) / 2.06))' }}>
           <Card id={id} balance={s.config.balance} players={s.players.length} turned={flip} current={current} eager />

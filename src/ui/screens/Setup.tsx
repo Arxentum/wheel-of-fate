@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { ELEMENTS, MAJORS, type Element, type GameSetup, type MajorId, type Orientation, type PlayerSetup } from '../../engine';
 import { ELEMENT_COLOR } from '../art/colors';
 import { Button, NumberBox, Segmented } from '../components/controls';
-import { LangSwitch } from '../components/LangSwitch';
 import { Piece } from '../components/Piece';
+import { PAGE_HASH, SiteNav } from '../components/SiteNav';
 import { useLang } from '../hooks/useLang';
 import styles from './Setup.module.css';
 
@@ -96,9 +96,7 @@ export function Setup({ onStart }: { onStart: (choice: SetupChoice) => void }) {
 
   return (
     <div className={styles.page}>
-      <header className={styles.top}>
-        <LangSwitch />
-      </header>
+      <SiteNav page="play" />
       <main className={styles.layout}>
         <section className={styles.hero}>
           <div className={styles.dots} aria-hidden="true">
@@ -113,6 +111,10 @@ export function Setup({ onStart }: { onStart: (choice: SetupChoice) => void }) {
             <li>{t('setup.fact.time')}</li>
             <li>{t('setup.fact.characters')}</li>
           </ul>
+          <div className={styles.links}>
+            <a href={PAGE_HASH.rules}>{t('nav.rules')} →</a>
+            <a href={PAGE_HASH.cards}>{t('nav.cards')} →</a>
+          </div>
           <div className={styles.decor} aria-hidden="true">
             <span style={{ background: 'var(--fire)' }} />
             <span style={{ background: 'var(--earth)' }} />

@@ -16,5 +16,8 @@
     "scripts",
     "vitest.config.ts",
     "vite.config.ts"
+  ],
+  "exclude": [
+    "tests/**/*.tsx"
   ]
 }

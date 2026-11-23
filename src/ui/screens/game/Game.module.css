@@ -973,37 +973,6 @@ html[lang='zh-Hant'] .logHead {
 }
 
 /* ---------- Overlays ---------- */
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgb(17 17 17 / 55%);
-  display: grid;
-  place-items: center;
-  z-index: 20;
-  animation: fade 160ms var(--ease);
-}
-
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
-}
-
-.modal {
-  background: var(--bg);
-  border: var(--line-bold) solid var(--ink);
-  box-shadow: 10px 10px 0 var(--ink);
-  padding: 20px 24px;
-  max-width: min(640px, calc(100vw - 40px));
-  max-height: calc(100vh - 40px);
-  overflow: auto;
-  animation: pop 200ms var(--ease);
-}
-
-.modalWide {
-  max-width: min(900px, calc(100vw - 40px));
-}
-
 .inspector {
   display: grid;
   grid-template-columns: auto minmax(280px, 1fr);

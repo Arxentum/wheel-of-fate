@@ -1,0 +1,33 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 20px;
+  border-bottom: var(--line-bold) solid var(--ink);
+  background: var(--bg);
+}
+
+.paused {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Pause sign: two bars. */
+.paused i {
+  width: 12px;
+  height: 14px;
+  border-left: 4px solid var(--fire);
+  border-right: 4px solid var(--fire);
+}
+
+.body {
+  flex: 1;
+  overflow: auto;
+}

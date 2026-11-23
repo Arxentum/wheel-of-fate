@@ -56,7 +56,7 @@ export function Card({ id, balance, players, turned = false, current, className,
     >
       <div className={styles.bandInner}>
         <SideMark id={id} side={side} />
-        <FitText max={13.5} min={8.5} className={styles.text}>
+        <FitText max={13.5} min={8} className={styles.text}>
           <span>
             <strong className={styles.faceName}>{face.name}</strong> {face.text}
           </span>

@@ -2,12 +2,6 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 16px 40px 24px;
-}
-
-.top {
-  display: flex;
-  justify-content: flex-end;
 }
 
 .layout {
@@ -19,6 +13,33 @@
   max-width: 1240px;
   width: 100%;
   margin: 0 auto;
+  padding: 24px 40px 32px;
+}
+
+.links {
+  display: flex;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.links a {
+  padding: 8px 14px;
+  border: var(--line-bold) solid var(--ink);
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+}
+
+.links a:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink);
 }
 
 .hero {

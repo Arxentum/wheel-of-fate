@@ -19,7 +19,7 @@ import { playerName } from '../../game/logText';
 import { anyCardOption, simpleOption, skillOption } from '../../game/options';
 import { useLang } from '../../hooks/useLang';
 import { TurnSteps } from './TurnSteps';
-import { targetOf, type T, type UiMode } from './shared';
+import { reasonText, targetOf, type T, type UiMode } from './shared';
 import styles from './Game.module.css';
 
 interface Props {
@@ -80,10 +80,6 @@ interface ChooseProps {
   t: T;
 }
 
-function reasonText(t: T, reason: string | undefined): string | undefined {
-  return reason ? t(`reason.${reason}` as Parameters<T>[0]) : undefined;
-}
-
 function Choose(props: ChooseProps) {
   const { s, d, c, t } = props;
   const { lang } = useLang();
@@ -106,7 +102,7 @@ function Choose(props: ChooseProps) {
               <span className={styles.optionKey}>A·B</span>
               <div className={styles.optionMain}>
                 <strong>{t('decide.playCard')}</strong>
-                <p className={cards.ok ? undefined : styles.reasonLine}>{cards.ok ? t('decide.playCardHint') : reasonText(t, cards.reason)}</p>
+                <p className={cards.ok ? undefined : styles.reasonLine}>{cards.ok ? t('decide.playCardHint') : reasonText(t, s, cards.reason)}</p>
               </div>
             </div>
             <div className={styles.option}>
@@ -118,7 +114,7 @@ function Choose(props: ChooseProps) {
                 <p className={styles.optionText} title={face.text}>
                   {face.text}
                 </p>
-                {!skill.ok && <p className={styles.reasonLine}>{reasonText(t, skill.reason)}</p>}
+                {!skill.ok && <p className={styles.reasonLine}>{reasonText(t, s, skill.reason)}</p>}
               </div>
               <Button size="sm" variant="primary" disabled={!skill.ok} onClick={() => startSkill(props, skill)}>
                 {t('decide.useSkill')}
@@ -169,7 +165,7 @@ function Choose(props: ChooseProps) {
             <Button variant="primary" onClick={() => c.act({ type: 'flip', flip: false })}>
               {t('decide.keep', { side: t(`side.${me.orientation}`) })}
             </Button>
-            <Button disabled={!flip.ok} reason={reasonText(t, flip.reason)} onClick={() => c.act({ type: 'flip', flip: true })}>
+            <Button disabled={!flip.ok} reason={reasonText(t, s, flip.reason)} onClick={() => c.act({ type: 'flip', flip: true })}>
               {t('decide.flipTo', { side: t(`side.${other}`), n: b.flipCost })}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => props.setUi({ kind: 'view', id: me.major, turned: me.orientation === 'reversed', owner: me.id })}>
@@ -194,10 +190,10 @@ function Choose(props: ChooseProps) {
             <Button variant="primary" onClick={() => c.act({ type: 'confirmMove' })} autoFocus>
               {t('decide.move', { n: steps })}
             </Button>
-            <Button disabled={!reroll.ok} reason={reasonText(t, reroll.reason)} onClick={() => c.act({ type: 'reroll' })}>
+            <Button disabled={!reroll.ok} reason={reasonText(t, s, reroll.reason)} onClick={() => c.act({ type: 'reroll' })}>
               {t('decide.reroll', { n: b.rerollCost })}
             </Button>
-            <Button disabled={!boost.ok} reason={reasonText(t, boost.reason)} onClick={() => c.act({ type: 'boost' })}>
+            <Button disabled={!boost.ok} reason={reasonText(t, s, boost.reason)} onClick={() => c.act({ type: 'boost' })}>
               {t('decide.boost', { n: b.boostCost })}
             </Button>
           </div>
@@ -265,7 +261,7 @@ function SkillPick(props: ChooseProps) {
     props.setSelected([]);
   };
   let pick: React.ReactNode;
-  if (!skill.ok) pick = <p className={styles.reasonLine}>{reasonText(t, skill.reason)}</p>;
+  if (!skill.ok) pick = <p className={styles.reasonLine}>{reasonText(t, s, skill.reason)}</p>;
   else if (skill.pick === 'target')
     pick = <Targets s={s} t={t} actions={skill.actions} onPick={(a) => c.act(a)} />;
   else if (skill.pick === 'sign') pick = <p className={styles.sub}>{t('decide.pickSign')}</p>;
@@ -275,7 +271,7 @@ function SkillPick(props: ChooseProps) {
     pick = (
       <>
         <p className={styles.sub}>{t('decide.selectDiscard', { n: selected.length })}</p>
-        <Button variant="primary" disabled={!check.ok} reason={check.ok ? undefined : reasonText(t, check.reason)} onClick={() => c.act(action)}>
+        <Button variant="primary" disabled={!check.ok} reason={check.ok ? undefined : reasonText(t, s, check.reason)} onClick={() => c.act(action)}>
           {t('decide.useWithDiscard', { n: selected.length })}
         </Button>
       </>
@@ -337,7 +333,7 @@ export function Targets({ s, t, actions, onPick }: { s: GameState; t: T; actions
 
 /** The High Priestess upright: use one minor's upright effect, take another card. */
 function ForesightPick(props: ChooseProps & { d: Extract<Decision, { kind: 'foresight' }> }) {
-  const { d, c, t } = props;
+  const { s, d, c, t } = props;
   const minors = d.cards.filter((u) => isSuit(cardDef(u)));
   const [use, setUse] = useState<CardUid | null>(minors[0] ?? null);
   const rest = d.cards.filter((u) => u !== use);
@@ -367,7 +363,7 @@ function ForesightPick(props: ChooseProps & { d: Extract<Decision, { kind: 'fore
           );
         })}
       </div>
-      <Button variant="primary" disabled={!check.ok} reason={check.ok ? undefined : reasonText(t, check.reason)} onClick={() => c.act(action)}>
+      <Button variant="primary" disabled={!check.ok} reason={check.ok ? undefined : reasonText(t, s, check.reason)} onClick={() => c.act(action)}>
         {t('decide.confirm')}
       </Button>
     </div>

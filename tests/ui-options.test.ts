@@ -43,3 +43,17 @@ describe('UI options agree with the engine', () => {
 function sameDef(a: number, b: number): boolean {
   return cardDef(a) === cardDef(b);
 }
+
+describe('reasonText', () => {
+  it('fills in the game costs and trap reach', async () => {
+    const { reasonText } = await import('../src/ui/screens/game/shared');
+    const { createGame } = await import('../src/engine');
+    const { translate } = await import('../src/i18n');
+    const { state } = createGame({ players: [{ controller: 'human', element: 'fire' }, { controller: 'ai', element: 'air' }], laps: 1 }, 'reason');
+    const en = (k: Parameters<typeof translate>[1], p?: Parameters<typeof translate>[2]) => translate('en', k, p);
+    expect(reasonText(en, state, 'cannotBoost')).toBe('No boost: one per turn, and it costs 2 Fate Points.');
+    expect(reasonText(en, state, 'cannotFlip')).toBe('Flipping costs 1 Fate Point.');
+    expect(reasonText(en, state, 'invalidSign')).toContain('1–3 signs');
+    expect(reasonText(en, state, undefined)).toBeUndefined();
+  });
+});

@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { GameController } from './game/controller';
 import { Game } from './screens/game/Game';
 import { AssetPreview } from './screens/AssetPreview';
+import { GalleryPage } from './screens/gallery/Gallery';
+import { HowToPlayPage } from './screens/rules/HowToPlay';
 import { Setup, toGameSetup, type SetupChoice } from './screens/Setup';
 
 interface Running {
@@ -14,14 +16,21 @@ interface Running {
 function useHash(): string {
   const [hash, setHash] = useState(() => window.location.hash);
   useEffect(() => {
-    const on = () => setHash(window.location.hash);
+    const on = () => {
+      setHash(window.location.hash);
+      window.scrollTo(0, 0);
+    };
     window.addEventListener('hashchange', on);
     return () => window.removeEventListener('hashchange', on);
   }, []);
   return hash;
 }
 
-/** Setup screen → game screen. `#/assets` shows the asset review page (milestone 2). */
+/**
+ * Pages: start (setup) → game; `#/rules` How to Play, `#/cards` the Card Gallery,
+ * `#/assets` the asset review page (milestone 2). A running game stays on screen; its
+ * Rules button opens the rules and the cards over it.
+ */
 export function App() {
   const hash = useHash();
   const [game, setGame] = useState<Running | null>(null);
@@ -44,7 +53,11 @@ export function App() {
   }, []);
 
   if (hash === '#/assets') return <AssetPreview />;
-  if (!game) return <Setup onStart={start} />;
+  if (!game) {
+    if (hash === '#/rules') return <HowToPlayPage />;
+    if (hash === '#/cards') return <GalleryPage />;
+    return <Setup onStart={start} />;
+  }
   return (
     <Game
       key={game.n}
