@@ -4,7 +4,7 @@ import type { Element, TrapKind } from '../../engine/types';
 import { ELEMENT_COLOR, ELEMENT_ON_COLOR } from '../art/colors';
 import { TRAP_PATHS, ZODIAC_PATHS } from '../art/glyphs';
 import { useLang } from '../hooks/useLang';
-import { BOARD, SIGN_SPAN, kitePath, piecePositions, polar, readableTurn, signAngle, wedgePath } from './boardGeometry';
+import { BOARD, SIGN_SPAN, kitePath, pieceSpots, polar, readableTurn, signAngle, wedgePath } from './boardGeometry';
 import { PieceToken } from './Piece';
 import styles from './Board.module.css';
 
@@ -64,8 +64,7 @@ export function Board({ pieces = [], traps = [], activeId, selectable = [], onSe
   useEffect(() => {
     lastSign.current = new Map(pieces.map((p) => [p.id, p.sign]));
   });
-  const bySign = new Map<number, BoardPiece[]>();
-  for (const p of pieces) bySign.set(p.sign, [...(bySign.get(p.sign) ?? []), p]);
+  const spots = pieceSpots(pieces);
 
   const pick = (sign: number) => onSelectSign?.(sign);
   const onKey = (sign: number) => (e: KeyboardEvent) => {
@@ -192,22 +191,19 @@ export function Board({ pieces = [], traps = [], activeId, selectable = [], onSe
       })}
 
       {/* Pieces on the track */}
-      {[...bySign.entries()].flatMap(([sign, group]) => {
-        const spots = piecePositions(sign, group.length);
-        return group.map((p, i) => {
-          const [x, y] = spots[i]!;
-          return (
-            <g
-              key={p.id}
-              data-piece={p.element}
-              className={glide(p.id, sign) ? `${styles.piece} ${styles.glide}` : styles.piece}
-              style={{ transform: `translate(${x}px, ${y}px)` }}
-            >
-              <title>{t('piece.label', { element: t(`element.${p.element}`) })}</title>
-              <PieceToken element={p.element} x={0} y={0} r={BOARD.pieceSize} active={p.id === activeId} />
-            </g>
-          );
-        });
+      {pieces.map((p) => {
+        const [x, y] = spots.get(p.id)!;
+        return (
+          <g
+            key={p.id}
+            data-piece={p.element}
+            className={glide(p.id, p.sign) ? `${styles.piece} ${styles.glide}` : styles.piece}
+            style={{ transform: `translate(${x}px, ${y}px)` }}
+          >
+            <title>{t('piece.label', { element: t(`element.${p.element}`) })}</title>
+            <PieceToken element={p.element} x={0} y={0} r={BOARD.pieceSize} active={p.id === activeId} />
+          </g>
+        );
       })}
     </svg>
   );

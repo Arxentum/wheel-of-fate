@@ -55,6 +55,8 @@ interface Shape {
 function chain(o: Out, s: Shape): AudioNode {
   const g = o.ctx.createGain();
   const a = s.attack ?? 0.004;
+  // Silent from the start: a source may begin a sample before its first automation event.
+  g.gain.value = SILENT;
   g.gain.setValueAtTime(SILENT, s.t);
   g.gain.exponentialRampToValueAtTime(Math.max(s.peak, SILENT * 2), s.t + a);
   g.gain.exponentialRampToValueAtTime(SILENT, s.t + Math.max(s.dur, a + 0.01));
@@ -286,6 +288,106 @@ const MAKERS: Record<CueName, Maker> = {
     for (const [i, m] of [69, 76, 81].entries()) bell(o, { t: t + i * 0.12, dur: 1.6, peak: 0.1, f: freq(m) });
     for (const m of [57, 64, 69]) tone(o, { t: t + 0.4, dur: 2, peak: 0.035, f: freq(m), type: 'sawtooth', lowpass: 1200, attack: 0.08 });
   },
+
+  // ---- Card effects ----
+  slash: (o, t, c) => {
+    noise(o, { t, dur: 0.2, peak: 0.16, filter: 'bandpass', f: 6500, to: 1400, q: 1.5, pan: c.pan, attack: 0.03 });
+    bell(o, { t: t + 0.12, dur: 0.35, peak: 0.07, f: 2200, pan: c.pan });
+    tone(o, { t: t + 0.14, dur: 0.18, peak: 0.14, f: 140, to: 60, pan: c.pan });
+  },
+  coins: (o, t, c) => {
+    [0, 0.06, 0.13, 0.21, 0.3].forEach((d, i) => bell(o, { t: t + d, dur: 0.25, peak: 0.05, f: freq(94 + ((i * 5) % 9)), pan: c.pan }));
+  },
+  flame: (o, t, c) => {
+    noise(o, { t, dur: 0.55, peak: 0.12, filter: 'lowpass', f: 700, to: 2600, pan: c.pan, attack: 0.12 });
+    for (let i = 0; i < 6; i++) noise(o, { t: t + 0.1 + i * 0.07, dur: 0.025, peak: 0.03, filter: 'highpass', f: 3000, pan: c.pan, attack: 0.004 });
+  },
+  wind: (o, t, c) => noise(o, { t, dur: 0.75, peak: 0.1, filter: 'bandpass', f: 400, to: 1300, q: 1.2, pan: c.pan, attack: 0.25 }),
+  water: (o, t, c) => {
+    for (let i = 0; i < 6; i++) tone(o, { t: t + i * 0.06, dur: 0.08, peak: 0.05, f: 380 + i * 70, to: 900 + i * 90, pan: c.pan, attack: 0.005 });
+    noise(o, { t, dur: 0.35, peak: 0.05, filter: 'lowpass', f: 1200, pan: c.pan });
+  },
+  heartbreak: (o, t, c) => {
+    tine(o, { t, dur: 0.4, peak: 0.07, f: 880, pan: c.pan });
+    noise(o, { t: t + 0.18, dur: 0.06, peak: 0.12, filter: 'highpass', f: 2500, pan: c.pan, attack: 0.001 });
+    tone(o, { t: t + 0.2, dur: 0.5, peak: 0.07, f: 660, to: 300, type: 'triangle', pan: c.pan });
+  },
+  magic: (o, t, c) => {
+    const notes = [93, 96, 98, 100, 103, 105, 100, 98];
+    notes.forEach((m, i) => tine(o, { t: t + i * 0.055, dur: 0.5, peak: 0.04, f: freq(m), pan: c.pan }));
+    noise(o, { t, dur: 0.6, peak: 0.025, filter: 'highpass', f: 7000, attack: 0.2, pan: c.pan });
+  },
+  shine: (o, t, c) => {
+    for (const [i, m] of [84, 88, 91, 96].entries()) bell(o, { t: t + i * 0.05, dur: 0.9, peak: 0.05, f: freq(m), pan: c.pan });
+    noise(o, { t, dur: 0.5, peak: 0.025, filter: 'highpass', f: 6500, attack: 0.15, pan: c.pan });
+  },
+  freeze: (o, t, c) => {
+    for (const f of [2500, 3330, 4100]) tone(o, { t, dur: 0.7, peak: 0.03, f, attack: 0.02, pan: c.pan });
+    noise(o, { t: t + 0.05, dur: 0.08, peak: 0.1, filter: 'highpass', f: 5000, pan: c.pan, attack: 0.001 });
+    noise(o, { t: t + 0.2, dur: 0.06, peak: 0.07, filter: 'highpass', f: 4000, pan: c.pan, attack: 0.001 });
+  },
+  quake: (o, t, c) => {
+    noise(o, { t, dur: 0.9, peak: 0.2, filter: 'lowpass', f: 140, pan: c.pan, attack: 0.08 });
+    tone(o, { t, dur: 0.8, peak: 0.16, f: 55, to: 38, pan: c.pan, attack: 0.05 });
+    tone(o, { t: t + 0.3, dur: 0.3, peak: 0.12, f: 110, to: 45, pan: c.pan });
+  },
+  thud: (o, t, c) => {
+    tone(o, { t, dur: 0.35, peak: 0.25, f: 130, to: 42, pan: c.pan, attack: 0.002 });
+    noise(o, { t, dur: 0.12, peak: 0.1, filter: 'lowpass', f: 900, pan: c.pan, attack: 0.001 });
+  },
+  bell: (o, t, c) => bell(o, { t, dur: 2, peak: 0.1, f: freq(64), pan: c.pan }),
+  roar: (o, t, c) => {
+    noise(o, { t, dur: 0.7, peak: 0.16, filter: 'bandpass', f: 380, to: 220, q: 0.9, pan: c.pan, attack: 0.08 });
+    tone(o, { t, dur: 0.65, peak: 0.07, f: 95, to: 70, type: 'sawtooth', lowpass: 600, pan: c.pan, attack: 0.08 });
+  },
+  zap: (o, t, c) => {
+    noise(o, { t, dur: 0.1, peak: 0.18, filter: 'highpass', f: 3000, pan: c.pan, attack: 0.001 });
+    tone(o, { t, dur: 0.25, peak: 0.07, f: 2200, to: 180, type: 'square', lowpass: 3000, pan: c.pan, attack: 0.001 });
+    tone(o, { t: t + 0.05, dur: 0.4, peak: 0.14, f: 90, to: 40, pan: c.pan });
+  },
+  chain: (o, t, c) => {
+    [0, 0.05, 0.11, 0.16, 0.23, 0.3].forEach((d, i) => {
+      bell(o, { t: t + d, dur: 0.15, peak: 0.045, f: 1500 + ((i * 433) % 1100), pan: c.pan });
+      noise(o, { t: t + d, dur: 0.035, peak: 0.03, filter: 'highpass', f: 5000, pan: c.pan, attack: 0.004 });
+    });
+  },
+  trumpet: (o, t, c) => {
+    for (const [i, m] of [67, 72].entries()) {
+      for (const detune of [-6, 6]) tone(o, { t: t + i * 0.18, dur: i ? 0.6 : 0.2, peak: 0.05, f: freq(m), detune, type: 'sawtooth', lowpass: 1800, attack: 0.04, pan: c.pan });
+    }
+  },
+  gallop: (o, t, c) => {
+    [0, 0.09, 0.26, 0.35, 0.52, 0.61].forEach((d, i) => wood(o, { t: t + d, dur: 0.05, peak: 0.1, f: i % 2 ? 640 : 820, pan: c.pan }));
+  },
+  boing: (o, t, c) => {
+    const osc = o.ctx.createOscillator();
+    osc.frequency.setValueAtTime(180, t);
+    osc.frequency.exponentialRampToValueAtTime(620, t + 0.12);
+    osc.frequency.exponentialRampToValueAtTime(260, t + 0.45);
+    osc.connect(chain(o, { t, dur: 0.5, peak: 0.12, pan: c.pan }));
+    osc.start(t);
+    osc.stop(t + 0.55);
+  },
+  snatch: (o, t, c) => {
+    noise(o, { t, dur: 0.12, peak: 0.1, filter: 'highpass', f: 2500, pan: c.pan, attack: 0.02 });
+    tine(o, { t: t + 0.1, dur: 0.3, peak: 0.06, f: 1320, pan: c.pan });
+  },
+  whisper: (o, t, c) => {
+    noise(o, { t, dur: 0.65, peak: 0.07, filter: 'bandpass', f: 2600, q: 2.5, pan: c.pan, attack: 0.2 });
+    noise(o, { t: t + 0.2, dur: 0.5, peak: 0.05, filter: 'bandpass', f: 1800, q: 2.5, pan: c.pan, attack: 0.15 });
+  },
+  bloom: (o, t, c) => {
+    for (const [i, m] of [76, 79, 83, 88].entries()) tine(o, { t: t + i * 0.08, dur: 0.8, peak: 0.05, f: freq(m), pan: c.pan });
+    tone(o, { t, dur: 0.9, peak: 0.03, f: freq(64), attack: 0.3, pan: c.pan });
+  },
+
+  // ---- Emotes: a pop and a little voice ----
+  emote: (o, t, c) => {
+    noise(o, { t, dur: 0.03, peak: 0.08, filter: 'bandpass', f: 1800, q: 2, pan: c.pan, attack: 0.001 });
+    const k = st(c.pitch);
+    tone(o, { t: t + 0.02, dur: 0.16, peak: 0.07, f: 320 * k, to: 520 * k, type: 'triangle', lowpass: 2000, pan: c.pan });
+    tone(o, { t: t + 0.02, dur: 0.16, peak: 0.035, f: 950 * k, to: 1400 * k, pan: c.pan });
+  },
 };
 
 /**
@@ -295,6 +397,7 @@ const MAKERS: Record<CueName, Maker> = {
 const LEVEL: Partial<Record<CueName, number>> = {
   start: 0.45, gong: 0.6, win: 0.7, fanfare: 0.65, trap: 0.55, skillDark: 0.65, skill: 0.85, yourTurn: 0.8,
   turn: 1.8, draw: 2.1, shuffle: 3.2, discard: 2.3, click: 1.3, pick: 1.3,
+  wind: 3, whisper: 3, thud: 0.6, gallop: 1.6, water: 1.4,
 };
 
 /** Plays one effect at time `t` (seconds, on the context's clock). */
@@ -327,6 +430,7 @@ export function playNote(o: Out, n: Note, t: number): void {
         lp.frequency.value = 900;
         const g = o.ctx.createGain();
         const peak = 0.018 * n.vel;
+        g.gain.value = 0;
         g.gain.setValueAtTime(0, t);
         g.gain.linearRampToValueAtTime(peak, t + Math.min(0.8, len / 2));
         g.gain.setValueAtTime(peak, t + len);

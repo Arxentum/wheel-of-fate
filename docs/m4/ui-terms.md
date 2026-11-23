@@ -92,7 +92,7 @@
 | `setup.start` | Start game | 開始遊戲 |
 | `setup.orderHint` | The first player moves on by one seat every round. | 每一輪的先手會輪到下一位。 |
 
-### 游戏画面（86）
+### 游戏画面（97）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -182,6 +182,17 @@
 | `played.conjure` | Extra card (Conjure) | 額外打出（變出） |
 | `played.foresight` | Upright effect (Foresight) | 正位效果（預知） |
 | `played.wheel` | Wheel of Fortune | 命運之輪 |
+| `emote.taunt` | Too slow! | 太慢了！ |
+| `emote.laugh` | Hahaha! | 哈哈哈！ |
+| `emote.cool` | Easy. | 輕鬆～ |
+| `emote.shock` | Whoa! | 嚇死我了！ |
+| `emote.cry` | Nooo… | 不要啊… |
+| `emote.angry` | Grr! | 氣死我了！ |
+| `emote.nice` | Nice one! | 厲害！ |
+| `emote.gg` | Good game! | 打得好！ |
+| `emote.open` | Emotes | 表情 |
+| `emote.bots` | Computer players send emotes too | 電腦玩家也會發表情 |
+| `emote.wait` | Emotes are sent by the player holding the device: take over first. | 表情由拿著裝置的玩家發送：請先接手。 |
 
 ### 状态（16）
 
@@ -372,7 +383,7 @@
 | `over.show` | Results | 結果 |
 | `handoff.leave` | Leave this game | 離開這一局 |
 
-### 玩法说明页（113）
+### 玩法说明页（114）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -489,8 +500,9 @@
 | `rules.screen.rules` | In a game, the Rules button opens this page and the cards. The game waits until you close it. | 遊戲中按「規則」可以打開這一頁和卡牌圖鑑；關閉之前遊戲會暫停。 |
 | `rules.cards.resonance` | Resonance: play a Minor card on a sign of its own element to gain {n\|more Fate Point\|more Fate Points}. | 共鳴：在與牌同元素的星座打出小阿爾克那，額外獲得 {n} 命運點。 |
 | `rules.screen.sound` | Set the music and the sound effects with the speaker button at the top of the screen. | 用畫面頂部的喇叭按鈕調整音樂和音效。 |
+| `rules.screen.emote` | Send an emote with the face button at the top. Computer players react on their own; you can turn that off there. | 用頂部的笑臉按鈕發表情。電腦玩家會自己看情況發，也可以在那裡關掉。 |
 
-### 卡牌图鉴页（25）
+### 卡牌图鉴页（28）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -519,3 +531,6 @@
 | `gallery.next` | Next | 下一張 |
 | `gallery.keys` | ← → previous and next card | ← → 切換上一張、下一張 |
 | `gallery.differs2p` | Changes with 2 players | 兩人局寫法不同 |
+| `gallery.effect` | On the board | 星盤上的效果 |
+| `gallery.playUp` | Play the upright effect | 播放正位效果 |
+| `gallery.playDown` | Play the reversed effect | 播放逆位效果 |

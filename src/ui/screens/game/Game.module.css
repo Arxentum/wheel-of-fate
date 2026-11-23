@@ -1534,3 +1534,86 @@ html[lang='zh-Hant'] .playedName {
     box-shadow: 9px 9px 0 var(--accent);
   }
 }
+
+/* ---------- Emote bubbles over the pieces ---------- */
+.bubble {
+  position: absolute;
+  z-index: 7;
+  transform: translate(-50%, calc(-100% - 26px));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 5px;
+  background: var(--paper);
+  border: var(--line-bold) solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 4px 4px 0 var(--ink);
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: bubbleIn 2.6s var(--ease) both;
+}
+
+html[lang='zh-Hant'] .bubble {
+  font-family: var(--font-zh);
+  font-size: 15px;
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  width: 16px;
+  height: 16px;
+  background: var(--paper);
+  border-right: var(--line-bold) solid var(--ink);
+  border-bottom: var(--line-bold) solid var(--ink);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.bubbleBelow {
+  transform: translate(-50%, 26px);
+}
+
+.bubbleBelow::after {
+  bottom: auto;
+  top: -12px;
+  border: 0;
+  border-left: var(--line-bold) solid var(--ink);
+  border-top: var(--line-bold) solid var(--ink);
+}
+
+@keyframes bubbleIn {
+  0% {
+    opacity: 0;
+    scale: 0.4;
+  }
+  8% {
+    opacity: 1;
+    scale: 1.08;
+  }
+  14% {
+    scale: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Narrow screens (tablets): keep the top bar on one line. */
+@media (max-width: 1120px) {
+  .lapsGoal,
+  .controlLabel {
+    display: none;
+  }
+
+  .round {
+    white-space: nowrap;
+  }
+}

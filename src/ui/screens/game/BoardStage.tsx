@@ -3,7 +3,11 @@ import { ELEMENT_COLOR } from '../../art/colors';
 import { Board, type BoardPiece } from '../../components/Board';
 import { CardArt } from '../../components/CardArt';
 import type { DiceView, Spotlight } from '../../game/controller';
+import type { Ref } from 'react';
+import { FxLayer, type FxItem } from '../../fx/FxLayer';
 import { useLang } from '../../hooks/useLang';
+import { EmoteBubbles } from './EmoteBubbles';
+import type { Bubble } from './useFx';
 import styles from './Game.module.css';
 
 interface Props {
@@ -15,15 +19,19 @@ interface Props {
   dice: DiceView | null;
   selectable?: number[];
   onSelectSign?: (sign: number) => void;
+  /** Card effects playing over the board, and emote bubbles over the pieces. */
+  fx?: readonly FxItem[];
+  bubbles?: readonly Bubble[];
+  stageRef?: Ref<HTMLDivElement>;
 }
 
 /** The board with the card just played and the last roll shown on the centre disc. */
-export function BoardStage({ s, activePlayer, pieces, spotlight, dice, selectable, onSelectSign }: Props) {
+export function BoardStage({ s, activePlayer, pieces, spotlight, dice, selectable, onSelectSign, fx = [], bubbles = [], stageRef }: Props) {
   const { t } = useLang();
   const boardPieces: BoardPiece[] = s.players.map((p) => ({ id: p.id, element: p.element, sign: ((pieces[p.id] ?? 0) % 12 + 12) % 12 }));
   const traps = s.traps.map((tr) => ({ sign: tr.sign, kind: tr.kind, owner: s.players[tr.owner]!.element }));
   return (
-    <div className={styles.stage}>
+    <div className={styles.stage} ref={stageRef}>
       <Board
         pieces={boardPieces}
         traps={traps}
@@ -62,6 +70,8 @@ export function BoardStage({ s, activePlayer, pieces, spotlight, dice, selectabl
           </div>
         )}
       </div>
+      <FxLayer items={fx} />
+      <EmoteBubbles bubbles={bubbles} />
     </div>
   );
 }

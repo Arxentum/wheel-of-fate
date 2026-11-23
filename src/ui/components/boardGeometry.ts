@@ -57,6 +57,21 @@ export function piecePositions(sign: number, n: number): [number, number][] {
   return Array.from({ length: n }, (_, i) => polar(BOARD.pieceR, mid + (i - (n - 1) / 2) * BOARD.pieceSpread));
 }
 
+/**
+ * Where each piece stands: pieces on the same sign side by side, in the order given. The
+ * board and the card effects drawn over it both use this, so they always agree.
+ */
+export function pieceSpots<Id extends string | number>(pieces: readonly { id: Id; sign: number }[]): Map<Id, [number, number]> {
+  const bySign = new Map<number, Id[]>();
+  for (const p of pieces) bySign.set(p.sign, [...(bySign.get(p.sign) ?? []), p.id]);
+  const out = new Map<Id, [number, number]>();
+  for (const [sign, ids] of bySign) {
+    const spots = piecePositions(sign, ids.length);
+    ids.forEach((id, i) => out.set(id, spots[i]!));
+  }
+  return out;
+}
+
 /** An eight-pointed compass star: kite points of the given length and half width. */
 export function kitePath(deg: number, length: number, halfWidth: number, base: number): string {
   const [tx, ty] = polar(length, deg);

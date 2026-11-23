@@ -11,6 +11,10 @@ export const CUE_NAMES = [
   'step', 'stepBack', 'land', 'fpGain', 'fpLoss', 'spend', 'discard', 'steal',
   'shield', 'curse', 'cleanse', 'block', 'shieldFade', 'trapSet', 'trapFade', 'trap',
   'flip', 'dice', 'boost', 'lap', 'gong', 'peek', 'win', 'lose', 'fanfare',
+  // Card effects (src/ui/fx) and emotes.
+  'slash', 'coins', 'flame', 'wind', 'water', 'heartbreak', 'magic', 'shine', 'freeze', 'quake',
+  'thud', 'bell', 'roar', 'zap', 'chain', 'trumpet', 'gallop', 'boing', 'snatch', 'whisper', 'bloom',
+  'emote',
 ] as const;
 
 export type CueName = (typeof CUE_NAMES)[number];
@@ -34,6 +38,11 @@ export interface CueContext {
 
 /** Fire on the left … Water on the right, gently. */
 const PAN: Record<Element, number> = { fire: -0.4, earth: -0.14, air: 0.14, water: 0.4 };
+
+/** Stereo position of a player's sounds. */
+export function panFor(el: Element): number {
+  return PAN[el];
+}
 
 const SPENDING = new Set(['reroll', 'boost', 'flip', 'skill']);
 

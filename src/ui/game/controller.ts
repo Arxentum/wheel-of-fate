@@ -82,7 +82,7 @@ export interface Timing {
 }
 
 /** Milliseconds at 1× speed. */
-export const TIMING: Timing = { think: 450, perSpace: 150, afterMove: 120, roll: 650, play: 600, event: 140 };
+export const TIMING: Timing = { think: 450, perSpace: 150, afterMove: 120, roll: 650, play: 900, event: 140 };
 
 export interface Scheduler {
   set: (fn: () => void, ms: number) => unknown;

@@ -258,3 +258,33 @@ html[lang='zh-Hant'] .groupHead h2 {
 html[lang='zh-Hant'] .embedded .title {
   font-size: 46px;
 }
+
+/* ---------- Effect preview on a small board ---------- */
+.effect {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 14px;
+  align-items: center;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: var(--line) solid var(--ink);
+  background: var(--cream);
+}
+
+.effectBoard {
+  width: 220px;
+}
+
+.effectButtons {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.effectTitle {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}

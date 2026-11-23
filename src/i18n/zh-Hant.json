@@ -618,5 +618,20 @@
   "played.meditate": "冥想",
   "played.conjure": "額外打出（變出）",
   "played.foresight": "正位效果（預知）",
-  "played.wheel": "命運之輪"
+  "played.wheel": "命運之輪",
+  "emote.taunt": "太慢了！",
+  "emote.laugh": "哈哈哈！",
+  "emote.cool": "輕鬆～",
+  "emote.shock": "嚇死我了！",
+  "emote.cry": "不要啊…",
+  "emote.angry": "氣死我了！",
+  "emote.nice": "厲害！",
+  "emote.gg": "打得好！",
+  "emote.open": "表情",
+  "emote.bots": "電腦玩家也會發表情",
+  "emote.wait": "表情由拿著裝置的玩家發送：請先接手。",
+  "rules.screen.emote": "用頂部的笑臉按鈕發表情。電腦玩家會自己看情況發，也可以在那裡關掉。",
+  "gallery.effect": "星盤上的效果",
+  "gallery.playUp": "播放正位效果",
+  "gallery.playDown": "播放逆位效果"
 }

@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { cardDef, isSuit, type Action, type CardUid } from '../../../engine';
 import { Button, Segmented } from '../../components/controls';
 import { LangSwitch } from '../../components/LangSwitch';
 import { SoundButton } from '../../components/SoundButton';
+import { EmoteButton } from '../../components/EmoteButton';
+import { useFx } from './useFx';
 import { useGameSound, useMusicScene } from '../../audio/useSound';
 import type { GameController, Speed } from '../../game/controller';
 import { cardSideOption, skillOption } from '../../game/options';
@@ -104,6 +106,8 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
   const turnNow = s.result ? null : (turnOnScreen(v.log.map((i) => i.event))?.p ?? s.turn.player);
   useGameSound(c);
   const fx = useTableFx(c);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const cardFx = useFx(c, stageRef);
   useMusicScene(over ? 'menu' : s.finalRound ? 'final' : 'game');
   // Playback starts once the sounds and table effects above are listening.
   useEffect(() => c.start(), [c]);
@@ -136,6 +140,7 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
           <Button size="sm" variant="ghost" onClick={() => c.skip()} disabled={!v.busy || v.handoffTo !== null} title={t('game.skipTitle')}>
             {t('game.skip')}
           </Button>
+          <EmoteButton disabled={v.viewer === null} onSend={(e) => v.viewer !== null && cardFx.sendEmote(v.viewer, e)} />
           <SoundButton />
           <Button size="sm" onClick={() => openRules(true)} title={t('game.rulesTitle')}>
             {t('game.rules')}
@@ -159,6 +164,9 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
           <BoardStage
             s={s}
             activePlayer={turnNow}
+            fx={cardFx.items}
+            bubbles={cardFx.bubbles}
+            stageRef={stageRef}
             pieces={v.pieces}
             spotlight={v.spotlight}
             dice={v.dice}

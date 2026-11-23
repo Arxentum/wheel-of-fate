@@ -23,6 +23,7 @@ import { ElementIcon } from '../../components/ElementIcon';
 import { Modal } from '../../components/Modal';
 import { SiteNav } from '../../components/SiteNav';
 import { renderFace } from '../../game/cardText';
+import { FxPreview } from '../../fx/FxPreview';
 import { useLang } from '../../hooks/useLang';
 import styles from './Gallery.module.css';
 
@@ -188,6 +189,8 @@ function CardDetail({ id, b, players, differs, startTurned, onClose, onStep }: D
   const { t, lang } = useLang();
   const [turned, setTurned] = useState(startTurned);
   const [preview, setPreview] = useState<Orientation | null>(null);
+  const [fx, setFx] = useState<{ side: Orientation; run: number }>({ side: 'upright', run: 0 });
+  const playFx = (side: Orientation) => setFx((cur) => ({ side, run: cur.run + 1 }));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -238,6 +241,20 @@ function CardDetail({ id, b, players, differs, startTurned, onClose, onStep }: D
               </div>
             );
           })}
+          <div className={styles.effect}>
+            <div className={styles.effectBoard}>
+              <FxPreview card={id} side={fx.side} run={fx.run} />
+            </div>
+            <div className={styles.effectButtons}>
+              <span className={styles.effectTitle}>{t('gallery.effect')}</span>
+              <Button size="sm" onClick={() => playFx('upright')}>
+                ▲ {t('gallery.playUp')}
+              </Button>
+              <Button size="sm" onClick={() => playFx('reversed')}>
+                ▼ {t('gallery.playDown')}
+              </Button>
+            </div>
+          </div>
           <div className={styles.detailButtons}>
             <Button size="sm" onClick={() => onStep(-1)}>
               ← {t('gallery.prev')}

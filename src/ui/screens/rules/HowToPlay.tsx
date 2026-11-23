@@ -578,6 +578,7 @@ function ScreenSection({ t }: { t: T }) {
     'rules.screen.computer',
     'rules.screen.lang',
     'rules.screen.sound',
+    'rules.screen.emote',
     'rules.screen.log',
     'rules.screen.rules',
   ];

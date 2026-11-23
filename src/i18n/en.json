@@ -618,5 +618,20 @@
   "played.meditate": "Meditate",
   "played.conjure": "Extra card (Conjure)",
   "played.foresight": "Upright effect (Foresight)",
-  "played.wheel": "Wheel of Fortune"
+  "played.wheel": "Wheel of Fortune",
+  "emote.taunt": "Too slow!",
+  "emote.laugh": "Hahaha!",
+  "emote.cool": "Easy.",
+  "emote.shock": "Whoa!",
+  "emote.cry": "Nooo…",
+  "emote.angry": "Grr!",
+  "emote.nice": "Nice one!",
+  "emote.gg": "Good game!",
+  "emote.open": "Emotes",
+  "emote.bots": "Computer players send emotes too",
+  "emote.wait": "Emotes are sent by the player holding the device: take over first.",
+  "rules.screen.emote": "Send an emote with the face button at the top. Computer players react on their own; you can turn that off there.",
+  "gallery.effect": "On the board",
+  "gallery.playUp": "Play the upright effect",
+  "gallery.playDown": "Play the reversed effect"
 }
