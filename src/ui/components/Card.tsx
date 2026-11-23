@@ -124,7 +124,7 @@ export function MiniCard({ id, selected = false, disabled = false, onClick, labe
   const cls = [styles.mini, selected ? styles.selected : '', disabled ? styles.disabled : '', className].filter(Boolean).join(' ');
   if (!onClick) return <div className={cls}>{body}</div>;
   return (
-    <button type="button" className={cls} onClick={onClick} aria-pressed={selected} aria-label={label ?? t(`card.${id}`)}>
+    <button type="button" className={cls} onClick={onClick} aria-pressed={selected} aria-label={label ?? t(`card.${id}`)} data-sound="pick">
       {body}
     </button>
   );

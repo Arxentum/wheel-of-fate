@@ -1,5 +1,6 @@
 import { useLang } from '../hooks/useLang';
 import { LangSwitch } from './LangSwitch';
+import { SoundButton } from './SoundButton';
 import styles from './SiteNav.module.css';
 
 export type Page = 'play' | 'rules' | 'cards';
@@ -32,6 +33,7 @@ export function SiteNav({ page }: { page: Page }) {
           </a>
         ))}
       </nav>
+      <SoundButton />
       <LangSwitch compact />
     </header>
   );

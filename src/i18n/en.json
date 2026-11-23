@@ -593,5 +593,16 @@
   "rules.cards.resonance": "Resonance: play a Minor card on a sign of its own element to gain {n|more Fate Point|more Fate Points}.",
   "small.title": "Best on a bigger screen",
   "small.text": "Wheel of Fate is made for laptops and for tablets held sideways. Turn your tablet, or open the game on a computer.",
-  "small.continue": "Continue anyway"
+  "small.continue": "Continue anyway",
+  "sound.open": "Sound settings",
+  "sound.mutedTitle": "Sound is off",
+  "sound.music": "Music",
+  "sound.effects": "Effects",
+  "sound.on": "On",
+  "sound.off": "Off",
+  "sound.volume": "{name} volume",
+  "sound.note": "Music and effects are played in the browser as you go.",
+  "rules.screen.sound": "Set the music and the sound effects with the speaker button at the top of the screen.",
+  "game.watching": "Watching",
+  "game.watchingHint": "Every seat is a computer player: sit back and watch, or skip to the end."
 }

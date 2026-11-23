@@ -5,6 +5,7 @@ import { AssetPreview } from './screens/AssetPreview';
 import { GalleryPage } from './screens/gallery/Gallery';
 import { HowToPlayPage } from './screens/rules/HowToPlay';
 import { SmallScreenNotice } from './components/SmallScreenNotice';
+import { useMusicScene, useSoundListeners } from './audio/useSound';
 import { Setup, toGameSetup, type SetupChoice } from './screens/Setup';
 
 interface Running {
@@ -35,6 +36,7 @@ function useHash(): string {
 function Pages() {
   const hash = useHash();
   const [game, setGame] = useState<Running | null>(null);
+  useSoundListeners();
   // The running controller lives outside React state updates, so it is created and disposed exactly once.
   const current = useRef<GameController | null>(null);
   const count = useRef(0);
@@ -54,11 +56,7 @@ function Pages() {
   }, []);
 
   if (hash === '#/assets') return <AssetPreview />;
-  if (!game) {
-    if (hash === '#/rules') return <HowToPlayPage />;
-    if (hash === '#/cards') return <GalleryPage />;
-    return <Setup onStart={start} />;
-  }
+  if (!game) return <OutsideGame hash={hash} onStart={start} />;
   return (
     <Game
       key={game.n}
@@ -68,6 +66,14 @@ function Pages() {
       onRematch={() => start({ ...game.choice, seed: '' })}
     />
   );
+}
+
+/** The start screen and the two reference pages, with the start screen's music. */
+function OutsideGame({ hash, onStart }: { hash: string; onStart: (choice: SetupChoice) => void }) {
+  useMusicScene('menu');
+  if (hash === '#/rules') return <HowToPlayPage />;
+  if (hash === '#/cards') return <GalleryPage />;
+  return <Setup onStart={onStart} />;
 }
 
 export function App() {

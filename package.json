@@ -16,7 +16,8 @@
     "check:cards": "tsx e2e/check-card-text.ts",
     "terms": "tsx scripts/ui-terms.ts",
     "e2e": "npm run build && playwright test",
-    "check:layout": "tsx e2e/layout-audit.ts"
+    "check:layout": "tsx e2e/layout-audit.ts",
+    "check:audio": "tsx e2e/check-audio.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

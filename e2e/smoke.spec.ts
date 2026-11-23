@@ -185,3 +185,36 @@ test.describe('phones', () => {
     await expect(notice).toBeHidden();
   });
 });
+
+test.describe('sound', () => {
+  const t = tr('en');
+
+  test('the audio starts on the first click and the sound settings are kept', async ({ page }) => {
+    const errors = watchErrors(page);
+    // Count the audio contexts the page makes, and keep them reachable for the check.
+    await page.addInitScript({
+      content: `(() => { const A = window.AudioContext; window.__contexts = []; window.AudioContext = class extends A { constructor(o) { super(o); window.__contexts.push(this); } }; })();`,
+    });
+    await openApp(page, { lang: 'en', seats: { fire: 'human', earth: 'computer', air: 'off', water: 'off' } });
+    expect(await page.evaluate(() => (window as unknown as { __contexts: AudioContext[] }).__contexts.length)).toBe(0);
+    await startGame(page, t, 'smoke-sound');
+    await expect(turnButtons(page, t).meditate).toBeVisible({ timeout: 20_000 });
+    const before = await page.evaluate(() => (window as unknown as { __contexts: AudioContext[] }).__contexts.map((c) => [c.state, c.currentTime]));
+    expect(before).toHaveLength(1);
+    expect(before[0]![0]).toBe('running');
+    await page.waitForTimeout(600);
+    const later = await page.evaluate(() => (window as unknown as { __contexts: AudioContext[] }).__contexts[0]!.currentTime);
+    expect(later).toBeGreaterThan(before[0]![1] as number);
+
+    // Music off, kept after a reload.
+    await page.getByRole('button', { name: t('sound.open') }).click();
+    const panel = page.getByRole('dialog', { name: t('sound.open') });
+    const musicToggle = panel.getByRole('button', { name: t('sound.on') }).first();
+    await musicToggle.click();
+    await expect(panel.getByRole('button', { pressed: false })).toHaveText(t('sound.off'));
+    await page.reload();
+    await page.getByRole('button', { name: t('sound.open') }).click();
+    await expect(page.getByRole('dialog', { name: t('sound.open') }).getByRole('button', { pressed: false })).toHaveText(t('sound.off'));
+    expect(errors).toEqual([]);
+  });
+});

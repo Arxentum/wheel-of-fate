@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { cardDef, isSuit, type Action, type CardUid } from '../../../engine';
 import { Button, Segmented } from '../../components/controls';
 import { LangSwitch } from '../../components/LangSwitch';
+import { SoundButton } from '../../components/SoundButton';
+import { useGameSound, useMusicScene } from '../../audio/useSound';
 import type { GameController, Speed } from '../../game/controller';
 import { cardSideOption, skillOption } from '../../game/options';
 import { useLang } from '../../hooks/useLang';
@@ -95,6 +97,8 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
 
   const over = v.latest.result && !v.busy;
   const round = s.round;
+  useGameSound(c);
+  useMusicScene(over ? 'menu' : s.finalRound ? 'final' : 'game');
 
   return (
     <div className={styles.game}>
@@ -124,6 +128,7 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
           <Button size="sm" variant="ghost" onClick={() => c.skip()} disabled={!v.busy || v.handoffTo !== null} title={t('game.skipTitle')}>
             {t('game.skip')}
           </Button>
+          <SoundButton />
           <Button size="sm" onClick={() => openRules(true)} title={t('game.rulesTitle')}>
             {t('game.rules')}
           </Button>
@@ -169,7 +174,15 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
             })}
           </div>
           <div className={styles.lower}>
-            <DecisionPanel c={c} v={v} ui={ui} setUi={setUi} selected={selected} setSelected={setSelected} />
+            <DecisionPanel
+              c={c}
+              v={v}
+              ui={ui}
+              setUi={setUi}
+              selected={selected}
+              setSelected={setSelected}
+              onShowResults={over && !overOpen ? () => setOverOpen(true) : undefined}
+            />
             <LogPanel s={s} items={v.log} />
           </div>
         </div>
@@ -194,13 +207,6 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
       {v.handoffTo !== null && !v.busy && <Handoff s={v.latest} to={v.handoffTo} onReady={() => c.takeOver()} onLeave={onNewGame} />}
       {rulesOpen && <Reference s={v.latest} onClose={() => openRules(false)} />}
       {over && overOpen && <GameOver s={v.latest} seed={seed} onAgain={onRematch} onNew={onNewGame} onClose={() => setOverOpen(false)} />}
-      {over && !overOpen && (
-        <div className={styles.overBar}>
-          <Button variant="primary" size="sm" onClick={() => setOverOpen(true)}>
-            {t('over.show')}
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

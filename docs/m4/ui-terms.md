@@ -44,7 +44,7 @@
 
 ## 2. 全部界面文字
 
-### 页面与导航（12）
+### 页面与导航（20）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -60,6 +60,14 @@
 | `small.title` | Best on a bigger screen | 建議使用較大的螢幕 |
 | `small.text` | Wheel of Fate is made for laptops and for tablets held sideways. Turn your tablet, or open the game on a computer. | 命運之輪是為筆電和橫放的平板設計的。請把平板轉成橫向，或用電腦開啟。 |
 | `small.continue` | Continue anyway | 仍要繼續 |
+| `sound.open` | Sound settings | 聲音設定 |
+| `sound.mutedTitle` | Sound is off | 聲音已關閉 |
+| `sound.music` | Music | 音樂 |
+| `sound.effects` | Effects | 音效 |
+| `sound.on` | On | 開 |
+| `sound.off` | Off | 關 |
+| `sound.volume` | {name} volume | {name}音量 |
+| `sound.note` | Music and effects are played in the browser as you go. | 音樂和音效都在瀏覽器裡即時播放。 |
 
 ### 开始画面（18）
 
@@ -84,7 +92,7 @@
 | `setup.start` | Start game | 開始遊戲 |
 | `setup.orderHint` | The first player moves on by one seat every round. | 每一輪的先手會輪到下一位。 |
 
-### 游戏画面（70）
+### 游戏画面（72）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -158,6 +166,8 @@
 | `game.rules` | Rules | 規則 |
 | `game.rulesTitle` | How to play and all the cards. The game waits while this is open. | 玩法說明和全部卡牌。打開時遊戲會暫停。 |
 | `game.paused` | Game paused | 遊戲暫停中 |
+| `game.watching` | Watching | 觀戰中 |
+| `game.watchingHint` | Every seat is a computer player: sit back and watch, or skip to the end. | 所有座位都是電腦玩家：坐著觀戰，或按「跳過」直接看結果。 |
 
 ### 状态（16）
 
@@ -348,7 +358,7 @@
 | `over.show` | Results | 結果 |
 | `handoff.leave` | Leave this game | 離開這一局 |
 
-### 玩法说明页（112）
+### 玩法说明页（113）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -464,6 +474,7 @@
 | `rules.screen.log` | The log lists everything that happens. It never shows cards a player looks at or takes in secret. | 記錄會列出所有發生的事，但不會透露別人私下查看或拿走的是哪張牌。 |
 | `rules.screen.rules` | In a game, the Rules button opens this page and the cards. The game waits until you close it. | 遊戲中按「規則」可以打開這一頁和卡牌圖鑑；關閉之前遊戲會暫停。 |
 | `rules.cards.resonance` | Resonance: play a Minor card on a sign of its own element to gain {n\|more Fate Point\|more Fate Points}. | 共鳴：在與牌同元素的星座打出小阿爾克那，額外獲得 {n} 命運點。 |
+| `rules.screen.sound` | Set the music and the sound effects with the speaker button at the top of the screen. | 用畫面頂部的喇叭按鈕調整音樂和音效。 |
 
 ### 卡牌图鉴页（25）
 

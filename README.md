@@ -18,6 +18,7 @@
 - 界面、卡牌效果、日志全部提供 English / 繁體中文，游戏中途也能切换。
 - 卡牌按印刷版用代码重画卡框：上方倒置的是逆位效果，下方是正位效果；点手牌可以预览两面再打出，不能用的选项会写明原因。
 - 玩法说明页（`#/rules`）和卡牌图鉴页（`#/cards`）；游戏里按「规则」打开时游戏会暂停。
+- 音效和背景音乐全部在浏览器里实时合成（Web Audio），没有音频文件：正位卡声音明亮、逆位低沉，最后一轮音乐加入心跳鼓点；顶部喇叭按钮可分别调节音乐和音效。
 - 规则引擎是纯 TypeScript，带种子随机数：同一个种子、同样的玩家，洗牌和骰子结果完全相同。
 
 | 游戏画面 | 卡牌图鉴 |
@@ -49,6 +50,7 @@ npm run dev
 | `npm run cards` | 从 `D:\Tarot Game\卡牌成品\` 裁出卡图到 `public/cards/`（原图只读，不会被改） |
 | `npm run terms` | 从字典生成中英界面用词对照表 `docs/m4/ui-terms.md` |
 | `npm run check:cards` | 检查 60 面卡的文字在两种语言下都放得进卡框（需要先开 `npm run dev`） |
+| `npm run check:audio` | 在浏览器里离线渲染每个音效和三档背景音乐，量峰值和响度，标出没声音、削波或明显过响过轻的（需要先开 `npm run dev`） |
 | `npm run check:layout` | 在 8 种笔记本、平板、大屏尺寸下打开各个画面，截图并列出被裁掉的内容（需要先开 `npm run dev`，截图在 `test-results/layout/`） |
 
 Playwright 默认使用电脑上已安装的 Chrome，不需要另外下载浏览器；在没有 Chrome 的电脑上可以设 `PW_CHANNEL=msedge`，或设为空字符串并运行 `npx playwright install chromium`。
@@ -67,6 +69,7 @@ src/
   i18n/          字典 en.json、zh-Hant.json 和占位符填充
   ui/
     game/        GameController（回放、跳过、热座、暂停）、卡牌文字、日志文字、可选操作
+    audio/       音效和背景音乐：事件对应的音效、编曲、Web Audio 合成和音量
     screens/     开始画面、游戏画面、玩法说明、卡牌图鉴
     components/  星盘、卡牌、棋子、按钮、弹窗等
 tests/           Vitest

@@ -67,6 +67,11 @@ export interface GameView {
   paused: boolean;
 }
 
+/** Something shown during playback, for sound: one space walked, or an event. */
+export type Shown =
+  | { kind: 'step'; p: PlayerId; dir: number; fast: boolean }
+  | { kind: 'event'; event: GameEvent; fast: boolean };
+
 export interface Timing {
   think: number;
   perSpace: number;
@@ -104,6 +109,7 @@ export interface ControllerOptions {
 export class GameController {
   private view: GameView;
   private readonly listeners = new Set<() => void>();
+  private readonly showListeners = new Set<(s: Shown) => void>();
   private readonly scheduler: Scheduler;
   private readonly timing: Timing;
   private readonly bot: (s: GameState) => Action;
@@ -146,6 +152,16 @@ export class GameController {
   };
 
   getView = (): GameView => this.view;
+
+  /** Hears every step and event as it is shown (`fast` while skipping). */
+  onShow = (fn: (s: Shown) => void): (() => void) => {
+    this.showListeners.add(fn);
+    return () => this.showListeners.delete(fn);
+  };
+
+  private emit(s: Shown): void {
+    for (const fn of this.showListeners) fn(s);
+  }
 
   dispose(): void {
     this.disposed = true;
@@ -280,6 +296,7 @@ export class GameController {
       if (dir === 0) {
         this.queue.shift();
         this.set({ moving: null, log: this.appendLog(e) });
+        this.emit({ kind: 'event', event: e, fast: this.skipping });
         return t.afterMove;
       }
       const next = pos + dir;
@@ -287,6 +304,7 @@ export class GameController {
       const pieces = [...this.view.pieces];
       pieces[e.p] = next;
       this.set({ pieces, moving: e.p });
+      this.emit({ kind: 'step', p: e.p, dir, fast: this.skipping });
       return t.perSpace;
     }
     this.queue.shift();
@@ -318,6 +336,7 @@ export class GameController {
         break;
     }
     this.set(patch);
+    this.emit({ kind: 'event', event: e, fast: this.skipping });
     return wait;
   }
 

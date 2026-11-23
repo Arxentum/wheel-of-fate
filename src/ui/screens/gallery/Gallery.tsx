@@ -125,7 +125,7 @@ export function GalleryContent({ balance: b, fixedPlayers, embedded = false }: P
           <ul className={styles.grid}>
             {g.ids.map((id) => (
               <li key={id}>
-                <button type="button" className={styles.tile} onClick={() => setOpen(id)} data-card={id}>
+                <button type="button" className={styles.tile} onClick={() => setOpen(id)} data-card={id} data-sound="pick">
                   <span className={styles.tileCard}>
                     <Card id={id} balance={b} players={n} turned={sideUp === 'reversed'} />
                   </span>

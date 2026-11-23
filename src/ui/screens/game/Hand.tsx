@@ -19,10 +19,11 @@ export function Hand({ s, viewer, clickable, dimmed, selected, onCard, hint }: P
   const { t } = useLang();
   const me = viewer !== null ? s.players[viewer]! : null;
   const top = s.discard.at(-1);
+  const watching = s.players.every((p) => p.controller === 'computer');
   return (
     <section className={styles.handBar} aria-label={t('game.hand')}>
       <div className={styles.handTitle}>
-        <h2 className={styles.panelTitle}>{me ? t('game.yourHand', { player: t(`player.${me.element}`) }) : t('game.handHidden')}</h2>
+        <h2 className={styles.panelTitle}>{me ? t('game.yourHand', { player: t(`player.${me.element}`) }) : watching ? t('game.watching') : t('game.handHidden')}</h2>
         {hint && <p className={styles.handHint}>{hint}</p>}
       </div>
       <div className={styles.handCards}>
@@ -38,7 +39,7 @@ export function Hand({ s, viewer, clickable, dimmed, selected, onCard, hint }: P
             ))
           : null}
         {me && me.hand.length === 0 && <p className={styles.empty}>{t('game.noCards')}</p>}
-        {!me && <p className={styles.empty}>{t('game.handHiddenHint')}</p>}
+        {!me && <p className={styles.empty}>{watching ? t('game.watchingHint') : t('game.handHiddenHint')}</p>}
       </div>
       <div className={styles.piles}>
         <figure className={styles.pile}>

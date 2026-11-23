@@ -577,6 +577,7 @@ function ScreenSection({ t }: { t: T }) {
     'rules.screen.hotseat',
     'rules.screen.computer',
     'rules.screen.lang',
+    'rules.screen.sound',
     'rules.screen.log',
     'rules.screen.rules',
   ];

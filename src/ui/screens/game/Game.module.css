@@ -1230,13 +1230,6 @@ html[lang='zh-Hant'] .rankName {
   white-space: nowrap;
 }
 
-.overBar {
-  position: fixed;
-  right: 24px;
-  bottom: 220px;
-  z-index: 10;
-}
-
 /* ---------- Smaller laptop screens ---------- */
 @media (max-height: 800px) {
   .handBar {

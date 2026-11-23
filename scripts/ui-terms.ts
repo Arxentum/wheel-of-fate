@@ -37,7 +37,7 @@ const COINED: [Key[], string][] = [
 
 /** Groups of the full list (card texts, card and sign names come from the rulebook and are left out). */
 const GROUPS: [string, RegExp][] = [
-  ['页面与导航', /^(app|nav|lang|small)\./],
+  ['页面与导航', /^(app|nav|lang|small|sound)\./],
   ['开始画面', /^setup\./],
   ['游戏画面', /^(game|tag|step|side|sideLabel|player|board|piece|trap|list)\./],
   ['状态', /^status\./],

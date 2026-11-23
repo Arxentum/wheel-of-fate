@@ -29,9 +29,11 @@ interface Props {
   setUi: (ui: UiMode) => void;
   selected: CardUid[];
   setSelected: (cards: CardUid[]) => void;
+  /** After the game, when the results were closed: shows them again. */
+  onShowResults?: () => void;
 }
 
-export function DecisionPanel({ c, v, ui, setUi, selected, setSelected }: Props) {
+export function DecisionPanel({ c, v, ui, setUi, selected, setSelected, onShowResults }: Props) {
   const { t } = useLang();
   const s = v.latest;
   const shown = v.shown;
@@ -47,14 +49,25 @@ export function DecisionPanel({ c, v, ui, setUi, selected, setSelected }: Props)
   );
 
   let body: React.ReactNode;
-  if (s.result && !v.busy) body = <p className={styles.prompt}>{t('game.overShort')}</p>;
+  if (s.result && !v.busy)
+    body = (
+      <div className={styles.choose}>
+        <p className={styles.prompt}>{t('game.overShort')}</p>
+        {onShowResults && (
+          <Button variant="primary" size="sm" onClick={onShowResults}>
+            {t('over.show')}
+          </Button>
+        )}
+      </div>
+    );
   else if (v.handoffTo !== null) body = <p className={styles.prompt}>{t('game.waitingFor', { player: playerName(t, s, v.handoffTo) })}</p>;
   else if (!c.canAct()) {
-    const who = s.pending ? s.pending.player : turnPlayer;
+    // The player whose turn is on screen (during playback the next decision may already be someone else's).
+    const who = turnPlayer;
     body = (
       <p className={`${styles.prompt} ${styles.thinking}`}>
-        <Piece element={s.players[who]!.element} size={26} />
-        {s.players[who]!.controller === 'computer' ? t('game.computerPlaying', { player: playerName(t, s, who) }) : t('game.playing')}
+        <Piece element={shown.players[who]!.element} size={26} />
+        {shown.players[who]!.controller === 'computer' ? t('game.computerPlaying', { player: playerName(t, shown, who) }) : t('game.playing')}
       </p>
     );
   } else {
