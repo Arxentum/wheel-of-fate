@@ -6,7 +6,7 @@ export { checkAction, checkSkillBase, checkFaceChoice, checkFuel, hasFuel, check
 export { enumerateActions, skillChoices } from './core/enumerate';
 export { cloneState } from './core/clone';
 export { canBoost, canReroll } from './core/flow';
-export { isLeading, leadersAmong, othersOf, playersAhead } from './core/context';
+export { isLeading, leadersAmong, othersOf, playersAhead, roundOrder } from './core/context';
 export { defaultBalance, applyBalancePatch } from './data/balance';
 export * from './data/board';
 export * from './data/cards';

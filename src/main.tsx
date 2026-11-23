@@ -10,7 +10,7 @@ import '@fontsource/barlow-condensed/700.css';
 import '@fontsource-variable/noto-sans-tc/wght.css';
 import './ui/styles/global.css';
 import { LangProvider } from './ui/hooks/useLang';
-import { AssetPreview } from './ui/screens/AssetPreview';
+import { App } from './ui/App';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('#root missing');
@@ -18,7 +18,7 @@ if (!root) throw new Error('#root missing');
 createRoot(root).render(
   <StrictMode>
     <LangProvider>
-      <AssetPreview />
+      <App />
     </LangProvider>
   </StrictMode>,
 );

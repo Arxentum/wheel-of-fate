@@ -35,3 +35,20 @@
   background: var(--ink);
   color: var(--paper);
 }
+
+.compact {
+  border-width: var(--line);
+}
+
+.compact .option {
+  padding: 3px 10px;
+  font-size: 14px;
+}
+
+.compact .option[lang='zh-Hant'] {
+  font-size: 13px;
+}
+
+.compact .option + .option {
+  border-left-width: var(--line);
+}

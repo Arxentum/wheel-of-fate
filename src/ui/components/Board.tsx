@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from 'react';
+import { useEffect, useRef, type KeyboardEvent } from 'react';
 import { BOARD_SIZE, SIGNS, elementOfSign } from '../../engine/data/board';
 import type { Element, TrapKind } from '../../engine/types';
 import { ELEMENT_COLOR, ELEMENT_ON_COLOR } from '../art/colors';
@@ -51,6 +51,19 @@ const STAR_SHORT: [number, Element][] = [
 export function Board({ pieces = [], traps = [], activeId, selectable = [], onSelectSign, className }: BoardProps) {
   const { t, lang } = useLang();
   const half = BOARD.half;
+  // Slide a piece only when it moves to a neighbouring sign; a longer jump (a skip, a big push)
+  // would cut straight across the disc, so it moves at once.
+  const lastSign = useRef(new Map<string | number, number>());
+  const before = lastSign.current;
+  const glide = (id: string | number, sign: number) => {
+    const was = before.get(id);
+    if (was === undefined) return false;
+    const d = (((sign - was) % BOARD_SIZE) + BOARD_SIZE) % BOARD_SIZE;
+    return d === 1 || d === BOARD_SIZE - 1;
+  };
+  useEffect(() => {
+    lastSign.current = new Map(pieces.map((p) => [p.id, p.sign]));
+  });
   const bySign = new Map<number, BoardPiece[]>();
   for (const p of pieces) bySign.set(p.sign, [...(bySign.get(p.sign) ?? []), p]);
 
@@ -184,7 +197,12 @@ export function Board({ pieces = [], traps = [], activeId, selectable = [], onSe
         return group.map((p, i) => {
           const [x, y] = spots[i]!;
           return (
-            <g key={p.id} data-piece={p.element} className={styles.piece} style={{ transform: `translate(${x}px, ${y}px)` }}>
+            <g
+              key={p.id}
+              data-piece={p.element}
+              className={glide(p.id, sign) ? `${styles.piece} ${styles.glide}` : styles.piece}
+              style={{ transform: `translate(${x}px, ${y}px)` }}
+            >
               <title>{t('piece.label', { element: t(`element.${p.element}`) })}</title>
               <PieceToken element={p.element} x={0} y={0} r={BOARD.pieceSize} active={p.id === activeId} />
             </g>

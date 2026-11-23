@@ -3,10 +3,10 @@ import { useLang } from '../hooks/useLang';
 import styles from './LangSwitch.module.css';
 
 /** Two-way language toggle; each option is labelled in its own language. */
-export function LangSwitch() {
+export function LangSwitch({ compact = false }: { compact?: boolean }) {
   const { lang, setLang, t } = useLang();
   return (
-    <div className={styles.switch} role="group" aria-label={t('lang.label')}>
+    <div className={compact ? `${styles.switch} ${styles.compact}` : styles.switch} role="group" aria-label={t('lang.label')}>
       {LANGS.map((l) => (
         <button
           key={l}

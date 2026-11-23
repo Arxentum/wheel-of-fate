@@ -1,0 +1,291 @@
+/* Full card: width from --card-w (default 280px). Rows follow the printed card. */
+.card {
+  --w: var(--card-w, 280px);
+  width: var(--w);
+  display: grid;
+  grid-template-rows: calc(var(--w) * 0.31) calc(var(--w) * 1.29) calc(var(--w) * 0.15) calc(var(--w) * 0.31);
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 360ms var(--ease);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+.turned {
+  transform: rotate(180deg);
+  box-shadow: -6px -6px 0 var(--ink);
+}
+
+.band {
+  position: relative;
+  padding: 6px 10px;
+  display: flex;
+  transition: background var(--normal) var(--ease), color var(--normal) var(--ease), opacity var(--normal) var(--ease);
+}
+
+.top {
+  border-bottom: 3px solid var(--ink);
+}
+
+.top .bandInner {
+  transform: rotate(180deg);
+}
+
+.bottom {
+  border-top: 3px solid var(--ink);
+}
+
+.bandInner {
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+  min-height: 0;
+}
+
+.text {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  line-height: 1.22;
+  font-family: var(--font-body);
+}
+
+.text > * {
+  display: inline;
+}
+
+html[lang='zh-Hant'] .text {
+  line-height: 1.38;
+}
+
+.faceName {
+  font-family: var(--font-label);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-right: 2px;
+}
+
+html[lang='zh-Hant'] .faceName {
+  font-family: var(--font-zh);
+}
+
+.mark {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.fuel {
+  display: grid;
+  gap: 2px;
+}
+
+.current {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.current .mark path {
+  fill: var(--paper);
+}
+
+.idle {
+  opacity: 0.55;
+}
+
+.art {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.number {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  padding: 0 6px;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.suit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+}
+
+.plate {
+  border-top: 3px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+}
+
+.name {
+  font-family: var(--font-title);
+  text-transform: uppercase;
+  font-size: calc(var(--w) * 0.085);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+html[lang='zh-Hant'] .name {
+  font-family: var(--font-zh);
+  font-weight: 800;
+  font-size: calc(var(--w) * 0.075);
+}
+
+.nameEn {
+  margin-top: 2px;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: calc(var(--w) * 0.038);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Mini card (hand) */
+.mini {
+  --w: var(--mini-w, 104px);
+  width: var(--w);
+  padding: 0;
+  border: 3px solid var(--ink);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease),
+    opacity var(--fast) var(--ease);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+button.mini {
+  cursor: pointer;
+}
+
+button.mini:hover {
+  transform: translateY(-6px);
+  box-shadow: 3px 9px 0 var(--ink);
+}
+
+.selected,
+button.selected:hover {
+  transform: translateY(-12px);
+  box-shadow: 3px 15px 0 var(--ink);
+  outline: 4px solid var(--earth);
+  outline-offset: 2px;
+}
+
+.disabled {
+  opacity: 0.5;
+}
+
+.miniArt {
+  position: relative;
+  aspect-ratio: 390 / 503;
+  overflow: hidden;
+}
+
+.miniArt img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.miniIcon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+}
+
+.miniPlate {
+  border-top: 3px solid var(--ink);
+  padding: 3px 2px 4px;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+html[lang='zh-Hant'] .miniPlate span {
+  font-family: var(--font-zh);
+  font-size: 14px;
+}
+
+.miniPlate small {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* Back */
+.back {
+  --w: var(--mini-w, 104px);
+  position: relative;
+  width: var(--w);
+  aspect-ratio: 390 / 503;
+  border: 3px solid var(--ink);
+  border-radius: 8px;
+  background: var(--paper);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.back img {
+  width: 82%;
+  height: auto;
+}
+
+.count {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  min-width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 16px;
+}

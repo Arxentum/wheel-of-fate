@@ -14,15 +14,30 @@ export const DICTIONARIES: Record<Lang, Record<MessageKey, string>> = {
   'zh-Hant': zhHant as Record<MessageKey, string>,
 };
 
-/** `{name}` placeholders in a message. */
+/**
+ * Placeholders: `{name}` inserts a value; `{name|one|other}` inserts a number with the
+ * singular or plural word ("1 space", "3 spaces"). Chinese messages only need `{name}`.
+ */
+const PLACEHOLDER = /\{(\w+)(?:\|([^|}]*)\|([^|}]*))?\}/g;
+
+/** Names of the placeholders in a message, sorted, without duplicates. */
 export function placeholders(message: string): string[] {
-  return [...message.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!).sort();
+  return [...new Set([...message.matchAll(PLACEHOLDER)].map((m) => m[1]!))].sort();
+}
+
+export function format(message: string, params?: Params): string {
+  if (!params) return message;
+  return message.replace(PLACEHOLDER, (whole, name: string, one?: string, other?: string) => {
+    if (!(name in params)) return whole;
+    const value = params[name]!;
+    if (one === undefined) return String(value);
+    return `${value} ${Number(value) === 1 ? one : other}`;
+  });
 }
 
 export function translate(lang: Lang, key: MessageKey, params?: Params): string {
   const message = DICTIONARIES[lang][key] ?? DICTIONARIES.en[key] ?? key;
-  if (!params) return message;
-  return message.replace(/\{(\w+)\}/g, (whole, name: string) => (name in params ? String(params[name]) : whole));
+  return format(message, params);
 }
 
 export function isLang(value: unknown): value is Lang {

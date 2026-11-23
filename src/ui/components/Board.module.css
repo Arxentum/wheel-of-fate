@@ -43,7 +43,11 @@
 }
 
 .piece {
-  transition: transform var(--normal) var(--ease);
+  transition: none;
+}
+
+.glide {
+  transition: transform 130ms var(--ease);
 }
 
 .start {
