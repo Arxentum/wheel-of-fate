@@ -7,6 +7,8 @@
 
 正位只给自己增益（前进、命运点、抽牌、护盾），逆位只能用来拦**领先于你**的玩家，所以落后的人也有办法反击。
 
+**在线试玩：** https://arxentum.github.io/wheel-of-fate/
+
 ![开始画面](docs/m5/screenshots/zh-01-start.jpg)
 
 ## 功能
@@ -88,7 +90,7 @@ docs/            规划、决定记录、平衡报告、各阶段截图
 - 页面切换用 `#/rules` 这类网址，不需要服务器做重写；
 - 体积：JS 约 130 KB、CSS 约 60 KB（gzip 后）；卡图 1x、2x 各约 4 MB，浏览器按屏幕只取其中一套，而且卡片出现时才加载；中文字体按需分片加载。
 
-可以直接上传到任何静态网站服务（GitHub Pages、Cloudflare Pages、Netlify 等）。
+可以直接上传到任何静态网站服务（GitHub Pages、Cloudflare Pages、Netlify 等）。本仓库用 GitHub Pages：推送到 `main` 后，`.github/workflows/deploy.yml` 会自动跑测试、构建并发布。
 
 ## 文档
 
