@@ -39,7 +39,7 @@ const COINED: [Key[], string][] = [
 const GROUPS: [string, RegExp][] = [
   ['页面与导航', /^(app|nav|lang|small|sound)\./],
   ['开始画面', /^setup\./],
-  ['游戏画面', /^(game|tag|step|side|sideLabel|player|board|piece|trap|list)\./],
+  ['游戏画面', /^(game|tag|step|side|sideLabel|player|board|piece|trap|list|float|banner|played)\./],
   ['状态', /^status\./],
   ['决定面板', /^decide\./],
   ['置灰原因', /^reason\./],

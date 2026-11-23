@@ -604,5 +604,19 @@
   "sound.note": "音樂和音效都在瀏覽器裡即時播放。",
   "rules.screen.sound": "用畫面頂部的喇叭按鈕調整音樂和音效。",
   "game.watching": "觀戰中",
-  "game.watchingHint": "所有座位都是電腦玩家：坐著觀戰，或按「跳過」直接看結果。"
+  "game.watchingHint": "所有座位都是電腦玩家：坐著觀戰，或按「跳過」直接看結果。",
+  "float.lap": "跑完第 {lap} 圈",
+  "float.blocked": "擋下",
+  "banner.yourTurn": "輪到你了",
+  "banner.first": "{player}先行動",
+  "banner.again": "{player}連續行動：新一輪由{player}先手",
+  "banner.youFirst": "你先行動",
+  "banner.youAgain": "你連續行動：新一輪由你先手",
+  "played.minor": "小阿爾克那",
+  "played.court": "宮廷牌組合",
+  "played.skill": "角色技能",
+  "played.meditate": "冥想",
+  "played.conjure": "額外打出（變出）",
+  "played.foresight": "正位效果（預知）",
+  "played.wheel": "命運之輪"
 }

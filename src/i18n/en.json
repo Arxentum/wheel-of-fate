@@ -604,5 +604,19 @@
   "sound.note": "Music and effects are played in the browser as you go.",
   "rules.screen.sound": "Set the music and the sound effects with the speaker button at the top of the screen.",
   "game.watching": "Watching",
-  "game.watchingHint": "Every seat is a computer player: sit back and watch, or skip to the end."
+  "game.watchingHint": "Every seat is a computer player: sit back and watch, or skip to the end.",
+  "float.lap": "Lap {lap} done",
+  "float.blocked": "Blocked",
+  "banner.yourTurn": "Your turn",
+  "banner.first": "{player} goes first",
+  "banner.again": "{player} goes again: first in the new round",
+  "banner.youFirst": "You go first",
+  "banner.youAgain": "You go again: you are first in the new round",
+  "played.minor": "Minor card",
+  "played.court": "Court combo",
+  "played.skill": "Character skill",
+  "played.meditate": "Meditate",
+  "played.conjure": "Extra card (Conjure)",
+  "played.foresight": "Upright effect (Foresight)",
+  "played.wheel": "Wheel of Fortune"
 }

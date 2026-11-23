@@ -4,7 +4,9 @@ import { Piece } from '../../components/Piece';
 import { renderFace } from '../../game/cardText';
 import { signName } from '../../game/logText';
 import { useLang } from '../../hooks/useLang';
-import { activeStatuses, statusDesc, tagFor } from './shared';
+import type { FloatSpec } from '../../game/tableFx';
+import { activeStatuses, statusDesc, tagFor, type T } from './shared';
+import type { Floater } from './useTableFx';
 import styles from './Game.module.css';
 
 interface Props {
@@ -16,9 +18,30 @@ interface Props {
   targetable?: boolean;
   onTarget?: () => void;
   onViewCharacter: () => void;
+  /** Notes floating up from this panel right now ("+2 FP", "Slowed"). */
+  floaters?: Floater[];
 }
 
-export function PlayerPanel({ s, id, active, targetable = false, onTarget, onViewCharacter }: Props) {
+const sign = (n: number) => (n > 0 ? '+' : '−');
+
+function floatText(t: T, spec: FloatSpec): { text: string; tone: 'gain' | 'loss' | 'good' | 'bad' | 'lap' | 'trap' | 'cards' } {
+  switch (spec.kind) {
+    case 'fp':
+      return { text: `${sign(spec.n)}${Math.abs(spec.n)} ${t('game.fp')}`, tone: spec.n > 0 ? 'gain' : 'loss' };
+    case 'cards':
+      return { text: `${sign(spec.n)}${t('game.cards', { n: Math.abs(spec.n) })}`, tone: 'cards' };
+    case 'status':
+      return { text: t(`status.${spec.status}`), tone: spec.status === 'shielded' ? 'good' : 'bad' };
+    case 'lap':
+      return { text: t('float.lap', { lap: spec.lap }), tone: 'lap' };
+    case 'trap':
+      return { text: t(`trap.${spec.trap}`), tone: 'trap' };
+    case 'blocked':
+      return { text: t('float.blocked'), tone: 'good' };
+  }
+}
+
+export function PlayerPanel({ s, id, active, targetable = false, onTarget, onViewCharacter, floaters = [] }: Props) {
   const { t, lang } = useLang();
   const p = s.players[id]!;
   const finish = s.config.finish;
@@ -38,6 +61,18 @@ export function PlayerPanel({ s, id, active, targetable = false, onTarget, onVie
       data-player={p.element}
     >
       <span className={styles.playerBar} style={{ background: ELEMENT_COLOR[p.element] }} />
+      {floaters.length > 0 && (
+        <div className={styles.floaters} aria-hidden="true">
+          {floaters.map((f, i) => {
+            const { text, tone } = floatText(t, f.spec);
+            return (
+              <span key={f.id} className={`${styles.floater} ${styles[`float_${tone}`]}`} style={{ ['--i' as string]: i }}>
+                {text}
+              </span>
+            );
+          })}
+        </div>
+      )}
       <header className={styles.playerHead}>
         <Piece element={p.element} size={28} active={active} />
         <span className={styles.playerName}>{t(`player.${p.element}`)}</span>

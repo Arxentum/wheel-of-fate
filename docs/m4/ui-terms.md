@@ -92,7 +92,7 @@
 | `setup.start` | Start game | 開始遊戲 |
 | `setup.orderHint` | The first player moves on by one seat every round. | 每一輪的先手會輪到下一位。 |
 
-### 游戏画面（72）
+### 游戏画面（86）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -168,6 +168,20 @@
 | `game.paused` | Game paused | 遊戲暫停中 |
 | `game.watching` | Watching | 觀戰中 |
 | `game.watchingHint` | Every seat is a computer player: sit back and watch, or skip to the end. | 所有座位都是電腦玩家：坐著觀戰，或按「跳過」直接看結果。 |
+| `float.lap` | Lap {lap} done | 跑完第 {lap} 圈 |
+| `float.blocked` | Blocked | 擋下 |
+| `banner.yourTurn` | Your turn | 輪到你了 |
+| `banner.first` | {player} goes first | {player}先行動 |
+| `banner.again` | {player} goes again: first in the new round | {player}連續行動：新一輪由{player}先手 |
+| `banner.youFirst` | You go first | 你先行動 |
+| `banner.youAgain` | You go again: you are first in the new round | 你連續行動：新一輪由你先手 |
+| `played.minor` | Minor card | 小阿爾克那 |
+| `played.court` | Court combo | 宮廷牌組合 |
+| `played.skill` | Character skill | 角色技能 |
+| `played.meditate` | Meditate | 冥想 |
+| `played.conjure` | Extra card (Conjure) | 額外打出（變出） |
+| `played.foresight` | Upright effect (Foresight) | 正位效果（預知） |
+| `played.wheel` | Wheel of Fortune | 命運之輪 |
 
 ### 状态（16）
 

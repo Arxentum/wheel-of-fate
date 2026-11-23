@@ -3,9 +3,11 @@ import {
   cardDef,
   faceKey,
   isSuit,
+  splitFace,
   type Action,
   type CardUid,
   type Decision,
+  type GameEvent,
   type GameState,
   type PlayerId,
 } from '../../../engine';
@@ -18,6 +20,8 @@ import type { GameController, GameView } from '../../game/controller';
 import { playerName } from '../../game/logText';
 import { anyCardOption, simpleOption, skillOption } from '../../game/options';
 import { useLang } from '../../hooks/useLang';
+import { lastPlay, turnOnScreen } from '../../game/tableFx';
+import { CardArt } from '../../components/CardArt';
 import { TurnSteps } from './TurnSteps';
 import { reasonText, targetOf, type T, type UiMode } from './shared';
 import styles from './Game.module.css';
@@ -37,14 +41,18 @@ export function DecisionPanel({ c, v, ui, setUi, selected, setSelected, onShowRe
   const { t } = useLang();
   const s = v.latest;
   const shown = v.shown;
-  const turnPlayer = shown.turn.player;
+  // Follow the playback: once it has reached the next turn, show that turn (just begun).
+  const events = v.log.map((i) => i.event);
+  const reached = s.result ? null : turnOnScreen(events);
+  const turnPlayer = reached?.p ?? shown.turn.player;
+  const step = reached && reached.p !== shown.turn.player ? 'draw' : shown.turn.step;
   const header = (
     <header className={styles.decisionHead}>
       <span className={styles.turnOf} title={t('game.turnOf', { player: playerName(t, shown, turnPlayer) })}>
         <i style={{ background: ELEMENT_COLOR[shown.players[turnPlayer]!.element] }} />
         {playerName(t, shown, turnPlayer)}
       </span>
-      <TurnSteps step={shown.turn.step} />
+      <TurnSteps step={step} />
     </header>
   );
 
@@ -70,12 +78,24 @@ export function DecisionPanel({ c, v, ui, setUi, selected, setSelected, onShowRe
         {shown.players[who]!.controller === 'computer' ? t('game.computerPlaying', { player: playerName(t, shown, who) }) : t('game.playing')}
       </p>
     );
+    const play = lastPlay(events, who);
+    if (play) body = (
+      <>
+        {body}
+        <PlayedCard s={shown} play={play} />
+      </>
+    );
   } else {
     body = <Choose s={s} d={s.pending!} c={c} ui={ui} setUi={setUi} selected={selected} setSelected={setSelected} t={t} />;
   }
 
+  const live = c.canAct();
   return (
-    <section className={styles.decision} aria-label={t('game.decision')}>
+    <section
+      className={live ? `${styles.decision} ${styles.decisionLive}` : styles.decision}
+      aria-label={t('game.decision')}
+      style={live ? { ['--accent' as string]: ELEMENT_COLOR[s.players[s.pending!.player]!.element] } : undefined}
+    >
       {header}
       <div className={styles.decisionBody}>{body}</div>
     </section>
@@ -418,5 +438,43 @@ function ClampText({ text }: { text: string }) {
     >
       {text}
     </button>
+  );
+}
+
+/** The card (or action) the player on screen has just played, large, with its effect. */
+function PlayedCard({ s, play }: { s: GameState; play: Extract<GameEvent, { t: 'play' }> }) {
+  const { t, lang } = useLang();
+  const b = s.config.balance;
+  if (!play.face) {
+    // Meditate has no card.
+    return (
+      <div className={styles.played}>
+        <div className={styles.playedBody}>
+          <span className={styles.playedKind}>{t(`played.${play.kind}`)}</span>
+          <p>{t('decide.meditateText', { draw: b.meditateDraw, fp: b.meditateFp })}</p>
+        </div>
+      </div>
+    );
+  }
+  const [card, side] = splitFace(play.face);
+  const face = renderFace(lang, b, s.players.length, play.face);
+  const hits = play.targets ?? (play.target !== undefined ? [play.target] : []);
+  return (
+    <div className={side === 'reversed' ? `${styles.played} ${styles.playedDark}` : styles.played}>
+      <div className={styles.playedArt}>
+        <CardArt id={card} alt="" eager />
+        {side === 'reversed' && <span className={styles.spotRev}>▼</span>}
+      </div>
+      <div className={styles.playedBody}>
+        <span className={styles.playedKind}>
+          {t(`played.${play.kind}`)} · {t(`card.${card}`)} · {t(`sideLabel.${side}`)}
+        </span>
+        <strong className={styles.playedName}>{face.name}</strong>
+        <p>{face.text}</p>
+        {hits.length > 0 && (
+          <span className={styles.playedTarget}>→ {hits.map((h) => playerName(t, s, h)).join(t('list.sep'))}</span>
+        )}
+      </div>
+    </div>
   );
 }

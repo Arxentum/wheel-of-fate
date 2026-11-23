@@ -8,6 +8,8 @@ import styles from './Game.module.css';
 
 interface Props {
   s: GameState;
+  /** The player whose turn is on screen (none after the game). */
+  activePlayer: number | null;
   pieces: number[];
   spotlight: Spotlight | null;
   dice: DiceView | null;
@@ -16,7 +18,7 @@ interface Props {
 }
 
 /** The board with the card just played and the last roll shown on the centre disc. */
-export function BoardStage({ s, pieces, spotlight, dice, selectable, onSelectSign }: Props) {
+export function BoardStage({ s, activePlayer, pieces, spotlight, dice, selectable, onSelectSign }: Props) {
   const { t } = useLang();
   const boardPieces: BoardPiece[] = s.players.map((p) => ({ id: p.id, element: p.element, sign: ((pieces[p.id] ?? 0) % 12 + 12) % 12 }));
   const traps = s.traps.map((tr) => ({ sign: tr.sign, kind: tr.kind, owner: s.players[tr.owner]!.element }));
@@ -25,7 +27,7 @@ export function BoardStage({ s, pieces, spotlight, dice, selectable, onSelectSig
       <Board
         pieces={boardPieces}
         traps={traps}
-        activeId={s.result ? undefined : s.turn.player}
+        activeId={activePlayer ?? undefined}
         selectable={selectable}
         onSelectSign={onSelectSign}
       />

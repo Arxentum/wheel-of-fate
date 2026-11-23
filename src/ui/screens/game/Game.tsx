@@ -14,6 +14,9 @@ import { LogPanel } from './LogPanel';
 import { CardInspector, CardViewer, GameOver, Handoff } from './Overlays';
 import { PlayerPanel } from './PlayerPanel';
 import { Reference } from './Reference';
+import { TurnBanner } from './TurnBanner';
+import { useTableFx } from './useTableFx';
+import { turnOnScreen } from '../../game/tableFx';
 import { targetOf, useGameView, type UiMode } from './shared';
 import styles from './Game.module.css';
 
@@ -97,8 +100,13 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
 
   const over = v.latest.result && !v.busy;
   const round = s.round;
+  // Whose turn the playback has reached (the panels' numbers follow a little later).
+  const turnNow = s.result ? null : (turnOnScreen(v.log.map((i) => i.event))?.p ?? s.turn.player);
   useGameSound(c);
+  const fx = useTableFx(c);
   useMusicScene(over ? 'menu' : s.finalRound ? 'final' : 'game');
+  // Playback starts once the sounds and table effects above are listening.
+  useEffect(() => c.start(), [c]);
 
   return (
     <div className={styles.game}>
@@ -147,8 +155,10 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
 
       <main className={styles.main}>
         <div className={styles.boardCol}>
+          {fx.banner && <TurnBanner s={v.latest} banner={fx.banner} />}
           <BoardStage
             s={s}
+            activePlayer={turnNow}
             pieces={v.pieces}
             spotlight={v.spotlight}
             dice={v.dice}
@@ -165,10 +175,11 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
                   key={id}
                   s={s}
                   id={id}
-                  active={!s.result && s.turn.player === id}
+                  active={turnNow === id}
                   targetable={!!target}
                   onTarget={target ? () => act(target) : undefined}
                   onViewCharacter={() => setUi({ kind: 'view', id: s.players[id]!.major, turned: s.players[id]!.orientation === 'reversed', owner: id })}
+                  floaters={fx.floaters.filter((f) => f.p === id)}
                 />
               );
             })}

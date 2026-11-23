@@ -116,6 +116,7 @@ html[lang='zh-Hant'] .brandName {
 }
 
 .boardCol {
+  position: relative;
   min-height: 0;
   display: flex;
   align-items: center;
@@ -1276,5 +1277,260 @@ html[lang='zh-Hant'] .rankName {
 @media (min-width: 2200px) and (min-height: 1240px) {
   .game {
     --zoom: 1.5;
+  }
+}
+
+/* ---------- Notes floating up from a player's panel ---------- */
+.floaters {
+  position: absolute;
+  top: 42px;
+  right: 10px;
+  z-index: 3;
+  display: grid;
+  justify-items: end;
+  pointer-events: none;
+}
+
+.floater {
+  grid-area: 1 / 1;
+  transform: translateY(calc(var(--i) * 24px));
+  padding: 1px 8px;
+  border: var(--line) solid var(--ink);
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  box-shadow: 3px 3px 0 var(--ink);
+  animation: floatUp 1.7s var(--ease) both;
+}
+
+html[lang='zh-Hant'] .floater {
+  font-family: var(--font-zh);
+  font-size: 14px;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  12% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -16px;
+  }
+}
+
+.float_gain {
+  background: var(--air);
+  color: var(--paper);
+}
+
+.float_loss,
+.float_trap {
+  background: var(--fire);
+  color: var(--paper);
+}
+
+.float_bad {
+  background: var(--paper);
+  color: var(--fire);
+  border-color: var(--fire);
+}
+
+.float_good {
+  background: var(--water);
+  color: var(--paper);
+}
+
+.float_lap {
+  background: var(--earth);
+  color: var(--ink);
+}
+
+.float_cards {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* ---------- Banner: a new round, or your turn ---------- */
+.banner {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 22px 12px 16px;
+  background: var(--ink);
+  color: var(--paper);
+  border-left: 12px solid var(--accent);
+  box-shadow: 8px 8px 0 var(--accent);
+  pointer-events: none;
+  animation: bannerIn 1.9s var(--ease) both;
+}
+
+.banner div {
+  display: grid;
+}
+
+.banner strong {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+html[lang='zh-Hant'] .banner strong {
+  font-family: var(--font-zh);
+  font-weight: 800;
+  font-size: 30px;
+}
+
+.banner span {
+  margin-top: 4px;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+html[lang='zh-Hant'] .banner span {
+  font-family: var(--font-zh);
+}
+
+@keyframes bannerIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-60%) skewX(-8deg);
+  }
+  14% {
+    opacity: 1;
+    transform: translateX(-50%) skewX(0);
+  }
+  82% {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-44%);
+  }
+}
+
+/* ---------- The card the player on screen has just played ---------- */
+.played {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 10px;
+  border: var(--line) solid var(--ink);
+  background: var(--bg);
+  animation: playedIn 240ms var(--ease);
+}
+
+@keyframes playedIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.played:not(:has(.playedArt)) {
+  grid-template-columns: 1fr;
+}
+
+.playedDark {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.playedArt {
+  position: relative;
+  width: 74px;
+  aspect-ratio: 390 / 503;
+  border: var(--line) solid var(--ink);
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.playedArt img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playedArt .spotRev {
+  font-size: 12px;
+}
+
+.playedBody {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.playedBody p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.playedKind {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.playedName {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+html[lang='zh-Hant'] .playedName {
+  font-family: var(--font-zh);
+  font-weight: 800;
+  font-size: 19px;
+}
+
+.playedTarget {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ---------- Your decision: the panel lights up in your colour ---------- */
+.decisionLive {
+  border-color: var(--accent);
+  box-shadow: 6px 6px 0 var(--accent);
+  animation: liveIn 420ms var(--ease);
+}
+
+@keyframes liveIn {
+  0% {
+    box-shadow: 0 0 0 var(--accent);
+  }
+  60% {
+    box-shadow: 9px 9px 0 var(--accent);
   }
 }

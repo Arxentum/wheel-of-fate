@@ -44,7 +44,7 @@ function Pages() {
   const start = useCallback((choice: SetupChoice) => {
     current.current?.dispose();
     const { setup, seed } = toGameSetup(choice);
-    const controller = new GameController(setup, seed);
+    const controller = new GameController(setup, seed, { autoStart: false });
     current.current = controller;
     setGame({ controller, choice, seed, n: ++count.current });
   }, []);

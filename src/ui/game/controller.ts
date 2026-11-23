@@ -103,6 +103,11 @@ interface Step {
 export interface ControllerOptions {
   scheduler?: Scheduler;
   timing?: Timing;
+  /**
+   * Start playing the opening events at once (default). The game screen passes false and
+   * calls start() once it listens, so the first sounds and notes are not missed.
+   */
+  autoStart?: boolean;
   bot?: (s: GameState) => Action;
 }
 
@@ -119,6 +124,8 @@ export class GameController {
   private logSeq = 0;
   private diceSeq = 0;
   private disposed = false;
+  private started = false;
+  private readonly opening: GameEvent[];
 
   constructor(setup: GameSetup, seed: string, opts: ControllerOptions = {}) {
     this.scheduler = opts.scheduler ?? realScheduler;
@@ -141,7 +148,15 @@ export class GameController {
       moving: null,
       paused: false,
     };
-    this.enqueue(events);
+    this.opening = events;
+    if (opts.autoStart ?? true) this.start();
+  }
+
+  /** Begins playing the game (once; later calls do nothing). */
+  start(): void {
+    if (this.started) return;
+    this.started = true;
+    this.enqueue(this.opening);
   }
 
   // ---- React glue ----
