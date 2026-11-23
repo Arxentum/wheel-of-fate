@@ -4,7 +4,7 @@ import { isActive } from '../rules/status';
 import type { GameState, PlayerId, PlayerState, Status, StatusKind } from '../types';
 
 /** Rule §12 weights (points). */
-export interface AiWeights {
+export interface BotWeights {
   space: number; oppSpace: number; oppSpace2p: number; nonLeaderFactor: number; fp: number; card: number;
   leadBias: number; shieldWhenLeading: number; trap: number; trapHitChance: number; finalRoundResources: number; boostKeep: number;
   /** Multiplier on the value of opponents' statuses (1 = rule §10 values). */
@@ -12,11 +12,11 @@ export interface AiWeights {
 }
 
 /**
- * Decision D-54: an AI tournament (one tuned AI against standard ones) showed that rule §12's
+ * Decision D-54: a tournament of computer players (one tuned against standard ones) showed that rule §12's
  * 1.5 points for an opponent's space and the full §10 status values overrate attacks in 3–4
  * player games. These defaults won 37% of 3-player games against the rulebook weights (fair 33%).
  */
-export const W: AiWeights = {
+export const W: BotWeights = {
   space: 2,
   oppSpace: 1.0,
   oppSpace2p: 2,
@@ -39,7 +39,7 @@ export const W: AiWeights = {
 };
 
 /** The exact weights of rule §12 (kept for comparison). */
-export const RULEBOOK_WEIGHTS: AiWeights = { ...W, oppSpace: 1.5, oppStatusFactor: 1 };
+export const RULEBOOK_WEIGHTS: BotWeights = { ...W, oppSpace: 1.5, oppStatusFactor: 1 };
 
 /** Rule §10: status values in spaces (Wrong Turn: −1 instead of about +2). */
 export const STATUS_SPACES: Record<StatusKind, number> = {
@@ -56,13 +56,13 @@ export const ADVANTAGE_ROLL = 22 / 9; // E[max of two 1..3 dice]
 
 export interface Perspective {
   me: PlayerId;
-  w: AiWeights;
+  w: BotWeights;
   /** Points per space for each opponent (the leader counts more). */
   oppSpace: number[];
   leading: boolean;
 }
 
-export function perspective(s: GameState, me: PlayerId, w: AiWeights = W): Perspective {
+export function perspective(s: GameState, me: PlayerId, w: BotWeights = W): Perspective {
   const base = s.players.length === 2 ? w.oppSpace2p : w.oppSpace;
   const top = Math.max(...s.players.map((p) => p.progress));
   const oppSpace = s.players.map((p) => (p.id === me ? 0 : base * (p.progress === top ? 1 : w.nonLeaderFactor)));

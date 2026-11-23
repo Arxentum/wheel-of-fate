@@ -15,7 +15,7 @@ for (const lang of LANGS) {
   test.describe(lang, () => {
     test('an all-computer game plays to the end', async ({ page }) => {
       const errors = watchErrors(page);
-      await openApp(page, { lang, seats: { fire: 'ai', earth: 'ai', air: 'ai', water: 'ai' } });
+      await openApp(page, { lang, seats: { fire: 'computer', earth: 'computer', air: 'computer', water: 'computer' } });
       await expect(page.getByRole('heading', { level: 1 })).toHaveText(t('app.title'));
       await shot(page, `${tag}-01-start`);
 
@@ -39,7 +39,7 @@ for (const lang of LANGS) {
 
     test('a human plays turns against the computer', async ({ page }) => {
       const errors = watchErrors(page);
-      await openApp(page, { lang, seats: { fire: 'human', earth: 'ai', air: 'ai', water: 'off' }, query: '?character=chariot.upright' });
+      await openApp(page, { lang, seats: { fire: 'human', earth: 'computer', air: 'computer', water: 'off' }, query: '?character=chariot.upright' });
       await startGame(page, t, 'smoke-human');
       await page.getByRole('radio', { name: '4×' }).click();
       const b = turnButtons(page, t);
@@ -102,7 +102,7 @@ for (const lang of LANGS) {
 
     test('How to Play, the Card Gallery and the rules during a game', async ({ page }) => {
       const errors = watchErrors(page);
-      await openApp(page, { lang, hash: '#/rules', seats: { fire: 'human', earth: 'ai', air: 'off', water: 'off' } });
+      await openApp(page, { lang, hash: '#/rules', seats: { fire: 'human', earth: 'computer', air: 'off', water: 'off' } });
       await expect(page.getByRole('heading', { level: 1 })).toHaveText(t('rules.title'));
       await shot(page, `${tag}-09-how-to-play`);
       await page.getByRole('navigation', { name: t('rules.toc') }).getByRole('button', { name: t('rules.trap.title') }).click();
@@ -148,7 +148,7 @@ test.describe('touch screens', () => {
 
   test('on a tablet a tap previews the reversed side and shows the whole skill text', async ({ page }) => {
     const errors = watchErrors(page);
-    await openApp(page, { lang: 'en', seats: { fire: 'human', earth: 'ai', air: 'off', water: 'off' }, query: '?character=highPriestess.upright' });
+    await openApp(page, { lang: 'en', seats: { fire: 'human', earth: 'computer', air: 'off', water: 'off' }, query: '?character=highPriestess.upright' });
     await startGame(page, t, 'smoke-touch');
     await expect(turnButtons(page, t).meditate).toBeVisible({ timeout: 20_000 });
 

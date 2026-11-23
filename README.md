@@ -60,7 +60,7 @@ src/
     core/        开局、合法性检查、执行动作、枚举合法动作
     effects/     各张卡的效果
     rules/       状态、陷阱、命运点
-    ai/          电脑对手（隐藏信息下的一步估值）
+    bot/         电脑对手（隐藏信息下的一步估值）
   sim/           平衡模拟器（npm run sim）
   i18n/          字典 en.json、zh-Hant.json 和占位符填充
   ui/

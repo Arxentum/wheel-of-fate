@@ -1,19 +1,19 @@
 // Turn flow, statuses, shields, traps, laps, victory and the engine's guarantees.
 import { describe, expect, it } from 'vitest';
 import {
-  DECK_SIZE, MAJORS, applyAction, canBoost, canReroll, checkAction, chooseAiAction, createGame,
+  DECK_SIZE, MAJORS, applyAction, canBoost, canReroll, checkAction, chooseBotAction, createGame,
   enumerateActions, hasShield, statusOf, trapAt, applyActionMut, type GameState,
 } from '../src/engine';
 import { act, autoUntil, cardLocations, ofType, playMinor, resume, scenario, skill, status, uid } from './helpers';
 import { RULEBOOK_V4 } from '../src/sim/rulebooks';
 
 const P0 = 0, P1 = 1, P2 = 2;
-const three = [{ controller: 'ai' as const, element: 'fire' as const }, { controller: 'ai' as const, element: 'earth' as const }, { controller: 'ai' as const, element: 'air' as const }];
+const three = [{ controller: 'computer' as const, element: 'fire' as const }, { controller: 'computer' as const, element: 'earth' as const }, { controller: 'computer' as const, element: 'air' as const }];
 
 function playAi(s: GameState, check?: (s: GameState) => void): void {
   let n = 0;
   while (s.pending) {
-    const a = chooseAiAction(s);
+    const a = chooseBotAction(s);
     expect(checkAction(s, a)).toEqual({ ok: true });
     applyActionMut(s, a);
     check?.(s);
@@ -24,7 +24,7 @@ function playAi(s: GameState, check?: (s: GameState) => void): void {
 describe('setup (rule §4)', () => {
   it('pieces on Aries, 3 FP, 3 cards, distinct characters, order by element', () => {
     const { state: s } = createGame({ laps: 2, players: [
-      { controller: 'human', element: 'water' }, { controller: 'ai', element: 'fire' }, { controller: 'ai', element: 'air' },
+      { controller: 'human', element: 'water' }, { controller: 'computer', element: 'fire' }, { controller: 'computer', element: 'air' },
     ] }, 'seed');
     expect(s.order).toEqual([1, 2, 0]);
     expect(new Set(s.players.map((p) => p.major)).size).toBe(3);
@@ -388,7 +388,7 @@ describe('engine guarantees', () => {
     for (const n of [2, 3, 4]) {
       for (const laps of [1, 2, 3]) {
         for (let g = 0; g < 34; g++) {
-          const { state } = createGame({ laps, players: els.slice(0, n).map((element) => ({ controller: 'ai', element })) }, `g${n}${laps}${g}`);
+          const { state } = createGame({ laps, players: els.slice(0, n).map((element) => ({ controller: 'computer', element })) }, `g${n}${laps}${g}`);
           playAi(state, (s) => {
             const locs = cardLocations(s);
             if (locs.length !== DECK_SIZE || new Set(locs).size !== DECK_SIZE) throw new Error('card lost or duplicated');

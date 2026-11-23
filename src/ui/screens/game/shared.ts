@@ -28,7 +28,7 @@ export function humansOf(s: GameState): PlayerId[] {
 
 export function tagFor(t: T, s: GameState, id: PlayerId): string {
   const p = s.players[id]!;
-  if (p.controller === 'ai') return t('tag.ai');
+  if (p.controller === 'computer') return t('tag.computer');
   return humansOf(s).length === 1 ? t('tag.you') : t('tag.human');
 }
 

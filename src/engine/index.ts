@@ -13,5 +13,5 @@ export * from './data/cards';
 export { isActive, hasShield, statusOf, NEGATIVE_STATUSES, FOREVER } from './rules/status';
 export { trapAt } from './rules/trap';
 export { canSpend } from './rules/fp';
-export { chooseAiAction, chooseAmong } from './ai/bot';
-export { W as AI_WEIGHTS, RULEBOOK_WEIGHTS as RULEBOOK_AI_WEIGHTS, type AiWeights } from './ai/evaluate';
+export { chooseBotAction, chooseAmong } from './bot/bot';
+export { W as BOT_WEIGHTS, RULEBOOK_WEIGHTS as RULEBOOK_BOT_WEIGHTS, type BotWeights } from './bot/evaluate';

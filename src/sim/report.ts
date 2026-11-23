@@ -1,5 +1,5 @@
 // Builds docs/balance-report.md (in Chinese, as the project's documents are): rules v3, v4 and v5.
-import { COURTS, MAJORS, SUITS, RULEBOOK_AI_WEIGHTS, AI_WEIGHTS, type BalancePatch, type FateCardId, type MajorId } from '../engine';
+import { COURTS, MAJORS, SUITS, RULEBOOK_BOT_WEIGHTS, BOT_WEIGHTS, type BalancePatch, type FateCardId, type MajorId } from '../engine';
 import { diagnoseReversed } from './diagnose';
 import { RULEBOOK_V3, RULEBOOK_V4 } from './rulebooks';
 import { runMany } from './runGame';
@@ -91,7 +91,7 @@ const V5_UPRIGHT: { id: string; what: string; v4: string; v5: string }[] = [
   { id: 'U1', what: '18 月亮 正位', v4: '前进 2 格、+1 FP、护盾；陷阱无效', v5: '前进 2 格；陷阱无效（去掉护盾和 FP，价值移到逆位的陷阱）' },
   { id: 'U2', what: '5 教皇 正位', v4: '前进 1 格、清除状态、+2 FP、抽 1、护盾', v5: '……+1 FP（两人局仍 +2 FP）' },
   { id: 'U3', what: '21 世界 正位', v4: '每局一次：前进到双鱼座，最多 8 格', v5: '……最多 9 格' },
-  { id: 'U4', what: '16 高塔 正位', v4: '前进 4 格，然后弃掉全部手牌', v5: '前进 4 格（**你领先时只前进 3 格**），然后弃掉全部手牌（按你的要求只加条件，不调费用）' },
+  { id: 'U4', what: '16 高塔 正位', v4: '前进 4 格，然后弃掉全部手牌', v5: '前进 4 格（**你领先时只前进 3 格**），然后弃掉全部手牌（只加条件，不调费用）' },
   { id: 'U5', what: '12 倒吊人 正位', v4: '前进 2 格、+3 FP、抽 1、护盾；你下回合迟缓', v5: '……+1 FP……（两人局：前进 3 格）' },
   { id: 'U6', what: '11 正义 正位', v4: '领先时：前进 1 格并 +2 FP', v5: '领先时：前进 1 格并 +3 FP' },
   { id: 'U7', what: '6 恋人 正位', v4: '5 格内没人时前进 2 格', v5: '5 格内没人时前进 3 格（两人局仍 2 格）' },
@@ -143,13 +143,13 @@ export function buildReport(o: ReportOptions): string {
   const diag4 = diagnoseReversed(diagGames, `${o.seed}-diag`, RULEBOOK_V4);
   const diag5 = diagnoseReversed(diagGames, `${o.seed}-diag`, {});
 
-  o.log('AI calibration');
+  o.log('Computer player calibration');
   const tg = Math.max(2000, Math.round(o.games * 2));
   const tour = [
-    { label: '1 个调整后 vs 2 个 §12 原权重（3 人局）', r: tournament(3, tg, AI_WEIGHTS, RULEBOOK_AI_WEIGHTS, {}, `${o.seed}-t1`) },
-    { label: '1 个 §12 原权重 vs 2 个调整后（3 人局）', r: tournament(3, tg, RULEBOOK_AI_WEIGHTS, AI_WEIGHTS, {}, `${o.seed}-t2`) },
-    { label: '1 个调整后 vs 3 个 §12 原权重（4 人局）', r: tournament(4, tg, AI_WEIGHTS, RULEBOOK_AI_WEIGHTS, {}, `${o.seed}-t3`) },
-    { label: '1 个调整后 vs 1 个 §12 原权重（2 人局）', r: tournament(2, tg, AI_WEIGHTS, RULEBOOK_AI_WEIGHTS, {}, `${o.seed}-t4`) },
+    { label: '1 个调整后 vs 2 个 §12 原权重（3 人局）', r: tournament(3, tg, BOT_WEIGHTS, RULEBOOK_BOT_WEIGHTS, {}, `${o.seed}-t1`) },
+    { label: '1 个 §12 原权重 vs 2 个调整后（3 人局）', r: tournament(3, tg, RULEBOOK_BOT_WEIGHTS, BOT_WEIGHTS, {}, `${o.seed}-t2`) },
+    { label: '1 个调整后 vs 3 个 §12 原权重（4 人局）', r: tournament(4, tg, BOT_WEIGHTS, RULEBOOK_BOT_WEIGHTS, {}, `${o.seed}-t3`) },
+    { label: '1 个调整后 vs 1 个 §12 原权重（2 人局）', r: tournament(2, tg, BOT_WEIGHTS, RULEBOOK_BOT_WEIGHTS, {}, `${o.seed}-t4`) },
   ];
   const seconds = ((Date.now() - t0) / 1000).toFixed(0);
   const total = VERSIONS.length * COUNTS.length * LAPS.length * o.games + VERSIONS.length * COUNTS.length * o.big
@@ -167,7 +167,7 @@ export function buildReport(o: ReportOptions): string {
   P();
   P(`> 由 \`npm run sim\` 生成：共 ${total.toLocaleString('en-US')} 局电脑对局，用时 ${seconds} 秒，总种子 \`${o.seed}\`（同一种子可完整复现）。`);
   P('> - **v3**：规则书 v3 原样。');
-  P('> - **v4**：M1 你接受的建议版（轮换先手、单体逆位打所有领先者、18 处角色数值，D-58）。');
+  P('> - **v4**：M1 采纳的建议版（轮换先手、单体逆位打所有领先者、18 处角色数值，D-58）。');
   P('> - **v5（现行，引擎默认值）**：v4 + 护盾返还（D-59）+ 角色逆位重设计和新陷阱规则（D-60 – D-63）。');
   P(`> 角色胜率以各人数 ${defaultLaps} 圈 ${o.big.toLocaleString('en-US')} 局为准（3 人局每个角色约 ${samples} 个样本，95% 误差约 ±${err.toFixed(1)} 个百分点）。平衡目标：3 人局每个角色在公平值 ±5 个百分点内，2 / 4 人局 ±8 内。`);
   P();
@@ -189,7 +189,7 @@ export function buildReport(o: ReportOptions): string {
   ]));
   P();
   const o3 = outOfRange(v5, 3), o2 = outOfRange(B('v5', 2), 2), o4 = outOfRange(B('v5', 4), 4);
-  P(`1. **默认 ${defaultLaps} 圈。** v5 的 3 人局平均 ${num(v5.meanRounds(), 1)} 轮，比 v4 多 ${num(v5.meanRounds() - v4.meanRounds(), 1)} 轮（你已同意多约 1.5 轮）。原因：要让电脑愿意用逆位，逆位让对手后退的格数大约要是正位自己前进的两倍，每多用一次逆位，全场的总进度就少几格（§4.3）。`);
+  P(`1. **默认 ${defaultLaps} 圈。** v5 的 3 人局平均 ${num(v5.meanRounds(), 1)} 轮，比 v4 多 ${num(v5.meanRounds() - v4.meanRounds(), 1)} 轮（已接受多约 1.5 轮）。原因：要让电脑愿意用逆位，逆位让对手后退的格数大约要是正位自己前进的两倍，每多用一次逆位，全场的总进度就少几格（§4.3）。`);
   P(`2. **角色平衡**：3 人局超出 ±5 的角色 ${o3.length} 个${o3.length ? `（${o3.map((m) => `${MAJOR_ZH[m]} ${pp(winRate(v5, m) - 1 / 3)}`).join('、')}）` : ''}；2 人局超出 ±8 的 ${o2.length} 个${o2.length ? `（${o2.map((m) => `${MAJOR_ZH[m]} ${pp(winRate(B('v5', 2), m) - 1 / 2)}`).join('、')}）` : ''}；4 人局 ${o4.length} 个${o4.length ? `（${o4.map((m) => `${MAJOR_ZH[m]} ${pp(winRate(B('v5', 4), m) - 1 / 4)}`).join('、')}）` : ''}。`);
   P(`3. **逆位真正有用了**：3 人局角色技能用逆位 ${pct(revShare(v5), 0)}（v4 ${pct(revShare(v4), 0)}）；「一律用逆位」的电脑平均胜率从 v4 的 ${pct(avg(diag4))} 升到 ${pct(avg(diag5))}（§4.4）。`);
   P(`4. **陷阱回来了**：每局触发 ${num(trapsPerGame(v5))} 次（v4 ${num(trapsPerGame(v4))}）。`);
@@ -200,7 +200,7 @@ export function buildReport(o: ReportOptions): string {
   P('## 1. 方法');
   P();
   P('- 模拟器 `npm run sim` 与网页共用 `src/engine/`；每局随机分配元素和角色（角色朝向随机），所有座位都是同一种电脑。共同获胜每人记 1/k 胜；「座位」指行动顺序（D-39 – D-42）。');
-  P('- 电脑按 §12 枚举所有合法行动，在隐藏信息的副本上执行后打分；权重经「电脑互打」校准（D-53、D-54，你已确认）：');
+  P('- 电脑按 §12 枚举所有合法行动，在隐藏信息的副本上执行后打分；权重经「电脑互打」校准（D-53、D-54，已确认）：');
   P();
   P(table(['对局', '局数', '主角胜率', '公平值', '95% 区间'], tour.map(({ label, r }) => [label, r.games, pct(r.rate), pct(r.fair), `±${(r.ci95 * 100).toFixed(1)}`])));
   P();
@@ -214,7 +214,7 @@ export function buildReport(o: ReportOptions): string {
     n, l, num(M('v3', n, l).meanRounds()), num(M('v4', n, l).meanRounds()), num(M('v5', n, l).meanRounds()), `${M('v5', n, l).percentile(0.1)}–${M('v5', n, l).percentile(0.9)}`,
   ]))));
   P();
-  const minutes = (human: number, ai: number, lo: boolean) => (v5.meanRounds() * (human * (lo ? 15 : 20) + ai * (lo ? 3 : 5))) / 60;
+  const minutes = (human: number, computer: number, lo: boolean) => (v5.meanRounds() * (human * (lo ? 15 : 20) + computer * (lo ? 3 : 5))) / 60;
   P(`「轮」= 每人各行动一次。时长按真人每回合 15–20 秒、电脑 3–5 秒估算：3 名真人约 ${Math.round(minutes(3, 0, true))}–${Math.round(minutes(3, 0, false))} 分钟，1 名真人 + 2 名电脑约 ${Math.round(minutes(1, 2, true))}–${Math.round(minutes(1, 2, false))} 分钟，接近 §2 的「约 10–15 分钟」。`);
   P();
 
@@ -285,7 +285,7 @@ export function buildReport(o: ReportOptions): string {
   // ---------- Changes ----------
   P('## 6. 规则改动明细');
   P();
-  P('### 6.1 v3 → v4（M1，你已接受）');
+  P('### 6.1 v3 → v4（M1，已采纳）');
   P();
   P('S1 每轮轮换先手；S2 单体逆位改为作用于所有领先于你的玩家；M1–M18 角色数值（力量去护盾、命运之轮按较低点数前进、恋人不多走 1 格、星星补到 2、节制不抽牌、世界最多 8 格；隐士 / 皇后 / 教皇 / 女祭司 / 死神 / 恶魔加前进；皇帝点数视为 4；魔术师额外打出最多 2 张；正义至少 2 格、领先时前进 1 格；审判抽 2 张；月亮 +1 FP；倒吊人改为「先走、下回合迟缓」）。详见 decisions.md D-58。');
   P();

@@ -62,7 +62,7 @@ export function shuffle<T>(st: RngState, items: T[]): T[] {
   return items;
 }
 
-/** A different but deterministic stream (used by the AI so it cannot peek at the real one). */
+/** A different but deterministic stream (used by the computer players so they cannot peek at the real one). */
 export function deriveRng(st: RngState, salt: number): RngState {
   const out: RngState = [
     (st[0] ^ 0x9e3779b9 ^ salt) >>> 0,

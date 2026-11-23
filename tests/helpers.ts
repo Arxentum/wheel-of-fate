@@ -42,7 +42,7 @@ export function scenario(spec: Spec = {}): GameState {
       laps: spec.laps ?? 2,
       balance: spec.balance,
       players: specs.map((p, i) => ({
-        controller: 'ai',
+        controller: 'computer',
         element: p.element ?? ELEMENTS[i]!,
         major: p.major ?? DEFAULT_MAJORS[i]!,
         orientation: p.orientation ?? 'upright',

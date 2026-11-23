@@ -17,7 +17,7 @@ export type FaceKey = `${CardId}.${Orientation}`;
 export type PlayerId = number;
 /** Index into the 48-card fate deck (see data/cards.ts `cardDef`). */
 export type CardUid = number;
-export type Controller = 'human' | 'ai';
+export type Controller = 'human' | 'computer';
 
 export type StatusKind =
   | 'slowed' | 'silenced' | 'drained' | 'stunned' | 'rooted' | 'shielded' | 'wrongTurn';
@@ -40,7 +40,7 @@ export interface FaceDef {
   targeting: Targeting;
   /** Numbers of the effect. Balance patches override them; card text reads them too. */
   params: Record<string, number>;
-  /** The effect rolls dice (the AI averages several samples). */
+  /** The effect rolls dice (the computer players average several samples). */
   random?: boolean;
 }
 

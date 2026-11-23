@@ -5,7 +5,7 @@ import { renderFace } from '../src/ui/game/cardText';
 
 function game(players: number): GameState {
   const elements = ['fire', 'earth', 'air', 'water'] as const;
-  return createGame({ players: elements.slice(0, players).map((element) => ({ controller: 'ai', element })), laps: 3 }, 'text').state;
+  return createGame({ players: elements.slice(0, players).map((element) => ({ controller: 'computer', element })), laps: 3 }, 'text').state;
 }
 
 const KEYS = Object.keys(FACES) as FaceKey[];

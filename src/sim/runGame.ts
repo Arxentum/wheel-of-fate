@@ -1,4 +1,4 @@
-import { applyActionMut, chooseAiAction, createGame, type BalancePatch, type Element } from '../engine';
+import { applyActionMut, chooseBotAction, createGame, type BalancePatch, type Element } from '../engine';
 import { seedFromString, shuffle } from '../engine/core/rng';
 import type { Stats } from './stats';
 
@@ -15,7 +15,7 @@ export function runGame(cfg: SimConfig, seed: string, stats: Stats): void {
   const setupRng = seedFromString(`${seed}:setup`);
   const elements = shuffle(setupRng, [...ELEMENTS]).slice(0, cfg.players);
   const { state, events } = createGame(
-    { laps: cfg.laps, balance: cfg.balance, players: elements.map((element) => ({ controller: 'ai', element })) },
+    { laps: cfg.laps, balance: cfg.balance, players: elements.map((element) => ({ controller: 'computer', element })) },
     seed,
   );
   stats.beginGame(state);
@@ -23,7 +23,7 @@ export function runGame(cfg: SimConfig, seed: string, stats: Stats): void {
   let guard = 0;
   while (state.pending) {
     stats.beforeDecision(state);
-    const a = chooseAiAction(state);
+    const a = chooseBotAction(state);
     const ev = applyActionMut(state, a);
     stats.afterDecision(state, a);
     for (const e of ev) stats.event(e);

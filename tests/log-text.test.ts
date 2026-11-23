@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyActionMut, chooseAiAction, createGame, type GameEvent, type GameSetup } from '../src/engine';
+import { applyActionMut, chooseBotAction, createGame, type GameEvent, type GameSetup } from '../src/engine';
 import { LANGS, translate, type MessageKey, type Params } from '../src/i18n';
 import { describeEvent } from '../src/ui/game/logText';
 
@@ -9,10 +9,10 @@ describe('log lines', () => {
     const seen = new Set<string>();
     for (const [n, seed] of [[2, 'log-a'], [3, 'log-b'], [4, 'log-c']] as const) {
       const elements = ['fire', 'earth', 'air', 'water'] as const;
-      const setup: GameSetup = { players: elements.slice(0, n).map((element) => ({ controller: 'ai', element })), laps: 2 };
+      const setup: GameSetup = { players: elements.slice(0, n).map((element) => ({ controller: 'computer', element })), laps: 2 };
       const { state, events } = createGame(setup, seed);
       const all: GameEvent[] = [...events];
-      while (state.pending) all.push(...applyActionMut(state, chooseAiAction(state)));
+      while (state.pending) all.push(...applyActionMut(state, chooseBotAction(state)));
       for (const e of all) {
         seen.add(e.t);
         const line = describeEvent(t, state, e);

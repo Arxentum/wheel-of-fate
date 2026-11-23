@@ -12,7 +12,7 @@ import { canSpend } from '../rules/fp';
 import { hasShield } from '../rules/status';
 import { trapAt, trapSignAllowed } from '../rules/trap';
 import type { Action, CardUid, FaceKey, GameState, Orientation, PlayerId, PlayerState, Suit } from '../types';
-import { W, perspective, score, type AiWeights, type Perspective } from './evaluate';
+import { W, perspective, score, type BotWeights, type Perspective } from './evaluate';
 
 const MINOR_VALUE: Record<Suit, number> = { wands: 1.0, swords: 0.9, pentacles: 0.85, cups: 0.8 };
 /** Flip only when the other face looks this many points better (the flip costs 1 FP = 0.5). */
@@ -139,7 +139,7 @@ function evalAction(s: GameState, a: Action, P: Perspective, base: number): numb
   return v;
 }
 
-function best(s: GameState, me: PlayerId, actions: readonly Action[], w: AiWeights): Action {
+function best(s: GameState, me: PlayerId, actions: readonly Action[], w: BotWeights): Action {
   if (actions.length === 0) throw new Error('no legal action');
   if (actions.length === 1) return actions[0]!;
   const P = perspective(s, me, w);
@@ -194,7 +194,7 @@ function playCandidates(s: GameState, me: PlayerId): Action[] {
 // ---------- Flip and Move (rule §12) ----------
 
 /** Best value of using the skill with `o` at the start of a fresh turn (a proxy for next turn). */
-function skillValue(s: GameState, me: PlayerId, o: Orientation, w: AiWeights): number {
+function skillValue(s: GameState, me: PlayerId, o: Orientation, w: BotWeights): number {
   const c = cloneState(s);
   const p = player(c, me);
   p.orientation = o;
@@ -211,7 +211,7 @@ function skillValue(s: GameState, me: PlayerId, o: Orientation, w: AiWeights): n
   return top;
 }
 
-function decideFlip(s: GameState, me: PlayerId, w: AiWeights): Action {
+function decideFlip(s: GameState, me: PlayerId, w: BotWeights): Action {
   const p = player(s, me);
   const no: Action = { type: 'flip', flip: false };
   if (!canSpend(p, s.config.balance.flipCost) || p.fp < 3) return no;
@@ -233,7 +233,7 @@ function threatAt(s: GameState, p: PlayerState, progress: number): boolean {
  * Rule §12: reroll a 1 with FP ≥ 3; boost when 1 space short of the finish with FP ≥ 2.
  * Additions (decision D-53): avoid a rival's trap; in the final round every space counts.
  */
-function decideMove(s: GameState, me: PlayerId, w: AiWeights): Action {
+function decideMove(s: GameState, me: PlayerId, w: BotWeights): Action {
   const p = player(s, me);
   const roll = s.turn.roll!.value;
   const landing = p.progress + roll;
@@ -249,8 +249,8 @@ function decideMove(s: GameState, me: PlayerId, w: AiWeights): Action {
 }
 
 /** The computer's action for the current decision. */
-export function chooseAiAction(s: GameState, tuning?: Partial<AiWeights>): Action {
-  const w: AiWeights = tuning ? { ...W, ...tuning } : W;
+export function chooseBotAction(s: GameState, tuning?: Partial<BotWeights>): Action {
+  const w: BotWeights = tuning ? { ...W, ...tuning } : W;
   const d = s.pending;
   if (!d) throw new Error('no decision pending');
   const p = player(s, d.player);
@@ -279,8 +279,8 @@ export function chooseAiAction(s: GameState, tuning?: Partial<AiWeights>): Actio
 
 export { skillChoices };
 
-/** The AI's pick among a given set of legal actions (used by the simulator's diagnostics). */
-export function chooseAmong(s: GameState, actions: readonly Action[], tuning?: Partial<AiWeights>): Action {
+/** The computer player's pick among a given set of legal actions (used by the simulator's diagnostics). */
+export function chooseAmong(s: GameState, actions: readonly Action[], tuning?: Partial<BotWeights>): Action {
   const d = s.pending;
   if (!d) throw new Error('no decision pending');
   return best(s, d.player, actions, tuning ? { ...W, ...tuning } : W);

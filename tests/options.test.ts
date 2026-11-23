@@ -1,7 +1,7 @@
 // Balance options used by the M1 proposal (src/sim/proposal.ts) and the experiments in the report.
 import { describe, expect, it } from 'vitest';
 import {
-  applyActionMut, applyBalancePatch, checkAction, chooseAiAction, createGame, defaultBalance,
+  applyActionMut, applyBalancePatch, checkAction, chooseBotAction, createGame, defaultBalance,
   enumerateActions, hasShield, statusOf, type GameState,
 } from '../src/engine';
 import { PROPOSAL } from '../src/sim/proposal';
@@ -13,7 +13,7 @@ const P0 = 0, P1 = 1, P2 = 2;
 function playOut(s: GameState): void {
   let n = 0;
   while (s.pending) {
-    applyActionMut(s, chooseAiAction(s));
+    applyActionMut(s, chooseBotAction(s));
     if (++n > 5000) throw new Error('game did not end');
   }
 }
@@ -113,7 +113,7 @@ describe('experimental end-game options (report §3)', () => {
   });
   it('seat compensation adds progress and FP by turn order', () => {
     const { state } = createGame({ laps: 2, balance: { startProgressBySeat: [2, 1, 0], startFpBySeat: [1, 0, 0] }, players: [
-      { controller: 'ai', element: 'air' }, { controller: 'ai', element: 'fire' }, { controller: 'ai', element: 'earth' },
+      { controller: 'computer', element: 'air' }, { controller: 'computer', element: 'fire' }, { controller: 'computer', element: 'earth' },
     ] }, 1);
     expect(state.players.map((p) => p.progress)).toEqual([0, 2, 1]);
     expect(state.players[1]!.fp).toBe(4);
@@ -213,7 +213,7 @@ describe('proposal parameters (report §6)', () => {
     expect(() => applyBalancePatch(defaultBalance(), PROPOSAL)).not.toThrow();
     for (let g = 0; g < 30; g++) {
       const { state } = createGame({ laps: 3, balance: PROPOSAL, players: [
-        { controller: 'ai', element: 'fire' }, { controller: 'ai', element: 'earth' }, { controller: 'ai', element: 'air' }, { controller: 'ai', element: 'water' },
+        { controller: 'computer', element: 'fire' }, { controller: 'computer', element: 'earth' }, { controller: 'computer', element: 'air' }, { controller: 'computer', element: 'water' },
       ] }, `prop-${g}`);
       playOut(state);
       expect(state.result).not.toBeNull();

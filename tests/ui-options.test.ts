@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyActionMut, cardDef, chooseAiAction, createGame, enumerateActions, type GameSetup } from '../src/engine';
+import { applyActionMut, cardDef, chooseBotAction, createGame, enumerateActions, type GameSetup } from '../src/engine';
 import { cardSideOption, skillOption } from '../src/ui/game/options';
 
 describe('UI options agree with the engine', () => {
@@ -7,7 +7,7 @@ describe('UI options agree with the engine', () => {
     let checked = 0;
     for (const [n, seed] of [[2, 'opt-a'], [3, 'opt-b'], [4, 'opt-c']] as const) {
       const elements = ['fire', 'earth', 'air', 'water'] as const;
-      const setup: GameSetup = { players: elements.slice(0, n).map((element) => ({ controller: 'ai', element })), laps: 2 };
+      const setup: GameSetup = { players: elements.slice(0, n).map((element) => ({ controller: 'computer', element })), laps: 2 };
       const { state } = createGame(setup, seed);
       while (state.pending) {
         const d = state.pending;
@@ -33,7 +33,7 @@ describe('UI options agree with the engine', () => {
             expect(skillOption(state, d.player).ok).toBe(legal.some((a) => a.type === 'useSkill'));
           }
         }
-        applyActionMut(state, chooseAiAction(state));
+        applyActionMut(state, chooseBotAction(state));
       }
     }
     expect(checked).toBeGreaterThan(100);
@@ -49,7 +49,7 @@ describe('reasonText', () => {
     const { reasonText } = await import('../src/ui/screens/game/shared');
     const { createGame } = await import('../src/engine');
     const { translate } = await import('../src/i18n');
-    const { state } = createGame({ players: [{ controller: 'human', element: 'fire' }, { controller: 'ai', element: 'air' }], laps: 1 }, 'reason');
+    const { state } = createGame({ players: [{ controller: 'human', element: 'fire' }, { controller: 'computer', element: 'air' }], laps: 1 }, 'reason');
     const en = (k: Parameters<typeof translate>[1], p?: Parameters<typeof translate>[2]) => translate('en', k, p);
     expect(reasonText(en, state, 'cannotBoost')).toBe('No boost: one per turn, and it costs 2 Fate Points.');
     expect(reasonText(en, state, 'cannotFlip')).toBe('Flipping costs 1 Fate Point.');

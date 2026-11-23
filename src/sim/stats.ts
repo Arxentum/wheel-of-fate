@@ -55,7 +55,7 @@ export class Stats {
     for (const p of s.players) this.majorGames.set(p.major, this.majorGames.get(p.major)! + 1);
   }
 
-  /** Before the AI answers a Play-step decision: which card types could be played. */
+  /** Before a computer player answers a Play-step decision: which card types could be played. */
   beforeDecision(s: GameState): void {
     const d = s.pending;
     if (!d || d.kind !== 'chooseAction') return;

@@ -3,7 +3,7 @@
 > 由 `npm run terms` 从 `src/i18n/*.json` 生成，不要手改；改字典后重新生成。
 > 卡牌效果、卡名、星座名、元素名来自规则书 v5，不在这里列出。`{n|单数|复数}` 是英文的单复数写法。
 
-## 1. 规则书里没有、由我拟定的词（D-47，请确认）
+## 1. 规则书里没有、自拟的界面词（D-47）
 
 | 键 | EN | 繁中 | 用在哪里 |
 |---|---|---|---|
@@ -71,7 +71,7 @@
 | `setup.players` | Players | 玩家 |
 | `setup.playersHint` | Choose who sits at each element. Turn order is Fire, Earth, Air, Water. | 選擇每個元素由誰來玩。行動順序是火、土、風、水。 |
 | `setup.human` | Player | 玩家 |
-| `setup.ai` | Computer | 電腦 |
+| `setup.computer` | Computer | 電腦 |
 | `setup.off` | Off | 不玩 |
 | `setup.needPlayers` | A game needs 2 to 4 players. | 一局需要 2 到 4 名玩家。 |
 | `setup.laps` | Laps to win | 勝利圈數 |
@@ -110,7 +110,7 @@
 | `player.water` | Water | 水象 |
 | `tag.you` | You | 你 |
 | `tag.human` | Player | 玩家 |
-| `tag.ai` | Computer | 電腦 |
+| `tag.computer` | Computer | 電腦 |
 | `game.round` | Round {n} | 第 {n} 輪 |
 | `game.goal` | {laps\|lap\|laps} to win | 跑完 {laps} 圈獲勝 |
 | `game.finalRound` | Final round | 最後一輪 |
@@ -138,7 +138,7 @@
 | `game.decision` | Your decision | 你的決定 |
 | `game.overShort` | The game is over. | 遊戲結束。 |
 | `game.waitingFor` | Waiting for {player}… | 等待{player}… |
-| `game.aiPlaying` | {player} is playing… | {player}正在行動… |
+| `game.computerPlaying` | {player} is playing… | {player}正在行動… |
 | `game.playing` | Playing… | 進行中… |
 | `game.log` | Log | 記錄 |
 | `game.hand` | Hand | 手牌 |
@@ -459,7 +459,7 @@
 | `rules.screen.cards` | Click a card in your hand to open it. Point at a side to turn the card that way up, then play that side. | 點手牌打開大卡；指到哪一面，整張卡就轉到那一面，再按那一面的按鈕打出。 |
 | `rules.screen.grey` | Choices you cannot make right now are greyed out, with the reason under them. | 現在不能選的選項會變灰，下面寫著原因。 |
 | `rules.screen.hotseat` | Several people on one device: hands are covered between turns. Pass the device; the next player confirms before their hand appears. | 多人共用一台裝置時，換人之間手牌會被遮住。把裝置交給下一位，他確認後才顯示手牌。 |
-| `rules.screen.ai` | Computer turns play back step by step. Change the speed (1×, 2×, 4×) or press Skip to jump to your next decision. | 電腦的回合會一步一步回放。可以切換速度（1×、2×、4×），或按「跳過」直接到你下一次要做決定的時候。 |
+| `rules.screen.computer` | Computer turns play back step by step. Change the speed (1×, 2×, 4×) or press Skip to jump to your next decision. | 電腦的回合會一步一步回放。可以切換速度（1×、2×、4×），或按「跳過」直接到你下一次要做決定的時候。 |
 | `rules.screen.lang` | Switch the language at any time, even in the middle of a game. | 隨時可以切換語言，遊戲進行中也可以。 |
 | `rules.screen.log` | The log lists everything that happens. It never shows cards a player looks at or takes in secret. | 記錄會列出所有發生的事，但不會透露別人私下查看或拿走的是哪張牌。 |
 | `rules.screen.rules` | In a game, the Rules button opens this page and the cards. The game waits until you close it. | 遊戲中按「規則」可以打開這一頁和卡牌圖鑑；關閉之前遊戲會暫停。 |

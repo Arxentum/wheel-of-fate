@@ -51,7 +51,7 @@ export function watchErrors(page: Page): string[] {
 
 export interface OpenOptions {
   lang: Lang;
-  seats?: Record<'fire' | 'earth' | 'air' | 'water', 'human' | 'ai' | 'off'>;
+  seats?: Record<'fire' | 'earth' | 'air' | 'water', 'human' | 'computer' | 'off'>;
   hash?: string;
   query?: string;
 }

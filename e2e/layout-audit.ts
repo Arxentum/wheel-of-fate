@@ -101,7 +101,7 @@ for (const [w, h] of SIZES) {
     console.log(tag);
 
     // Setup, then a 4-player game with a human (a long character text: the High Priestess).
-    let page = await openPage(browser, lang, w, h, { fire: 'human', earth: 'ai', air: 'ai', water: 'ai' }, '#/', '?character=highPriestess.upright');
+    let page = await openPage(browser, lang, w, h, { fire: 'human', earth: 'computer', air: 'computer', water: 'computer' }, '#/', '?character=highPriestess.upright');
     await shoot(page, `${tag}-01-setup`, true);
     await startGame(page, t, 'audit-1');
     const meditate = page.getByRole('button', { name: t('decide.meditate'), exact: true });
@@ -137,7 +137,7 @@ for (const [w, h] of SIZES) {
     await page.close();
 
     // All computers, skipped to the end.
-    page = await openPage(browser, lang, w, h, { fire: 'ai', earth: 'ai', air: 'ai', water: 'ai' });
+    page = await openPage(browser, lang, w, h, { fire: 'computer', earth: 'computer', air: 'computer', water: 'computer' });
     await startGame(page, t, 'audit-3');
     await page.waitForTimeout(400);
     await page.getByRole('button', { name: t('game.skip') }).click();

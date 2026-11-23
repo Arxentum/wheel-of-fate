@@ -14,7 +14,7 @@ async function open(lang: string, hash: string): Promise<Page> {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   await page.addInitScript((l) => {
     localStorage.setItem('wof.lang', l);
-    localStorage.setItem('wof.setup', JSON.stringify({ seats: { fire: 'human', earth: 'ai', air: 'ai', water: 'off' }, laps: 3 }));
+    localStorage.setItem('wof.setup', JSON.stringify({ seats: { fire: 'human', earth: 'computer', air: 'computer', water: 'off' }, laps: 3 }));
   }, lang);
   await page.goto(base + hash);
   await page.waitForTimeout(900);

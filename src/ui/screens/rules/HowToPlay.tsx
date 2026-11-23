@@ -575,7 +575,7 @@ function ScreenSection({ t }: { t: T }) {
     'rules.screen.cards',
     'rules.screen.grey',
     'rules.screen.hotseat',
-    'rules.screen.ai',
+    'rules.screen.computer',
     'rules.screen.lang',
     'rules.screen.log',
     'rules.screen.rules',

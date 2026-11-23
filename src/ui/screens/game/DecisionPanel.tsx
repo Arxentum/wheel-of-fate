@@ -54,7 +54,7 @@ export function DecisionPanel({ c, v, ui, setUi, selected, setSelected }: Props)
     body = (
       <p className={`${styles.prompt} ${styles.thinking}`}>
         <Piece element={s.players[who]!.element} size={26} />
-        {s.players[who]!.controller === 'ai' ? t('game.aiPlaying', { player: playerName(t, s, who) }) : t('game.playing')}
+        {s.players[who]!.controller === 'computer' ? t('game.computerPlaying', { player: playerName(t, s, who) }) : t('game.playing')}
       </p>
     );
   } else {

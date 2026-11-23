@@ -4,7 +4,7 @@ import type { BalanceConfig, FaceKey, GameEvent, GameState, PlayerId, PlayerStat
 export interface ApplyOptions {
   /**
    * Stop as soon as the current player's Play step is over (before Flip), leaving
-   * `pending` null. Used by the AI to evaluate an action without moving on.
+   * `pending` null. Used by the computer players to evaluate an action without moving on.
    */
   haltAfterPlay?: boolean;
 }

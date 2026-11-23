@@ -1,8 +1,8 @@
-// Diagnostic (user request after M1): is a character's reversed skill really weak, or does the AI
+// Diagnostic (user request after M1): is a character's reversed skill really weak, or does the computer player
 // undervalue it? One player holds the character and always uses its reversed skill when it can;
-// the other players are default AIs. Compared with the same character played by the default AI.
+// the other players are default computer players. Compared with the same character played by the default computer player.
 import {
-  MAJORS, applyActionMut, canSpend, chooseAiAction, chooseAmong, createGame, enumerateActions,
+  MAJORS, applyActionMut, canSpend, chooseBotAction, chooseAmong, createGame, enumerateActions,
   type Action, type BalancePatch, type Element, type GameState, type MajorId, type PlayerId,
 } from '../engine';
 import { nextInt, seedFromString, shuffle } from '../engine/core/rng';
@@ -42,13 +42,13 @@ export function diagnoseReversed(games: number, seed: string, balance: BalancePa
         const { state } = createGame({
           laps, balance,
           players: els.map((element, i) => ({
-            controller: 'ai', element,
+            controller: 'computer', element,
             ...(i === hero ? { major, ...(forceReversed ? { orientation: 'reversed' as const } : {}) } : {}),
           })),
         }, `${seed}-${major}-game-${g}`);
         while (state.pending) {
           const forced = forceReversed ? reversedPolicy(state, hero) : null;
-          const ev = applyActionMut(state, forced ?? chooseAiAction(state));
+          const ev = applyActionMut(state, forced ?? chooseBotAction(state));
           for (const e of ev) if (e.t === 'play' && e.kind === 'skill' && e.p === hero && e.face?.endsWith('.reversed')) uses++;
         }
         const w = state.result!.winners;

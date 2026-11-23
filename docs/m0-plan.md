@@ -15,7 +15,7 @@
 | 实物照片 6 张 | 黑底金线星盘、白底卡牌、金属棋子。 |
 | Figma 最终版（已连上，只读） | **Game System Map**：12 格圆环，白羊座在正上方、顺时针；每格是元素色块 + 白色星座符号 + 英文名；中间米白圆盘上一颗八角罗盘星（红色竖、绿色横、蓝/黄斜），黑色圆心；「START HERE」标在白羊座旁。只有水瓶座涂成蓝色，其余 11 格和元素一致。**Turn Flow**：六个圆角卡片，黑色编号圆章 + 粗压缩标题 + 图标 + 一句说明，中间黑箭头。整体：米白底、黑色 01–11 编号方块、粗黑压缩标题字、红黄蓝黑几何装饰块。这些会作为 M3 的视觉参考。 |
 
-`GC7 塔罗奥德赛策划案.docx`、`技能.docx` 按你的要求没有当规则来源（规则书已经吸收了需要的部分）。
+`GC7 塔罗奥德赛策划案.docx`、`技能.docx` 按项目要求没有当规则来源（规则书已经吸收了需要的部分）。
 
 ---
 
@@ -62,9 +62,9 @@
 
 ## ② 歧义和冲突（摘要）
 
-完整的 50 条见 [decisions.md](decisions.md)，下面是**会改变玩法**、最需要你确认的几条：
+完整的 50 条见 [decisions.md](decisions.md)，下面是**会改变玩法**、最需要先定下来的几条：
 
-| # | 问题 | 我的处理 |
+| # | 问题 | 处理方式 |
 |---|---|---|
 | D-14 | 「每次向前越过白羊座 +2 FP」——被推回再走过去要不要再给？ | 只在第一次到达新的一圈时给（记最高圈数）。 |
 | D-30 | 世界正位「前进到双鱼座」+ 通用规则「不含当前格」：站在双鱼座会走 12 格。 | 站在双鱼座时不能用（置灰）。 |
@@ -128,9 +128,9 @@ D:\Tarot Game\web\
 │  │  │  └─ apply.ts      applyAction(state, action)：校验 → 执行 → 返回新状态和事件
 │  │  ├─ rules\           move.ts、status.ts、shield.ts、trap.ts、deck.ts、fp.ts、victory.ts
 │  │  ├─ effects\         minor.ts、court.ts、major.ts：每一面一个 resolve
-│  │  ├─ ai\              evaluate.ts（§12 估值）、bot.ts（chooseAction）
+│  │  ├─ bot\             evaluate.ts（§12 估值）、bot.ts（chooseAction）
 │  │  ├─ events.ts        事件类型（日志、动画、统计都从这里来）
-│  │  └─ index.ts         对外只导出 createGame / options / applyAction / chooseAiAction / 查询函数
+│  │  └─ index.ts         对外只导出 createGame / options / applyAction / chooseBotAction / 查询函数
 │  ├─ sim\                cli.ts、runGame.ts、stats.ts、report.ts（写 docs\balance-report.md）
 │  ├─ i18n\               en.json、zh-Hant.json、index.ts（t(key, params)、复数）
 │  ├─ ui\
@@ -199,7 +199,7 @@ interface Trap { sign: SignIndex; kind: 'chain' | 'illusion'; owner: PlayerId; s
 
 // ---- 玩家 ----
 interface PlayerState {
-  id: PlayerId; controller: 'human' | 'ai'; element: Element;
+  id: PlayerId; controller: 'human' | 'computer'; element: Element;
   progress: number;
   lapsRewarded: number;          // 已经拿过 +2 FP 的最高圈数（D-14）
   fp: number;
@@ -365,11 +365,11 @@ npm run sim -- --players 3 --laps 2 --games 500 --seed 42   # 单独跑一组
 
 | 里程碑 | 要点 |
 |---|---|
-| M1 引擎 + 电脑 + 模拟器 | 按 3.3–3.9 实现；先单元测试，后模拟器；报告给建议值和重跑结果，你同意后才改规则书。 |
-| M2 素材 | `scripts/build-cards.ts` 逐张裁插画（D-43），1x（约 400 宽）和 2x（原始宽度约 780）WebP；先出一张对比图给你看裁切边界。星盘做成 React 内的 SVG（12 段元素色 + 星座符号用 SVG 路径画，不依赖字体里的符号）；四元素图标用传统炼金术三角（火 △、水 ▽、风 △ 加横线、土 ▽ 加横线），棋子 = 元素色 + 元素符号，色弱也能分清。 |
+| M1 引擎 + 电脑 + 模拟器 | 按 3.3–3.9 实现；先单元测试，后模拟器；报告给建议值和重跑结果，确认后才改规则书。 |
+| M2 素材 | `scripts/build-cards.ts` 逐张裁插画（D-43），1x（约 400 宽）和 2x（原始宽度约 780）WebP；先出一张对比图检查裁切边界。星盘做成 React 内的 SVG（12 段元素色 + 星座符号用 SVG 路径画，不依赖字体里的符号）；四元素图标用传统炼金术三角（火 △、水 ▽、风 △ 加横线、土 ▽ 加横线），棋子 = 元素色 + 元素符号，色弱也能分清。 |
 | M3 可玩版本 | 开始画面、游戏画面（星盘、四个玩家面板、手牌、牌堆、六步指示、事件记录）、正逆位双面预览、置灰原因、遮挡交接画面、电脑回合动画和加速/跳过。 |
 | M4 双语与说明 | 中途切语言；玩法说明页；卡牌图鉴页。 |
-| M5 打磨与发布 | 1280×720 以上的笔记本和平板横屏；Playwright 全电脑对局冒烟测试 + 中英截图；`npm run build`；部署方式建议（部署前问你）；中文 README。 |
+| M5 打磨与发布 | 1280×720 以上的笔记本和平板横屏；Playwright 全电脑对局冒烟测试 + 中英截图；`npm run build`；部署方式建议（部署前先定平台）；中文 README。 |
 
 ## 5. 风险
 

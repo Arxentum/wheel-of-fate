@@ -34,9 +34,9 @@ function manualScheduler() {
 
 const allAi: GameSetup = {
   players: [
-    { controller: 'ai', element: 'fire' },
-    { controller: 'ai', element: 'earth' },
-    { controller: 'ai', element: 'air' },
+    { controller: 'computer', element: 'fire' },
+    { controller: 'computer', element: 'earth' },
+    { controller: 'computer', element: 'air' },
   ],
   laps: 1,
 };
@@ -80,7 +80,7 @@ describe('GameController', () => {
 
   it('waits for the human, then plays their action back', () => {
     const sch = manualScheduler();
-    const setup: GameSetup = { players: [{ controller: 'human', element: 'fire' }, { controller: 'ai', element: 'water' }], laps: 1 };
+    const setup: GameSetup = { players: [{ controller: 'human', element: 'fire' }, { controller: 'computer', element: 'water' }], laps: 1 };
     const c = new GameController(setup, 'ctl-3', { scheduler: sch });
     sch.flush();
     let v = c.getView();

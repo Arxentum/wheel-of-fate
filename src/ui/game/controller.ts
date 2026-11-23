@@ -1,7 +1,7 @@
 import {
   applyAction,
   checkAction,
-  chooseAiAction,
+  chooseBotAction,
   createGame,
   type Action,
   type Check,
@@ -98,7 +98,7 @@ interface Step {
 export interface ControllerOptions {
   scheduler?: Scheduler;
   timing?: Timing;
-  ai?: (s: GameState) => Action;
+  bot?: (s: GameState) => Action;
 }
 
 export class GameController {
@@ -106,7 +106,7 @@ export class GameController {
   private readonly listeners = new Set<() => void>();
   private readonly scheduler: Scheduler;
   private readonly timing: Timing;
-  private readonly ai: (s: GameState) => Action;
+  private readonly bot: (s: GameState) => Action;
   private queue: Step[] = [];
   private timer: unknown = null;
   private skipping = false;
@@ -117,7 +117,7 @@ export class GameController {
   constructor(setup: GameSetup, seed: string, opts: ControllerOptions = {}) {
     this.scheduler = opts.scheduler ?? realScheduler;
     this.timing = opts.timing ?? TIMING;
-    this.ai = opts.ai ?? ((s) => chooseAiAction(s));
+    this.bot = opts.bot ?? ((s) => chooseBotAction(s));
     const { state, events } = createGame(setup, seed);
     const humans = state.players.filter((p) => p.controller === 'human');
     this.view = {
@@ -336,9 +336,9 @@ export class GameController {
       return;
     }
     const decider = latest.players[d.player]!;
-    if (decider.controller === 'ai') {
+    if (decider.controller === 'computer') {
       this.set({ shown: latest, pieces, busy: true, moving: null });
-      this.schedule(() => this.apply(this.ai(this.view.latest)), this.timing.think);
+      this.schedule(() => this.apply(this.bot(this.view.latest)), this.timing.think);
       return;
     }
     // A human decides: stop skipping, and pass the device if several humans share it.

@@ -7,7 +7,7 @@ import { PAGE_HASH, SiteNav } from '../components/SiteNav';
 import { useLang } from '../hooks/useLang';
 import styles from './Setup.module.css';
 
-export type SeatMode = 'human' | 'ai' | 'off';
+export type SeatMode = 'human' | 'computer' | 'off';
 
 export interface SetupChoice {
   seats: Record<Element, SeatMode>;
@@ -17,7 +17,7 @@ export interface SetupChoice {
 
 const STORAGE_KEY = 'wof.setup';
 export const DEFAULT_SETUP: SetupChoice = {
-  seats: { fire: 'human', earth: 'ai', air: 'ai', water: 'off' },
+  seats: { fire: 'human', earth: 'computer', air: 'computer', water: 'off' },
   laps: 3,
   seed: '',
 };
@@ -28,7 +28,7 @@ export function loadSetup(): SetupChoice {
     if (!raw) return DEFAULT_SETUP;
     const saved = JSON.parse(raw) as Partial<SetupChoice>;
     const seats = { ...DEFAULT_SETUP.seats, ...(saved.seats ?? {}) };
-    for (const el of ELEMENTS) if (!['human', 'ai', 'off'].includes(seats[el])) seats[el] = DEFAULT_SETUP.seats[el];
+    for (const el of ELEMENTS) if (!['human', 'computer', 'off'].includes(seats[el])) seats[el] = DEFAULT_SETUP.seats[el];
     const laps = [1, 2, 3].includes(saved.laps ?? 0) ? saved.laps! : DEFAULT_SETUP.laps;
     return { seats, laps, seed: '' };
   } catch {
@@ -70,7 +70,7 @@ export function toGameSetup(c: SetupChoice): { setup: GameSetup; seed: string } 
   let given = false;
   const players: PlayerSetup[] = ELEMENTS.filter((el) => c.seats[el] !== 'off').map((element) => {
     const human = c.seats[element] === 'human';
-    const p: PlayerSetup = { element, controller: human ? 'human' : 'ai' };
+    const p: PlayerSetup = { element, controller: human ? 'human' : 'computer' };
     if (human && fixed && !given) {
       given = true;
       return { ...p, ...fixed };
@@ -145,7 +145,7 @@ export function Setup({ onStart }: { onStart: (choice: SetupChoice) => void }) {
                     onChange={(m) => setSeat(el, m)}
                     options={[
                       { value: 'human', label: t('setup.human') },
-                      { value: 'ai', label: t('setup.ai') },
+                      { value: 'computer', label: t('setup.computer') },
                       { value: 'off', label: t('setup.off') },
                     ]}
                   />
