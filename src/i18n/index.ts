@@ -1,45 +1,18 @@
 import en from './en.json';
 import zhHant from './zh-Hant.json';
+import { format, type Lang, type Params } from './format';
 
-export type Lang = 'en' | 'zh-Hant';
-export const LANGS: readonly Lang[] = ['en', 'zh-Hant'];
-export const DEFAULT_LANG: Lang = 'en';
+export { DEFAULT_LANG, LANGS, format, isLang, placeholders, type Lang, type Params } from './format';
 
 /** Every UI string has a key in en.json; zh-Hant.json must have the same keys (tests/i18n.test.ts). */
 export type MessageKey = keyof typeof en;
-export type Params = Record<string, string | number>;
 
 export const DICTIONARIES: Record<Lang, Record<MessageKey, string>> = {
   en,
   'zh-Hant': zhHant as Record<MessageKey, string>,
 };
 
-/**
- * Placeholders: `{name}` inserts a value; `{name|one|other}` inserts a number with the
- * singular or plural word ("1 space", "3 spaces"). Chinese messages only need `{name}`.
- */
-const PLACEHOLDER = /\{(\w+)(?:\|([^|}]*)\|([^|}]*))?\}/g;
-
-/** Names of the placeholders in a message, sorted, without duplicates. */
-export function placeholders(message: string): string[] {
-  return [...new Set([...message.matchAll(PLACEHOLDER)].map((m) => m[1]!))].sort();
-}
-
-export function format(message: string, params?: Params): string {
-  if (!params) return message;
-  return message.replace(PLACEHOLDER, (whole, name: string, one?: string, other?: string) => {
-    if (!(name in params)) return whole;
-    const value = params[name]!;
-    if (one === undefined) return String(value);
-    return `${value} ${Number(value) === 1 ? one : other}`;
-  });
-}
-
 export function translate(lang: Lang, key: MessageKey, params?: Params): string {
   const message = DICTIONARIES[lang][key] ?? DICTIONARIES.en[key] ?? key;
   return format(message, params);
-}
-
-export function isLang(value: unknown): value is Lang {
-  return typeof value === 'string' && (LANGS as readonly string[]).includes(value);
 }

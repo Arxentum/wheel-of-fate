@@ -111,9 +111,7 @@ function Choose(props: ChooseProps) {
                 <strong>
                   {t('decide.skill', { face: face.name })} · {t('decide.cost', { n: b.skillCost })}
                 </strong>
-                <p className={styles.optionText} title={face.text}>
-                  {face.text}
-                </p>
+                <ClampText text={face.text} />
                 {!skill.ok && <p className={styles.reasonLine}>{reasonText(t, s, skill.reason)}</p>}
               </div>
               <Button size="sm" variant="primary" disabled={!skill.ok} onClick={() => startSkill(props, skill)}>
@@ -391,5 +389,21 @@ function VeilPick(props: ChooseProps & { d: Extract<Decision, { kind: 'veil' }> 
         {t('decide.discard')}
       </Button>
     </div>
+  );
+}
+
+/** A long effect text cut to a few lines; a click or tap shows all of it. */
+function ClampText({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button
+      type="button"
+      className={open ? `${styles.optionText} ${styles.optionTextOpen}` : styles.optionText}
+      onClick={() => setOpen((o) => !o)}
+      aria-expanded={open}
+      title={text}
+    >
+      {text}
+    </button>
   );
 }

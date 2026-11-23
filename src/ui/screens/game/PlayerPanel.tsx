@@ -1,10 +1,10 @@
-import { FOREVER, faceKey, roundOrder, signOf, statusOf, type GameState, type PlayerId, type StatusKind } from '../../../engine';
+import { FOREVER, faceKey, roundOrder, signOf, type GameState, type PlayerId } from '../../../engine';
 import { ELEMENT_COLOR } from '../../art/colors';
 import { Piece } from '../../components/Piece';
 import { renderFace } from '../../game/cardText';
 import { signName } from '../../game/logText';
 import { useLang } from '../../hooks/useLang';
-import { tagFor } from './shared';
+import { activeStatuses, statusDesc, tagFor } from './shared';
 import styles from './Game.module.css';
 
 interface Props {
@@ -18,8 +18,6 @@ interface Props {
   onViewCharacter: () => void;
 }
 
-const STATUS_ORDER: StatusKind[] = ['shielded', 'wrongTurn', 'rooted', 'stunned', 'slowed', 'silenced', 'drained'];
-
 export function PlayerPanel({ s, id, active, targetable = false, onTarget, onViewCharacter }: Props) {
   const { t, lang } = useLang();
   const p = s.players[id]!;
@@ -31,8 +29,7 @@ export function PlayerPanel({ s, id, active, targetable = false, onTarget, onVie
   const skill = renderFace(lang, s.config.balance, s.players.length, face);
   const cooldown = p.lastSkillTurn !== null && p.lastSkillTurn >= p.turnNo - (active ? 1 : 0);
   const used = p.major === 'world' && p.onceUsed[p.orientation];
-  const statuses = STATUS_ORDER.map((k) => statusOf(p, k)).filter((st): st is NonNullable<typeof st> => !!st && st.until >= p.turnNo);
-  const immune = p.trapImmuneTurn !== null && p.trapImmuneTurn >= p.turnNo;
+  const { statuses, immune } = activeStatuses(s, id);
 
   return (
     <article
@@ -95,24 +92,21 @@ export function PlayerPanel({ s, id, active, targetable = false, onTarget, onVie
       </button>
 
       {(statuses.length > 0 || immune) && (
-        <ul className={styles.statuses}>
+        // A tap opens the character card with every status explained (no hover on a tablet).
+        <button type="button" className={styles.statuses} onClick={onViewCharacter} title={t('game.viewCard')}>
           {statuses.map((st) => (
-            <li
-              key={st.kind}
-              className={st.kind === 'shielded' ? styles.statusGood : styles.statusBad}
-              title={t(`status.${st.kind}.desc`, { n: st.amount ?? s.config.balance.cards['fool.reversed'].back ?? 2 })}
-            >
+            <span key={st.kind} className={st.kind === 'shielded' ? styles.statusGood : styles.statusBad} title={statusDesc(t, s, st.kind, st.amount)}>
               {t(`status.${st.kind}`)}
               {/* During your own turn, mark what only starts next turn. Off turn, everything shown is for your next turn. */}
               {active && st.kind !== 'shielded' && st.until < FOREVER && st.from > p.turnNo && <small>{t('game.statusNext')}</small>}
-            </li>
+            </span>
           ))}
           {immune && (
-            <li className={styles.statusGood} title={t('status.trapImmune.desc')}>
+            <span className={styles.statusGood} title={statusDesc(t, s, 'trapImmune')}>
               {t('status.trapImmune')}
-            </li>
+            </span>
           )}
-        </ul>
+        </button>
       )}
       </div>
     </article>

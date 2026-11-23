@@ -590,5 +590,8 @@
   "gallery.next": "下一張",
   "gallery.keys": "← → 切換上一張、下一張",
   "gallery.differs2p": "兩人局寫法不同",
-  "rules.cards.resonance": "共鳴：在與牌同元素的星座打出小阿爾克那，額外獲得 {n} 命運點。"
+  "rules.cards.resonance": "共鳴：在與牌同元素的星座打出小阿爾克那，額外獲得 {n} 命運點。",
+  "small.title": "建議使用較大的螢幕",
+  "small.text": "命運之輪是為筆電和橫放的平板設計的。請把平板轉成橫向，或用電腦開啟。",
+  "small.continue": "仍要繼續"
 }

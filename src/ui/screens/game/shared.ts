@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import type { Action, CardId, CardUid, GameState, PlayerId } from '../../../engine';
+import { statusOf, type Action, type CardId, type CardUid, type GameState, type PlayerId, type StatusKind } from '../../../engine';
 import type { GameController, GameView } from '../../game/controller';
 import type { MessageKey, Params } from '../../../i18n';
 
@@ -46,4 +46,19 @@ export function reasonText(t: T, s: GameState, reason: string | undefined): stri
   const b = s.config.balance;
   const n = reason === 'cannotReroll' ? b.rerollCost : reason === 'cannotBoost' ? b.boostCost : reason === 'cannotFlip' ? b.flipCost : 0;
   return t(`reason.${reason}` as MessageKey, { n, reach: b.trapReach > 0 ? b.trapReach : 12 });
+}
+
+const STATUS_ORDER: StatusKind[] = ['shielded', 'wrongTurn', 'rooted', 'stunned', 'slowed', 'silenced', 'drained'];
+
+/** The statuses a player has now (still to come or running), and whether traps cannot touch them. */
+export function activeStatuses(s: GameState, id: PlayerId) {
+  const p = s.players[id]!;
+  const statuses = STATUS_ORDER.map((k) => statusOf(p, k)).filter((st): st is NonNullable<typeof st> => !!st && st.until >= p.turnNo);
+  const immune = p.trapImmuneTurn !== null && p.trapImmuneTurn >= p.turnNo;
+  return { statuses, immune };
+}
+
+/** A status's description, with the Wrong Turn distance filled in. */
+export function statusDesc(t: T, s: GameState, kind: StatusKind | 'trapImmune', amount?: number): string {
+  return t(`status.${kind}.desc` as MessageKey, { n: amount ?? s.config.balance.cards['fool.reversed']?.back ?? 2 });
 }

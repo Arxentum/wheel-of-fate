@@ -4,6 +4,7 @@ import { Game } from './screens/game/Game';
 import { AssetPreview } from './screens/AssetPreview';
 import { GalleryPage } from './screens/gallery/Gallery';
 import { HowToPlayPage } from './screens/rules/HowToPlay';
+import { SmallScreenNotice } from './components/SmallScreenNotice';
 import { Setup, toGameSetup, type SetupChoice } from './screens/Setup';
 
 interface Running {
@@ -31,7 +32,7 @@ function useHash(): string {
  * `#/assets` the asset review page (milestone 2). A running game stays on screen; its
  * Rules button opens the rules and the cards over it.
  */
-export function App() {
+function Pages() {
   const hash = useHash();
   const [game, setGame] = useState<Running | null>(null);
   // The running controller lives outside React state updates, so it is created and disposed exactly once.
@@ -66,5 +67,14 @@ export function App() {
       onNewGame={leave}
       onRematch={() => start({ ...game.choice, seed: '' })}
     />
+  );
+}
+
+export function App() {
+  return (
+    <>
+      <Pages />
+      <SmallScreenNotice />
+    </>
   );
 }

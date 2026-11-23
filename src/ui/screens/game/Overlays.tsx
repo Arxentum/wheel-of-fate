@@ -21,7 +21,7 @@ import { renderFace } from '../../game/cardText';
 import { playerName } from '../../game/logText';
 import { cardSideOption } from '../../game/options';
 import { useLang } from '../../hooks/useLang';
-import { reasonText, targetOf, type T } from './shared';
+import { activeStatuses, reasonText, statusDesc, targetOf, type T } from './shared';
 import styles from './Game.module.css';
 
 /** Label of a court combo's fuel and/or target. */
@@ -67,6 +67,7 @@ export function CardInspector({ s, card, onPlay, onClose }: { s: GameState; card
                 className={opt.ok ? styles.faceBox : `${styles.faceBox} ${styles.faceOff}`}
                 onMouseEnter={() => setPreview(side)}
                 onFocus={() => setPreview(side)}
+                onClick={() => setPreview(side)}
               >
                 <h3>
                   <span className={styles.sideMark}>{side === 'upright' ? '▲' : '▼'}</span>
@@ -92,9 +93,14 @@ export function CardInspector({ s, card, onPlay, onClose }: { s: GameState; card
               </div>
             );
           })}
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            {t('decide.cancel')}
-          </Button>
+          <div className={styles.buttons}>
+            <Button size="sm" onClick={() => setPreview((p) => (p === 'upright' ? 'reversed' : 'upright'))}>
+              {t('game.turnCard')}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              {t('decide.cancel')}
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>
@@ -132,6 +138,7 @@ export function CardViewer({ s, id, turned, owner, onClose }: { s: GameState; id
               </div>
             );
           })}
+          {owner !== undefined && <StatusList s={s} owner={owner} />}
           <div className={styles.buttons}>
             <Button size="sm" onClick={() => setFlip((f) => !f)}>
               {t('game.turnCard')}
@@ -143,6 +150,27 @@ export function CardViewer({ s, id, turned, owner, onClose }: { s: GameState; id
         </div>
       </div>
     </Modal>
+  );
+}
+
+/** The owner's statuses with what each one does (the panels only show their names). */
+function StatusList({ s, owner }: { s: GameState; owner: PlayerId }) {
+  const { t } = useLang();
+  const { statuses, immune } = activeStatuses(s, owner);
+  if (statuses.length === 0 && !immune) return null;
+  const rows = [
+    ...statuses.map((st) => ({ kind: st.kind, good: st.kind === 'shielded', desc: statusDesc(t, s, st.kind, st.amount) })),
+    ...(immune ? [{ kind: 'trapImmune' as const, good: true, desc: statusDesc(t, s, 'trapImmune') }] : []),
+  ];
+  return (
+    <ul className={styles.statusList}>
+      {rows.map((r) => (
+        <li key={r.kind}>
+          <span className={r.good ? styles.statusGood : styles.statusBad}>{t(`status.${r.kind}`)}</span>
+          {r.desc}
+        </li>
+      ))}
+    </ul>
   );
 }
 

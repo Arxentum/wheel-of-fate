@@ -1,0 +1,35 @@
+.cover {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: var(--bg);
+}
+
+.box {
+  max-width: 420px;
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  border: var(--line-bold) solid var(--ink);
+  box-shadow: 8px 8px 0 var(--ink);
+  background: var(--paper);
+  padding: 24px;
+}
+
+.icon {
+  width: 80px;
+  height: 60px;
+}
+
+.box h2 {
+  font-size: 30px;
+  text-transform: uppercase;
+}
+
+.box p {
+  margin: 0;
+  font-size: 17px;
+}

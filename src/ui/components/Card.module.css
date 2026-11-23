@@ -239,9 +239,11 @@ button.selected:hover {
   line-height: 1.1;
   font-family: var(--font-label);
   font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.04em;
+  /* Narrow piles (58 px) still fit "Pentacles". */
+  font-size: min(14px, calc(var(--w) * 0.19));
+  letter-spacing: 0.02em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 html[lang='zh-Hant'] .miniPlate span {

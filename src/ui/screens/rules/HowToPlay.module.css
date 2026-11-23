@@ -708,3 +708,25 @@ html[lang='zh-Hant'] .h2 {
 html[lang='zh-Hant'] .embedded .title {
   font-size: 46px;
 }
+
+/* ---------- Tablets ---------- */
+@media (max-width: 1180px) {
+  .layout {
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 28px;
+    padding: 24px 24px 60px;
+  }
+
+  .boardBox {
+    width: 270px;
+  }
+
+  .row {
+    grid-template-columns: 46px 120px 1fr 1fr;
+    gap: 10px;
+  }
+
+  .thumb {
+    width: 46px;
+  }
+}

@@ -44,7 +44,7 @@
 
 ## 2. 全部界面文字
 
-### 页面与导航（9）
+### 页面与导航（12）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -57,6 +57,9 @@
 | `nav.play` | Play | 遊戲 |
 | `nav.rules` | How to Play | 玩法說明 |
 | `nav.cards` | Cards | 卡牌圖鑑 |
+| `small.title` | Best on a bigger screen | 建議使用較大的螢幕 |
+| `small.text` | Wheel of Fate is made for laptops and for tablets held sideways. Turn your tablet, or open the game on a computer. | 命運之輪是為筆電和橫放的平板設計的。請把平板轉成橫向，或用電腦開啟。 |
+| `small.continue` | Continue anyway | 仍要繼續 |
 
 ### 开始画面（18）
 

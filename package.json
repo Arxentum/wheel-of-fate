@@ -14,7 +14,9 @@
     "sim": "tsx src/sim/cli.ts",
     "cards": "tsx scripts/build-cards.ts",
     "check:cards": "tsx e2e/check-card-text.ts",
-    "terms": "tsx scripts/ui-terms.ts"
+    "terms": "tsx scripts/ui-terms.ts",
+    "e2e": "npm run build && playwright test",
+    "check:layout": "tsx e2e/layout-audit.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
