@@ -6,7 +6,8 @@ import { BOARD, pieceSpots, polar, signAngle } from '../../components/boardGeome
 import type { GameController } from '../../game/controller';
 import { EMOTE_PITCH, emoteWishes, replyTo, type EmoteId, type EmoteWish } from '../../game/emotes';
 import { fxFor, type FxPlan } from '../../fx/faceFx';
-import { IMPACT_MS, fxDuration, pieceReaction, type FxItem, type Point } from '../../fx/FxLayer';
+import { BOARD_SHAKE, IMPACT_MS, SHAKES, fxDuration, pieceReaction, type FxItem, type Point } from '../../fx/FxLayer';
+import { useLang } from '../../hooks/useLang';
 import { emoteStore } from '../../fx/emoteStore';
 
 export interface Bubble {
@@ -31,6 +32,9 @@ export function useFx(c: GameController, stage: RefObject<HTMLElement | null>) {
   const [items, setItems] = useState<FxItem[]>([]);
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const sayRef = useRef<(p: PlayerId, emote: EmoteId) => void>(() => {});
+  const { t } = useLang();
+  const tRef = useRef(t);
+  tRef.current = t;
 
   useEffect(() => {
     let seq = 0;
@@ -57,12 +61,14 @@ export function useFx(c: GameController, stage: RefObject<HTMLElement | null>) {
       const to: Point[] = plan.sign !== undefined ? [polar(BOARD.trapR, signAngle(plan.sign))] : plan.targets.map((t) => spots.get(t) ?? from);
       const hit = plan.sign !== undefined ? [] : plan.targets.map((t) => v.shown.players[t]!.element);
       const id = ++seq;
-      setItems((cur) => [...cur, { id, plan, from, to, hit, speed }]);
+      const label = plan.face ? `${tRef.current(`face.${plan.face}.name`)}${tRef.current('fx.bang')}` : undefined;
+      setItems((cur) => [...cur, { id, plan, from, to, hit, speed, ...(label ? { label } : {}) }]);
       later(() => setItems((cur) => cur.filter((x) => x.id !== id)), fxDuration(speed) + 250);
       const impact = IMPACT_MS[plan.fx] / speed;
       const el = v.shown.players[plan.targets[0] ?? plan.actor]!.element;
       sound().play([{ name: plan.sound, pan: panFor(el), delay: impact / 1000 }]);
       const frames = pieceReaction(plan);
+      if (SHAKES.has(plan.fx)) later(() => stage.current?.animate(BOARD_SHAKE, { duration: 380 / speed, easing: 'ease-out' }), impact);
       later(() => {
         for (const element of hit) {
           const token = stage.current?.querySelector(`[data-piece="${element}"] > g`);

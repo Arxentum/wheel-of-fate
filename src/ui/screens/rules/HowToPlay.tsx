@@ -27,6 +27,7 @@ import { ElementIcon } from '../../components/ElementIcon';
 import { Piece } from '../../components/Piece';
 import { PAGE_HASH, SiteNav } from '../../components/SiteNav';
 import { renderFace } from '../../game/cardText';
+import { tips } from '../../game/tips';
 import { useLang } from '../../hooks/useLang';
 import type { MessageKey } from '../../../i18n';
 import styles from './HowToPlay.module.css';
@@ -570,6 +571,24 @@ function WinSection({ t, laps }: { t: T; laps: number }) {
   );
 }
 
+function TipsAgain({ t }: { t: T }) {
+  const [done, setDone] = useState(false);
+  return (
+    <p className={styles.note}>
+      <Button
+        size="sm"
+        onClick={() => {
+          tips.reset();
+          setDone(true);
+        }}
+      >
+        {t('rules.tipsAgain')}
+      </Button>{' '}
+      {done && <span>{t('rules.tipsAgainDone')}</span>}
+    </p>
+  );
+}
+
 function ScreenSection({ t }: { t: T }) {
   const keys: MessageKey[] = [
     'rules.screen.cards',
@@ -579,15 +598,19 @@ function ScreenSection({ t }: { t: T }) {
     'rules.screen.lang',
     'rules.screen.sound',
     'rules.screen.emote',
+    'rules.screen.keys',
     'rules.screen.log',
     'rules.screen.rules',
   ];
   return (
-    <ul className={`${styles.bullets} ${styles.prose}`}>
-      {keys.map((k) => (
-        <li key={k}>{t(k)}</li>
-      ))}
-    </ul>
+    <>
+      <ul className={`${styles.bullets} ${styles.prose}`}>
+        {keys.map((k) => (
+          <li key={k}>{t(k)}</li>
+        ))}
+      </ul>
+      <TipsAgain t={t} />
+    </>
   );
 }
 

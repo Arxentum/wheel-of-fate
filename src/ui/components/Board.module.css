@@ -67,3 +67,41 @@
   font-family: var(--font-zh);
   letter-spacing: 0.1em;
 }
+
+/* Move preview */
+.movePreview {
+  pointer-events: none;
+}
+
+.movePath {
+  fill: var(--paper);
+  opacity: 0.38;
+}
+
+.moveLand {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 9;
+  animation: landPulse 1.1s ease-in-out infinite;
+}
+
+.moveBoost {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 6;
+  stroke-dasharray: 14 10;
+  opacity: 0.75;
+}
+
+.moveDanger {
+  fill: none;
+  stroke: var(--fire);
+  stroke-width: 9;
+  stroke-dasharray: 6 8;
+}
+
+@keyframes landPulse {
+  50% {
+    stroke-width: 14;
+  }
+}

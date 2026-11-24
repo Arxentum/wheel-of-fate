@@ -7,7 +7,7 @@
   height: calc(100dvh / var(--zoom));
   min-height: 680px;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
 }
 
@@ -109,7 +109,7 @@ html[lang='zh-Hant'] .brandName {
 
 .main {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(600px, 54%);
+  grid-template-columns: minmax(0, 1fr) minmax(600px, 52%);
   gap: 16px;
   padding: 12px 16px;
   min-height: 0;
@@ -123,11 +123,12 @@ html[lang='zh-Hant'] .brandName {
   justify-content: center;
 }
 
+/* Players, then the decision and the log, then the hand. */
 .side {
   min-height: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 12px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 10px;
 }
 
 .players {
@@ -647,6 +648,7 @@ html[lang='zh-Hant'] .charName {
   background: var(--paper);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
+  container: decision / inline-size;
 }
 
 .decisionHead {
@@ -659,7 +661,21 @@ html[lang='zh-Hant'] .charName {
 }
 
 .decisionHead .steps {
-  flex: 1 1 300px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@container decision (max-width: 500px) {
+  .step .stepName,
+  .stepDone .stepName {
+    display: none;
+  }
+}
+
+@container decision (max-width: 340px) {
+  .stepNow .stepName {
+    display: none;
+  }
 }
 
 .turnOf {
@@ -701,6 +717,7 @@ html[lang='zh-Hant'] .turnOf {
 .stepDone {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 3px;
   padding: 1px 3px;
   border: var(--line) solid var(--ink);
@@ -909,6 +926,36 @@ html[lang='zh-Hant'] .option strong {
   grid-template-rows: auto minmax(0, 1fr);
 }
 
+.logTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px 4px 10px;
+  border-bottom: var(--line) solid var(--ink);
+}
+
+.logFilter {
+  padding: 1px 7px;
+  border: var(--line) solid var(--ink);
+  background: var(--paper);
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+html[lang='zh-Hant'] .logFilter {
+  font-family: var(--font-zh);
+}
+
+.logFilterOn {
+  background: var(--ink);
+  color: var(--bg);
+}
+
 .log > .panelTitle {
   padding: 6px 10px;
   border-bottom: var(--line) solid var(--ink);
@@ -946,6 +993,23 @@ html[lang='zh-Hant'] .logHead {
 
 .logLine {
   margin: 0 0 2px;
+  padding-left: 7px;
+  border-left: 3px solid var(--who, transparent);
+}
+
+.logLine[data-tone]::before {
+  margin-right: 4px;
+  font-size: 10px;
+}
+
+.logLine[data-tone='up']::before {
+  content: '▲';
+  color: var(--air);
+}
+
+.logLine[data-tone='down']::before {
+  content: '▼';
+  color: var(--fire);
 }
 
 .logStrong {
@@ -953,36 +1017,43 @@ html[lang='zh-Hant'] .logHead {
 }
 
 /* ---------- Hand ---------- */
+/* The hand sits under the side column, so the board can take the whole height on the left. */
 .handBar {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr) auto;
-  gap: 16px;
-  align-items: center;
-  padding: 10px 16px 12px;
-  border-top: var(--line-bold) solid var(--ink);
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'title title' 'cards piles';
+  column-gap: 12px;
+  align-items: end;
+  padding: 6px 10px 8px;
+  border: var(--line-bold) solid var(--ink);
   background: var(--cream);
-  --mini-w: 92px;
+  --mini-w: 80px;
 }
 
 .handTitle {
-  display: grid;
-  gap: 6px;
-  align-self: start;
-  padding-top: 6px;
+  grid-area: title;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
 }
 
 .handHint {
   margin: 0;
   font-size: 13px;
   color: var(--mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .handCards {
+  grid-area: cards;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: flex-end;
-  min-height: 150px;
-  padding-top: 12px;
+  min-height: 132px;
+  padding-top: 14px;
   overflow-x: auto;
 }
 
@@ -994,9 +1065,10 @@ html[lang='zh-Hant'] .logHead {
 }
 
 .piles {
+  grid-area: piles;
   display: flex;
-  gap: 12px;
-  --mini-w: 70px;
+  gap: 10px;
+  --mini-w: 62px;
 }
 
 .pile {
@@ -1015,7 +1087,7 @@ html[lang='zh-Hant'] .logHead {
 }
 
 .emptyPile {
-  width: 70px;
+  width: 62px;
   aspect-ratio: 390 / 503;
   border: 3px dashed var(--mute);
   border-radius: 8px;
@@ -1161,7 +1233,7 @@ html[lang='zh-Hant'] .faceBox h3 {
 .over {
   display: grid;
   gap: 12px;
-  min-width: 460px;
+  min-width: 0;
 }
 
 .overTitle {
@@ -1190,7 +1262,7 @@ html[lang='zh-Hant'] .overWinner {
 
 .ranking li {
   display: grid;
-  grid-template-columns: 28px 30px 1fr auto auto auto;
+  grid-template-columns: 28px 30px minmax(0, 1fr) auto auto;
   gap: 10px;
   align-items: center;
   border: var(--line) solid var(--ink);
@@ -1219,6 +1291,12 @@ html[lang='zh-Hant'] .rankName {
   font-family: var(--font-zh);
 }
 
+.rankWho {
+  display: grid;
+  min-width: 0;
+  line-height: 1.15;
+}
+
 .rankCard {
   font-size: 13px;
   color: var(--mute);
@@ -1234,32 +1312,42 @@ html[lang='zh-Hant'] .rankName {
 /* ---------- Smaller laptop screens ---------- */
 @media (max-height: 800px) {
   .handBar {
-    --mini-w: 66px;
-    padding: 2px 16px 6px;
+    --mini-w: 62px;
+    padding: 4px 10px 6px;
   }
 
   .handCards {
-    min-height: 108px;
-    padding-top: 10px;
+    min-height: 104px;
+    padding-top: 12px;
   }
 
   .piles {
-    --mini-w: 58px;
+    --mini-w: 52px;
   }
 
   .emptyPile {
-    width: 58px;
+    width: 52px;
   }
 
   .player {
-    gap: 4px;
-    padding: 6px 8px 6px 14px;
+    gap: 3px;
+    padding: 4px 8px 5px 14px;
+  }
+
+  /* The decision panel already says what to do with the hand. */
+  .handTitle {
+    display: none;
+  }
+
+  .handCards {
+    min-height: 100px;
+    padding-top: 12px;
   }
 }
 
 @media (max-width: 1360px) {
   .main {
-    grid-template-columns: minmax(0, 1fr) minmax(560px, 58%);
+    grid-template-columns: minmax(0, 1fr) minmax(560px, 54%);
   }
 
   .lower {
@@ -1615,5 +1703,191 @@ html[lang='zh-Hant'] .bubble {
 
   .round {
     white-space: nowrap;
+  }
+}
+
+/* The emote button at the end of the decision header, next to the actions. */
+.headExtra {
+  margin-left: auto;
+  display: flex;
+}
+
+/* ---------- Hand: the card in full while the mouse rests on it ---------- */
+.handBar {
+  position: relative;
+}
+
+.handSlot {
+  display: flex;
+}
+
+.handPreview {
+  --card-w: 210px;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  z-index: 15;
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: previewIn 160ms var(--ease);
+}
+
+@keyframes previewIn {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+/* ---------- Results: ranking on the left, chart and stats on the right ---------- */
+.overGrid {
+  display: grid;
+  grid-template-columns: minmax(380px, 1fr) minmax(340px, 420px);
+  gap: 22px;
+  align-items: start;
+}
+
+.overStats {
+  display: grid;
+  gap: 6px;
+}
+
+.overHeading {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+html[lang='zh-Hant'] .overHeading {
+  font-family: var(--font-zh);
+}
+
+.chart {
+  width: 100%;
+  height: auto;
+  border: var(--line) solid var(--ink);
+  background: var(--paper);
+}
+
+.chartLabel {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 11px;
+  fill: var(--mute);
+}
+
+.statsTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--paper);
+  border: var(--line) solid var(--ink);
+  font-size: 13px;
+}
+
+.statsTable th,
+.statsTable td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--cream);
+  text-align: center;
+}
+
+.statsTable thead th {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  border-bottom: var(--line) solid var(--ink);
+}
+
+html[lang='zh-Hant'] .statsTable thead th {
+  font-family: var(--font-zh);
+}
+
+.statsTable tbody th {
+  width: 34px;
+}
+
+.statsTable td {
+  font-family: var(--font-title);
+  font-size: 17px;
+}
+
+.statBest {
+  background: var(--earth);
+}
+
+@media (max-width: 1100px) {
+  .overGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- First-game tips, over the decision panel ---------- */
+.lower {
+  position: relative;
+}
+
+.coach {
+  --log-share: calc(1 / 2.7);
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: calc((100% - 12px) * var(--log-share));
+  z-index: 12;
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  background: var(--earth);
+  border: var(--line-bold) solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  animation: coachIn 260ms var(--ease);
+}
+
+.coach::after {
+  content: '';
+  position: absolute;
+  left: -11px;
+  top: 16px;
+  width: 16px;
+  height: 16px;
+  background: var(--earth);
+  border-left: var(--line-bold) solid var(--ink);
+  border-bottom: var(--line-bold) solid var(--ink);
+  transform: rotate(45deg);
+}
+
+@media (max-width: 1360px) {
+  .coach {
+    --log-share: calc(1 / 2.6);
+  }
+}
+
+.coach strong {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+html[lang='zh-Hant'] .coach strong {
+  font-family: var(--font-zh);
+}
+
+.coach p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.coachButtons {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+@keyframes coachIn {
+  from {
+    opacity: 0;
+    translate: 10px 0;
   }
 }

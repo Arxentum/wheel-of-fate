@@ -92,7 +92,7 @@
 | `setup.start` | Start game | 開始遊戲 |
 | `setup.orderHint` | The first player moves on by one seat every round. | 每一輪的先手會輪到下一位。 |
 
-### 游戏画面（97）
+### 游戏画面（109）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -193,6 +193,18 @@
 | `emote.open` | Emotes | 表情 |
 | `emote.bots` | Computer players send emotes too | 電腦玩家也會發表情 |
 | `emote.wait` | Emotes are sent by the player holding the device: take over first. | 表情由拿著裝置的玩家發送：請先接手。 |
+| `fx.bang` | ! | ！ |
+| `game.logKey` | Key events | 只看重點 |
+| `tip.choose.title` | Pick one action | 選一個行動 |
+| `tip.choose` | Play a card from your hand (click it to see both sides), use your character’s skill, or meditate. One action a turn. | 從手牌打出一張（點它看兩面）、發動角色技能，或冥想。每回合只能選一個。 |
+| `tip.reversed.title` | Someone is ahead | 有人領先了 |
+| `tip.reversed` | Reversed sides hit the players ahead of you. Open a card and point at its reversed side to see what it does to them. | 逆位效果會打領先於你的玩家。打開一張牌，指到逆位那一面，看看它會怎麼打他們。 |
+| `tip.flip.title` | Flip your character? | 要翻轉角色嗎？ |
+| `tip.flip` | Optional: pay {flip\|Fate Point\|Fate Points} to turn your character over. The other side’s skill is ready from your next turn. | 可選：花 {flip} 命運點把角色卡翻面，另一面的技能從下個回合起可以用。 |
+| `tip.move.title` | Time to move | 該移動了 |
+| `tip.move` | The board marks where you will land. Move now, reroll for {reroll\|Fate Point\|Fate Points}, or boost +1 for {boost\|Fate Point\|Fate Points}. | 星盤上標出了你會停在哪裡。現在前進、花 {reroll} 命運點重擲，或花 {boost} 命運點加速 +1 格。 |
+| `tip.ok` | Got it | 知道了 |
+| `tip.off` | No more tips | 不再提示 |
 
 ### 状态（16）
 
@@ -364,7 +376,7 @@
 | `log.take` | {player} adds a card to their hand. | {player}把 1 張牌加入手牌。 |
 | `log.gameOver` | Game over. Winner: {winners}. | 遊戲結束。勝者：{winners}。 |
 
-### 热座与结算（14）
+### 热座与结算（23）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -382,8 +394,17 @@
 | `over.board` | See the board | 查看星盤 |
 | `over.show` | Results | 結果 |
 | `handoff.leave` | Leave this game | 離開這一局 |
+| `over.chart` | Progress by round | 每輪位置 |
+| `over.stats` | Game stats | 本局統計 |
+| `over.finish` | Finish | 終點 |
+| `over.lapLine` | Lap {n} | 第 {n} 圈 |
+| `over.stat.played` | Cards played | 出牌 |
+| `over.stat.hits` | Hits | 打退別人 |
+| `over.stat.lost` | Spaces lost | 被打退 |
+| `over.stat.gained` | FP gained | 獲得命運點 |
+| `over.stat.traps` | Traps sprung | 陷阱觸發 |
 
-### 玩法说明页（114）
+### 玩法说明页（117）
 
 | 键 | EN | 繁中 |
 |---|---|---|
@@ -501,6 +522,9 @@
 | `rules.cards.resonance` | Resonance: play a Minor card on a sign of its own element to gain {n\|more Fate Point\|more Fate Points}. | 共鳴：在與牌同元素的星座打出小阿爾克那，額外獲得 {n} 命運點。 |
 | `rules.screen.sound` | Set the music and the sound effects with the speaker button at the top of the screen. | 用畫面頂部的喇叭按鈕調整音樂和音效。 |
 | `rules.screen.emote` | Send an emote with the face button at the top. Computer players react on their own; you can turn that off there. | 用頂部的笑臉按鈕發表情。電腦玩家會自己看情況發，也可以在那裡關掉。 |
+| `rules.screen.keys` | Keyboard: M meditate, S skill, 1–9 open a card of your hand, ↑ / ↓ play its upright / reversed side, Space move or confirm, R reroll, B boost, F flip, Esc close. The keys are shown on the buttons. | 鍵盤：M 冥想、S 技能、1–9 打開第幾張手牌、↑ / ↓ 打出正位 / 逆位、空白鍵前進或確認、R 重擲、B 加速、F 翻轉、Esc 關閉。按鈕上會標出按鍵。 |
+| `rules.tipsAgain` | Show the first-game tips again | 重新顯示新手提示 |
+| `rules.tipsAgainDone` | They will show in your next game. | 下一局會再顯示。 |
 
 ### 卡牌图鉴页（28）
 

@@ -22,7 +22,22 @@ export interface FxItem {
   hit: string[];
   /** Playback speed: effects run faster at 2× and 4×. */
   speed: number;
+  /** The move's name, popping up where it lands ("Cut!"). */
+  label?: string;
 }
+
+/** Heavy hits shake the whole board. */
+export const SHAKES = new Set<Primitive>(['slash', 'stamp', 'bolt', 'wave', 'meteor']);
+
+/** The board shaking for a moment. */
+export const BOARD_SHAKE: Keyframe[] = [
+  { transform: 'translate(0, 0)' },
+  { transform: 'translate(-7px, 3px)', offset: 0.15 },
+  { transform: 'translate(6px, -4px)', offset: 0.35 },
+  { transform: 'translate(-4px, 2px)', offset: 0.6 },
+  { transform: 'translate(2px, -1px)', offset: 0.8 },
+  { transform: 'translate(0, 0)' },
+];
 
 /** When the effect lands, in milliseconds at 1× (its sound plays then). */
 export const IMPACT_MS: Record<Primitive, number> = {
@@ -52,7 +67,7 @@ function Icon({ name, color, size }: { name: IconName; color: string; size: numb
 const tr = (x: number, y: number, extra = '') => `translate(${x}px, ${y}px) ${extra}`.trim();
 
 /** Overall size of the effects (board units are 1080 across; a piece is 42). */
-const K = 1.7;
+const K = 2;
 
 /** Unit vector from a point towards the board's centre: "up" for effects, so they stay on the board. */
 function inward(at: Point): Point {
@@ -166,6 +181,39 @@ function Flight({ path, name, color, size, ms, delay, spin = 360 }: { path: Poin
   return (
     <Anim frames={frames} ms={ms} delay={delay} easing="cubic-bezier(.4,0,.6,1)">
       <Icon name={name} color={color} size={size} />
+    </Anim>
+  );
+}
+
+/** The move's name in big comic letters, where the effect lands. */
+function Word({ at, text, color, ms, delay }: { at: Point; text: string; color: string; ms: number; delay: number }) {
+  const [x, y] = up(at, 250);
+  const fill = color === '#111111' ? 'var(--paper)' : color;
+  return (
+    <Anim
+      ms={ms}
+      delay={delay}
+      frames={[
+        { transform: tr(x, y, 'rotate(-8deg) scale(0.2)'), opacity: 0 },
+        { transform: tr(x, y, 'rotate(-6deg) scale(1.18)'), opacity: 1, offset: 0.12 },
+        { transform: tr(x, y, 'rotate(-6deg) scale(1)'), opacity: 1, offset: 0.2 },
+        { transform: tr(x, y - 8, 'rotate(-6deg) scale(1)'), opacity: 1, offset: 0.78 },
+        { transform: tr(x, y - 24, 'rotate(-6deg) scale(0.95)'), opacity: 0 },
+      ]}
+    >
+      <text
+        x={0}
+        y={0}
+        textAnchor="middle"
+        dominantBaseline="central"
+        style={{ fontFamily: 'var(--font-title)', fontWeight: 900, fontSize: 76, letterSpacing: 2, paintOrder: 'stroke' }}
+        fill={fill}
+        stroke="var(--ink)"
+        strokeWidth={14}
+        strokeLinejoin="round"
+      >
+        {text}
+      </text>
     </Anim>
   );
 }
@@ -562,6 +610,15 @@ export function FxLayer({ items }: { items: readonly FxItem[] }) {
       {items.map((item) => (
         <g key={item.id}>
           <Effect item={item} />
+          {item.label && (
+            <Word
+              at={item.to[0] ?? item.from}
+              text={item.label}
+              color={item.plan.color}
+              ms={fxDuration(item.speed) * 0.95}
+              delay={IMPACT_MS[item.plan.fx] / Math.max(1, item.speed)}
+            />
+          )}
         </g>
       ))}
     </svg>

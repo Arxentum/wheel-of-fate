@@ -29,6 +29,8 @@ for (const lang of LANGS) {
       const dialog = page.getByRole('dialog', { name: t('over.title') });
       await expect(dialog).toBeVisible({ timeout: 60_000 });
       await expect(dialog.getByText(pattern(t, 'over.winner')).or(dialog.getByText(pattern(t, 'over.winners')))).toBeVisible();
+      await expect(dialog.getByRole('img', { name: t('over.chart') })).toBeVisible();
+      await expect(dialog.getByRole('table')).toBeVisible();
       await shot(page, `${tag}-03-game-over`);
 
       await dialog.getByRole('button', { name: t('over.board') }).click();
@@ -92,10 +94,10 @@ for (const lang of LANGS) {
       await b.move.click();
       // Earth's turn: the device is passed and Fire's hand is covered.
       await expect(page.getByRole('heading', { name: t('handoff.title', { player: t('player.earth') }) })).toBeVisible({ timeout: 20_000 });
-      await expect(page.getByText(t('game.handHidden'))).toBeVisible();
+      await expect(page.getByText(t('game.handHiddenHint'))).toBeVisible();
       await shot(page, `${tag}-08-hot-seat`);
       await b.handoff.click();
-      await expect(page.getByText(t('game.yourHand', { player: t('player.earth') }))).toBeVisible();
+      await expect(page.getByRole('region', { name: t('game.hand') }).getByRole('button').first()).toBeVisible();
       await expect(b.meditate).toBeVisible();
       expect(errors).toEqual([]);
     });
@@ -215,6 +217,30 @@ test.describe('sound', () => {
     await page.reload();
     await page.getByRole('button', { name: t('sound.open') }).click();
     await expect(page.getByRole('dialog', { name: t('sound.open') }).getByRole('button', { pressed: false })).toHaveText(t('sound.off'));
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('keyboard', () => {
+  const t = tr('en');
+
+  test('a whole turn can be played from the keyboard', async ({ page }) => {
+    const errors = watchErrors(page);
+    await openApp(page, { lang: 'en', seats: { fire: 'human', earth: 'computer', air: 'off', water: 'off' } });
+    await startGame(page, t, 'smoke-keys');
+    const b = turnButtons(page, t);
+    await expect(b.meditate).toBeVisible({ timeout: 20_000 });
+    await page.keyboard.press('m');
+    await expect(b.keep).toBeVisible({ timeout: 10_000 });
+    await page.keyboard.press(' ');
+    await expect(b.move).toBeVisible({ timeout: 10_000 });
+    await page.keyboard.press(' ');
+    // The computer's turn, then Fire again: a number key opens a card of the hand.
+    await expect(b.meditate).toBeVisible({ timeout: 30_000 });
+    await page.keyboard.press('1');
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 });

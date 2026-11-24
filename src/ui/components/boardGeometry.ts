@@ -27,6 +27,14 @@ export const BOARD = {
 
 export const SIGN_SPAN = 30;
 
+/** Where a move would go (drawn on the board): signs passed, landing sign, landing with a boost, traps in the way. */
+export interface MovePreview {
+  path: number[];
+  land: number;
+  boostLand?: number;
+  danger: number[];
+}
+
 /** Centre angle of a sign in degrees (0 = Aries at 12 o'clock is -90°). */
 export function signAngle(sign: number): number {
   return -90 + sign * SIGN_SPAN;

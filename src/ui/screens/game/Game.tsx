@@ -5,6 +5,7 @@ import { LangSwitch } from '../../components/LangSwitch';
 import { SoundButton } from '../../components/SoundButton';
 import { EmoteButton } from '../../components/EmoteButton';
 import { useFx } from './useFx';
+import { saveSpeed } from '../../game/speedStore';
 import { useGameSound, useMusicScene } from '../../audio/useSound';
 import type { GameController, Speed } from '../../game/controller';
 import { cardSideOption, skillOption } from '../../game/options';
@@ -17,8 +18,10 @@ import { CardInspector, CardViewer, GameOver, Handoff } from './Overlays';
 import { PlayerPanel } from './PlayerPanel';
 import { Reference } from './Reference';
 import { TurnBanner } from './TurnBanner';
+import { Coach } from './Coach';
 import { useTableFx } from './useTableFx';
 import { turnOnScreen } from '../../game/tableFx';
+import { movePreviewFor } from '../../game/movePreview';
 import { targetOf, useGameView, type UiMode } from './shared';
 import styles from './Game.module.css';
 
@@ -111,6 +114,7 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
   useMusicScene(over ? 'menu' : s.finalRound ? 'final' : 'game');
   // Playback starts once the sounds and table effects above are listening.
   useEffect(() => c.start(), [c]);
+  useShortcuts();
 
   return (
     <div className={styles.game}>
@@ -134,13 +138,15 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
             size="sm"
             label={t('game.speed')}
             value={v.speed}
-            onChange={(sp) => c.setSpeed(sp)}
+            onChange={(sp) => {
+              c.setSpeed(sp);
+              saveSpeed(sp);
+            }}
             options={[1, 2, 4].map((n) => ({ value: n as Speed, label: `${n}×` }))}
           />
           <Button size="sm" variant="ghost" onClick={() => c.skip()} disabled={!v.busy || v.handoffTo !== null} title={t('game.skipTitle')}>
             {t('game.skip')}
           </Button>
-          <EmoteButton disabled={v.viewer === null} onSend={(e) => v.viewer !== null && cardFx.sendEmote(v.viewer, e)} />
           <SoundButton />
           <Button size="sm" onClick={() => openRules(true)} title={t('game.rulesTitle')}>
             {t('game.rules')}
@@ -165,6 +171,7 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
             s={s}
             activePlayer={turnNow}
             fx={cardFx.items}
+            movePreview={d?.kind === 'move' ? movePreviewFor(v.latest, d.player) : null}
             bubbles={cardFx.bubbles}
             stageRef={stageRef}
             pieces={v.pieces}
@@ -193,6 +200,7 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
             })}
           </div>
           <div className={styles.lower}>
+            <Coach s={v.latest} active={actNow} />
             <DecisionPanel
               c={c}
               v={v}
@@ -201,21 +209,22 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
               selected={selected}
               setSelected={setSelected}
               onShowResults={over && !overOpen ? () => setOverOpen(true) : undefined}
+              extra={<EmoteButton disabled={v.viewer === null} onSend={(e) => v.viewer !== null && cardFx.sendEmote(v.viewer, e)} />}
             />
             <LogPanel s={s} items={v.log} />
           </div>
+          <Hand
+            s={s}
+            viewer={v.viewer}
+            clickable={(uid) => (discardMode ? true : playable.has(uid))}
+            dimmed={(uid) => !!playMode && !playable.has(uid)}
+            selected={selected}
+            onCard={onCard}
+            hint={handHint}
+          />
         </div>
       </main>
 
-      <Hand
-        s={s}
-        viewer={v.viewer}
-        clickable={(uid) => (discardMode ? true : playable.has(uid))}
-        dimmed={(uid) => !!playMode && !playable.has(uid)}
-        selected={selected}
-        onCard={onCard}
-        hint={handHint}
-      />
 
       {ui.kind === 'inspect' && actNow && (
         <CardInspector s={v.latest} card={ui.card} onClose={() => setUi({ kind: 'idle' })} onPlay={act} />
@@ -225,7 +234,41 @@ export function Game({ controller: c, seed, onNewGame, onRematch }: Props) {
       )}
       {v.handoffTo !== null && !v.busy && <Handoff s={v.latest} to={v.handoffTo} onReady={() => c.takeOver()} onLeave={onNewGame} />}
       {rulesOpen && <Reference s={v.latest} onClose={() => openRules(false)} />}
-      {over && overOpen && <GameOver s={v.latest} seed={seed} onAgain={onRematch} onNew={onNewGame} onClose={() => setOverOpen(false)} />}
+      {over && overOpen && (
+        <GameOver s={v.latest} seed={seed} events={v.log.map((i) => i.event)} onAgain={onRematch} onNew={onNewGame} onClose={() => setOverOpen(false)} />
+      )}
     </div>
   );
+}
+
+/**
+ * Keyboard: a key presses the button that carries it (data-key), inside the open dialog if
+ * there is one; 1–9 open the cards of the hand.
+ */
+function useShortcuts(): void {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      const k = e.key === ' ' ? 'space' : e.key === 'ArrowUp' ? 'up' : e.key === 'ArrowDown' ? 'down' : e.key.toLowerCase();
+      const dialog = document.querySelector('[role="dialog"][aria-modal="true"]');
+      if (!dialog && /^[1-9]$/.test(k)) {
+        const slot = document.querySelectorAll('[data-hand-card]')[Number(k) - 1];
+        const card = slot?.querySelector<HTMLButtonElement>('button:not([disabled])');
+        if (card) {
+          e.preventDefault();
+          card.click();
+        }
+        return;
+      }
+      const button = (dialog ?? document).querySelector<HTMLButtonElement>(`[data-key="${k}"]:not([disabled])`);
+      if (button) {
+        e.preventDefault();
+        button.click();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GameController } from './game/controller';
+import { loadSpeed } from './game/speedStore';
 import { Game } from './screens/game/Game';
 import { AssetPreview } from './screens/AssetPreview';
 import { GalleryPage } from './screens/gallery/Gallery';
@@ -45,6 +46,7 @@ function Pages() {
     current.current?.dispose();
     const { setup, seed } = toGameSetup(choice);
     const controller = new GameController(setup, seed, { autoStart: false });
+    controller.setSpeed(loadSpeed());
     current.current = controller;
     setGame({ controller, choice, seed, n: ++count.current });
   }, []);

@@ -4,7 +4,7 @@ import type { Element, TrapKind } from '../../engine/types';
 import { ELEMENT_COLOR, ELEMENT_ON_COLOR } from '../art/colors';
 import { TRAP_PATHS, ZODIAC_PATHS } from '../art/glyphs';
 import { useLang } from '../hooks/useLang';
-import { BOARD, SIGN_SPAN, kitePath, pieceSpots, polar, readableTurn, signAngle, wedgePath } from './boardGeometry';
+import { BOARD, SIGN_SPAN, kitePath, pieceSpots, polar, readableTurn, signAngle, wedgePath, type MovePreview } from './boardGeometry';
 import { PieceToken } from './Piece';
 import styles from './Board.module.css';
 
@@ -32,7 +32,11 @@ interface BoardProps {
   selectable?: readonly number[];
   onSelectSign?: (sign: number) => void;
   className?: string;
+  /** Where the current move would go: the signs passed, where it lands, where a boost lands, traps on the way. */
+  movePreview?: MovePreview | null;
 }
+
+export type { MovePreview } from './boardGeometry';
 
 /** Compass star colours: the vertical points fire, horizontal air, diagonals earth and water. */
 const STAR_LONG: [number, Element][] = [
@@ -48,7 +52,7 @@ const STAR_SHORT: [number, Element][] = [
   [45, 'water'],
 ];
 
-export function Board({ pieces = [], traps = [], activeId, selectable = [], onSelectSign, className }: BoardProps) {
+export function Board({ pieces = [], traps = [], activeId, selectable = [], onSelectSign, className, movePreview }: BoardProps) {
   const { t, lang } = useLang();
   const half = BOARD.half;
   // Slide a piece only when it moves to a neighbouring sign; a longer jump (a skip, a big push)
@@ -140,6 +144,33 @@ export function Board({ pieces = [], traps = [], activeId, selectable = [], onSe
           </g>
         );
       })}
+
+      {/* Move preview: the way along the track, the landing sign (and with a boost), traps in the way */}
+      {movePreview && (
+        <g className={styles.movePreview} aria-hidden="true">
+          {movePreview.path.map((sign) => {
+            const mid = signAngle(sign);
+            return <path key={`p${sign}`} d={wedgePath(BOARD.trackLine + 2, BOARD.ringOuter - 2, mid - SIGN_SPAN / 2 + 1, mid + SIGN_SPAN / 2 - 1)} className={styles.movePath} />;
+          })}
+          {movePreview.boostLand !== undefined && (
+            <path
+              d={wedgePath(BOARD.ringInner + 5, BOARD.ringOuter - 5, signAngle(movePreview.boostLand) - SIGN_SPAN / 2 + 1.5, signAngle(movePreview.boostLand) + SIGN_SPAN / 2 - 1.5)}
+              className={styles.moveBoost}
+            />
+          )}
+          <path
+            d={wedgePath(BOARD.ringInner + 5, BOARD.ringOuter - 5, signAngle(movePreview.land) - SIGN_SPAN / 2 + 1.5, signAngle(movePreview.land) + SIGN_SPAN / 2 - 1.5)}
+            className={styles.moveLand}
+          />
+          {movePreview.danger.map((sign) => (
+            <path
+              key={`d${sign}`}
+              d={wedgePath(BOARD.ringInner + 5, BOARD.ringOuter - 5, signAngle(sign) - SIGN_SPAN / 2 + 1.5, signAngle(sign) + SIGN_SPAN / 2 - 1.5)}
+              className={styles.moveDanger}
+            />
+          ))}
+        </g>
+      )}
 
       {/* Track line, rim and the edge of the disc */}
       <circle r={BOARD.trackLine} fill="none" stroke="var(--bg)" strokeWidth={2} opacity={0.6} pointerEvents="none" />

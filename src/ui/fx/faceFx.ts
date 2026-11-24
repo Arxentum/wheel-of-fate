@@ -130,6 +130,8 @@ export const FACE_FX: Record<FaceKey, FaceFx> = {
 export const MEDITATE_FX: FaceFx = { fx: 'aura', icon: 'lantern', color: EARTH, sound: 'shine' };
 
 export interface FxPlan extends FaceFx {
+  /** The card side played (none for meditating). */
+  face?: FaceKey;
   actor: PlayerId;
   /** Players hit (the actor for upright sides). */
   targets: PlayerId[];
@@ -145,8 +147,9 @@ export interface FxPlan extends FaceFx {
 export function fxFor(play: Extract<GameEvent, { t: 'play' }>, s: GameState): FxPlan | null {
   if (play.kind === 'meditate') return { ...MEDITATE_FX, actor: play.p, targets: [play.p], side: 'upright' };
   if (!play.face) return null;
-  const fx = FACE_FX[play.face];
-  const side = splitFace(play.face)[1];
+  const face = play.face;
+  const fx = { ...FACE_FX[face], face };
+  const side = splitFace(face)[1];
   if (side === 'upright') return { ...fx, actor: play.p, targets: [play.p], side };
   if (play.sign !== undefined) return { ...fx, actor: play.p, targets: [], sign: play.sign, side };
   const targets = play.targets ?? (play.target !== undefined ? [play.target] : playersAhead(s, play.p));

@@ -13,7 +13,11 @@ interface ButtonProps {
   className?: string;
   type?: 'button' | 'submit';
   autoFocus?: boolean;
+  /** Keyboard shortcut ('m', 'space', 'up' …): pressed by the game's key handler, shown on the button. */
+  shortcut?: string;
 }
+
+const KEY_LABEL: Record<string, string> = { space: '␣', up: '↑', down: '↓' };
 
 /** A thick-bordered button; a disabled one says why under it. */
 export function Button({
@@ -27,6 +31,7 @@ export function Button({
   className,
   type = 'button',
   autoFocus,
+  shortcut,
 }: ButtonProps) {
   const button = (
     <button
@@ -37,8 +42,14 @@ export function Button({
       aria-disabled={disabled}
       title={title ?? (disabled ? reason : undefined)}
       autoFocus={autoFocus}
+      data-key={shortcut}
     >
       {children}
+      {shortcut && (
+        <kbd className={styles.kbd} aria-hidden="true">
+          {KEY_LABEL[shortcut] ?? shortcut.toUpperCase()}
+        </kbd>
+      )}
     </button>
   );
   if (!disabled || !reason) return button;

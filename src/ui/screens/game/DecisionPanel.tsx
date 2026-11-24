@@ -35,9 +35,11 @@ interface Props {
   setSelected: (cards: CardUid[]) => void;
   /** After the game, when the results were closed: shows them again. */
   onShowResults?: () => void;
+  /** Extra control at the end of the header (the emote button). */
+  extra?: React.ReactNode;
 }
 
-export function DecisionPanel({ c, v, ui, setUi, selected, setSelected, onShowResults }: Props) {
+export function DecisionPanel({ c, v, ui, setUi, selected, setSelected, onShowResults, extra }: Props) {
   const { t } = useLang();
   const s = v.latest;
   const shown = v.shown;
@@ -53,6 +55,7 @@ export function DecisionPanel({ c, v, ui, setUi, selected, setSelected, onShowRe
         {playerName(t, shown, turnPlayer)}
       </span>
       <TurnSteps step={step} />
+      {extra && <span className={styles.headExtra}>{extra}</span>}
     </header>
   );
 
@@ -147,7 +150,7 @@ function Choose(props: ChooseProps) {
                 <ClampText text={face.text} />
                 {!skill.ok && <p className={styles.reasonLine}>{reasonText(t, s, skill.reason)}</p>}
               </div>
-              <Button size="sm" variant="primary" disabled={!skill.ok} onClick={() => startSkill(props, skill)}>
+              <Button size="sm" variant="primary" disabled={!skill.ok} onClick={() => startSkill(props, skill)} shortcut="s">
                 {t('decide.useSkill')}
               </Button>
             </div>
@@ -157,7 +160,7 @@ function Choose(props: ChooseProps) {
                 <strong>{t('decide.meditate')}</strong>
                 <p>{t('decide.meditateText', { draw: b.meditateDraw, fp: b.meditateFp })}</p>
               </div>
-              <Button size="sm" disabled={!meditate.ok} onClick={() => c.act({ type: 'meditate' })}>
+              <Button size="sm" disabled={!meditate.ok} onClick={() => c.act({ type: 'meditate' })} shortcut="m">
                 {t('decide.meditate')}
               </Button>
             </div>
@@ -170,7 +173,7 @@ function Choose(props: ChooseProps) {
         <div className={styles.choose}>
           <p className={styles.prompt}>{t('decide.conjure', { n: d.left })}</p>
           <p className={styles.sub}>{t('decide.conjureHint')}</p>
-          <Button variant="primary" onClick={() => c.act({ type: 'conjurePlay', play: null })}>
+          <Button variant="primary" onClick={() => c.act({ type: 'conjurePlay', play: null })} shortcut="space">
             {t('decide.conjureDone')}
           </Button>
         </div>
@@ -193,10 +196,10 @@ function Choose(props: ChooseProps) {
             {next.text}
           </p>
           <div className={styles.buttons}>
-            <Button variant="primary" onClick={() => c.act({ type: 'flip', flip: false })}>
+            <Button variant="primary" onClick={() => c.act({ type: 'flip', flip: false })} shortcut="space">
               {t('decide.keep', { side: t(`side.${me.orientation}`) })}
             </Button>
-            <Button disabled={!flip.ok} reason={reasonText(t, s, flip.reason)} onClick={() => c.act({ type: 'flip', flip: true })}>
+            <Button disabled={!flip.ok} reason={reasonText(t, s, flip.reason)} onClick={() => c.act({ type: 'flip', flip: true })} shortcut="f">
               {t('decide.flipTo', { side: t(`side.${other}`), n: b.flipCost })}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => props.setUi({ kind: 'view', id: me.major, turned: me.orientation === 'reversed', owner: me.id })}>
@@ -218,13 +221,13 @@ function Choose(props: ChooseProps) {
             {s.turn.boosted ? ` ${t('decide.boosted')}` : ''}
           </p>
           <div className={styles.buttons}>
-            <Button variant="primary" onClick={() => c.act({ type: 'confirmMove' })} autoFocus>
+            <Button variant="primary" onClick={() => c.act({ type: 'confirmMove' })} autoFocus shortcut="space">
               {t('decide.move', { n: steps })}
             </Button>
-            <Button disabled={!reroll.ok} reason={reasonText(t, s, reroll.reason)} onClick={() => c.act({ type: 'reroll' })}>
+            <Button disabled={!reroll.ok} reason={reasonText(t, s, reroll.reason)} onClick={() => c.act({ type: 'reroll' })} shortcut="r">
               {t('decide.reroll', { n: b.rerollCost })}
             </Button>
-            <Button disabled={!boost.ok} reason={reasonText(t, s, boost.reason)} onClick={() => c.act({ type: 'boost' })}>
+            <Button disabled={!boost.ok} reason={reasonText(t, s, boost.reason)} onClick={() => c.act({ type: 'boost' })} shortcut="b">
               {t('decide.boost', { n: b.boostCost })}
             </Button>
           </div>
@@ -302,14 +305,14 @@ function SkillPick(props: ChooseProps) {
     pick = (
       <>
         <p className={styles.sub}>{t('decide.selectDiscard', { n: selected.length })}</p>
-        <Button variant="primary" disabled={!check.ok} reason={check.ok ? undefined : reasonText(t, s, check.reason)} onClick={() => c.act(action)}>
+        <Button variant="primary" disabled={!check.ok} reason={check.ok ? undefined : reasonText(t, s, check.reason)} onClick={() => c.act(action)} shortcut="space">
           {t('decide.useWithDiscard', { n: selected.length })}
         </Button>
       </>
     );
   } else
     pick = (
-      <Button variant="primary" onClick={() => c.act(skill.actions[0]!)} autoFocus>
+      <Button variant="primary" onClick={() => c.act(skill.actions[0]!)} autoFocus shortcut="space">
         {t('decide.useSkill')}
       </Button>
     );
@@ -394,7 +397,7 @@ function ForesightPick(props: ChooseProps & { d: Extract<Decision, { kind: 'fore
           );
         })}
       </div>
-      <Button variant="primary" disabled={!check.ok} reason={check.ok ? undefined : reasonText(t, s, check.reason)} onClick={() => c.act(action)}>
+      <Button variant="primary" disabled={!check.ok} reason={check.ok ? undefined : reasonText(t, s, check.reason)} onClick={() => c.act(action)} shortcut="space">
         {t('decide.confirm')}
       </Button>
     </div>
@@ -418,7 +421,7 @@ function VeilPick(props: ChooseProps & { d: Extract<Decision, { kind: 'veil' }> 
           <MiniCard key={u} id={cardDef(u)} selected={pick.includes(u)} onClick={() => toggle(u)} />
         ))}
       </div>
-      <Button variant="primary" disabled={!ok} reason={ok ? undefined : t('decide.selectExactly', { n: d.count })} onClick={() => c.act(action)}>
+      <Button variant="primary" disabled={!ok} reason={ok ? undefined : t('decide.selectExactly', { n: d.count })} onClick={() => c.act(action)} shortcut="space">
         {t('decide.discard')}
       </Button>
     </div>

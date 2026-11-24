@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { gameStats } from '../../game/stats';
+import { ProgressChart, StatsTable } from './GameStats';
 import {
   SUIT_ELEMENT,
   cardDef,
@@ -8,6 +10,7 @@ import {
   type Action,
   type CardId,
   type CardUid,
+  type GameEvent,
   type GameState,
   type Orientation,
   type PlayerId,
@@ -75,7 +78,7 @@ export function CardInspector({ s, card, onPlay, onClose }: { s: GameState; card
                 </h3>
                 <p>{face.text}</p>
                 {opt.ok && !several && (
-                  <Button variant="primary" onClick={() => onPlay(opt.actions[0]!)}>
+                  <Button variant="primary" onClick={() => onPlay(opt.actions[0]!)} shortcut={side === 'upright' ? 'up' : 'down'}>
                     {t('decide.playSide', { side: t(`side.${side}`) })}
                   </Button>
                 )}
@@ -185,7 +188,7 @@ export function Handoff({ s, to, onReady, onLeave }: { s: GameState; to: PlayerI
         <Piece element={el} size={120} />
         <h2>{t('handoff.title', { player: playerName(t, s, to) })}</h2>
         <p>{t('handoff.text')}</p>
-        <Button variant="primary" size="lg" onClick={onReady} autoFocus>
+        <Button variant="primary" size="lg" onClick={onReady} autoFocus shortcut="space">
           {t('handoff.ready', { player: playerName(t, s, to) })}
         </Button>
         <Button variant="ghost" size="sm" onClick={onLeave}>
@@ -197,12 +200,29 @@ export function Handoff({ s, to, onReady, onLeave }: { s: GameState; to: PlayerI
 }
 
 /** Final ranking. */
-export function GameOver({ s, seed, onAgain, onNew, onClose }: { s: GameState; seed: string; onAgain: () => void; onNew: () => void; onClose: () => void }) {
+export function GameOver({
+  s,
+  seed,
+  events,
+  onAgain,
+  onNew,
+  onClose,
+}: {
+  s: GameState;
+  seed: string;
+  /** The whole game's events (for the statistics). */
+  events: readonly GameEvent[];
+  onAgain: () => void;
+  onNew: () => void;
+  onClose: () => void;
+}) {
   const { t } = useLang();
   const r = s.result!;
+  const stats = useMemo(() => gameStats(events, s.players.length), [events, s.players.length]);
   let place = 1;
   return (
-    <Modal onClose={onClose} label={t('over.title')}>
+    <Modal onClose={onClose} label={t('over.title')} size="wide">
+      <div className={styles.overGrid}>
       <div className={styles.over}>
         <h2 className={styles.overTitle}>{t('over.title')}</h2>
         <p className={styles.overWinner}>
@@ -218,8 +238,10 @@ export function GameOver({ s, seed, onAgain, onNew, onClose }: { s: GameState; s
                 <li key={id} className={r.winners.includes(id) ? styles.rankWin : undefined}>
                   <span className={styles.rankPlace}>{place}</span>
                   <Piece element={p.element} size={30} />
-                  <span className={styles.rankName}>{playerName(t, s, id)}</span>
-                  <span className={styles.rankCard}>{t(`card.${p.major}`)}</span>
+                  <span className={styles.rankWho}>
+                    <span className={styles.rankName}>{playerName(t, s, id)}</span>
+                    <span className={styles.rankCard}>{t(`card.${p.major}`)}</span>
+                  </span>
                   <span className={styles.rankStat}>{t('over.progress', { n: p.progress, finish: s.config.finish })}</span>
                   <span className={styles.rankStat}>{t('over.fp', { n: p.fp })}</span>
                 </li>
@@ -239,6 +261,13 @@ export function GameOver({ s, seed, onAgain, onNew, onClose }: { s: GameState; s
             {t('over.board')}
           </Button>
         </div>
+      </div>
+      <div className={styles.overStats}>
+        <h3 className={styles.overHeading}>{t('over.chart')}</h3>
+        <ProgressChart s={s} stats={stats} />
+        <h3 className={styles.overHeading}>{t('over.stats')}</h3>
+        <StatsTable s={s} stats={stats} />
+      </div>
       </div>
     </Modal>
   );
